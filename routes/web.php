@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 // Root redirect ke dashboard
 Route::get('/', fn () => redirect()->route('dashboard'));
 
+// Cek Pesanan (Public)
+Route::get('/cek-pesanan', [\App\Http\Controllers\TrackOrderController::class, 'index'])->name('cek-pesanan');
+
 Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
     // --- Dashboard ---

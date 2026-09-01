@@ -115,6 +115,16 @@ export default function Login({ status, canResetPassword }) {
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="mt-8 text-center border-t border-gray-100 pt-6">
+                <p className="text-sm text-gray-500 mb-4">Apakah Anda pelanggan?</p>
+                <Link
+                    href={route('cek-pesanan')}
+                    className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 border border-brand-200 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 hover:bg-brand-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors"
+                >
+                    Lacak Pesanan Anda
+                </Link>
+            </div>
         </GuestLayout>
     );
 }

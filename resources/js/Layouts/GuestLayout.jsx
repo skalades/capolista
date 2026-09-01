@@ -1,7 +1,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
 
-export default function GuestLayout({ children }) {
+export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' }) {
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* Left Panel - Branding (Hidden on mobile) */}
@@ -30,7 +30,7 @@ export default function GuestLayout({ children }) {
 
             {/* Right Panel - Form */}
             <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:w-1/2 lg:px-20 xl:px-24">
-                <div className="mx-auto w-full max-w-sm lg:w-96">
+                <div className={`mx-auto w-full ${maxWidth}`}>
                     <div className="lg:hidden mb-8 text-center">
                         <Link href="/" className="inline-flex flex-col items-center gap-2">
                             <div className="h-16 w-16 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg">
