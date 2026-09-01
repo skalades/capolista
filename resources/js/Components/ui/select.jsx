@@ -1,0 +1,1 @@
+export const Select = (props) => <div {...props} />; export const SelectContent = (props) => <div {...props} />; export const SelectItem = (props) => <div {...props} />; export const SelectTrigger = (props) => <div {...props} />; export const SelectValue = (props) => <div {...props} />

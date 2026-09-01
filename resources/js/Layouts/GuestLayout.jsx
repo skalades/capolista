@@ -1,0 +1,47 @@
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import { Link } from '@inertiajs/react';
+
+export default function GuestLayout({ children }) {
+    return (
+        <div className="flex min-h-screen bg-gray-50">
+            {/* Left Panel - Branding (Hidden on mobile) */}
+            <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-brand-900 p-12 relative overflow-hidden">
+                {/* Decorative background elements */}
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-600/20 to-brand-900/80 z-0"></div>
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-brand-500 rounded-full blur-3xl opacity-20"></div>
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-brand-400 rounded-full blur-3xl opacity-20"></div>
+
+                <div className="relative z-10">
+                    <Link href="/" className="inline-flex items-center gap-3">
+                        <ApplicationLogo className="h-10 w-10 text-white" />
+                        <span className="text-2xl font-bold tracking-wider text-white">CAPOLISTA</span>
+                    </Link>
+                </div>
+                
+                <div className="relative z-10 mb-12">
+                    <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+                        Sistem Manajemen <br /> Order & Produksi
+                    </h1>
+                    <p className="text-brand-100 text-lg max-w-md">
+                        Pantau progres desain, printing, dan pemasangan dalam satu platform terintegrasi.
+                    </p>
+                </div>
+            </div>
+
+            {/* Right Panel - Form */}
+            <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:w-1/2 lg:px-20 xl:px-24">
+                <div className="mx-auto w-full max-w-sm lg:w-96">
+                    <div className="lg:hidden mb-8 text-center">
+                        <Link href="/" className="inline-flex flex-col items-center gap-2">
+                            <div className="h-16 w-16 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <ApplicationLogo className="h-10 w-10 text-white" />
+                            </div>
+                            <span className="text-2xl font-bold tracking-wider text-gray-900">CAPOLISTA</span>
+                        </Link>
+                    </div>
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+}

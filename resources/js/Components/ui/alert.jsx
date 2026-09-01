@@ -1,0 +1,1 @@
+export const Alert = (props) => <div className='bg-blue-100 p-4 rounded' {...props} />; export const AlertDescription = (props) => <div {...props} />; export const AlertTitle = (props) => <div className='font-bold' {...props} />

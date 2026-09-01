@@ -1,0 +1,322 @@
+# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+# Sistem Manajemen Konveksi Multi-Level Berbasis Divisi
+## CAPOLISTA APPAREL
+
+**Versi Dokumen:** 1.0
+**Tanggal:** 31 Agustus 2026
+**Status:** Draft
+**Disusun untuk:** Capolista Apparel (UMKM Konveksi)
+
+---
+
+## 1. RINGKASAN EKSEKUTIF
+
+Capolista Apparel membutuhkan sebuah sistem manajemen internal berbasis digital untuk mengelola alur kerja produksi konveksi (kaus/apparel custom) secara terstruktur, mulai dari order masuk, proses desain, printing, pemasangan, hingga quality control dan pengiriman ke customer. Sistem ini dirancang dengan pendekatan **multi-level akses berdasarkan divisi**, sehingga setiap divisi hanya melihat dan mengerjakan tugas sesuai tanggung jawabnya, sementara manajemen/owner memiliki visibilitas penuh atas seluruh proses.
+
+Tujuan utama sistem ini adalah menghilangkan miskomunikasi antar divisi, mempercepat proses produksi, memberikan transparansi status order kepada customer maupun owner, serta menyediakan data untuk pengambilan keputusan bisnis.
+
+---
+
+## 2. LATAR BELAKANG & MASALAH
+
+### 2.1 Kondisi Saat Ini
+- Proses order, desain, printing, dan pemasangan masih dikoordinasikan secara manual (grup chat, catatan kertas, atau spreadsheet terpisah).
+- Tidak ada sistem terpusat untuk melacak status order secara real-time.
+- Owner kesulitan memantau progres produksi tanpa harus bertanya langsung ke tiap divisi.
+- Rawan terjadi kesalahan data (ukuran, jumlah, desain) karena berpindah tangan antar divisi tanpa dokumentasi digital.
+- Sulit menghitung kapasitas produksi, beban kerja tiap divisi, dan performa (siapa yang sering telat, dsb).
+
+### 2.2 Masalah yang Ingin Diselesaikan
+1. Tidak ada standar alur kerja digital antar divisi (Desain → Printing → Pemasangan → QC → Packing).
+2. Tidak ada sistem approval/hand-off yang jelas antar divisi.
+3. Owner/manajemen tidak punya dashboard untuk melihat status seluruh order secara real-time.
+4. Data pelanggan, order, dan riwayat produksi tidak terpusat.
+5. Tidak ada pelacakan kinerja per divisi/karyawan.
+
+---
+
+## 3. TUJUAN PRODUK (GOALS)
+
+1. Menyediakan satu sistem terpusat untuk mengelola seluruh alur produksi konveksi dari order hingga selesai.
+2. Memberikan akses berjenjang (multi-level) sesuai peran/divisi sehingga setiap pengguna hanya melihat data yang relevan dengan tugasnya.
+3. Memberikan visibilitas penuh kepada Owner/Admin atas seluruh proses dan performa bisnis.
+4. Mempercepat proses hand-off antar divisi dengan notifikasi otomatis.
+5. Menyediakan riwayat dan laporan (produksi, keuangan dasar, kinerja divisi) untuk pengambilan keputusan.
+
+### 3.1 Non-Goals (Di Luar Cakupan Versi Ini)
+- Sistem akuntansi penuh (general ledger, pajak, dsb) — cukup pencatatan transaksi dasar.
+- E-commerce/toko online untuk publik (fokus internal, bukan customer-facing marketplace).
+- Integrasi otomatis dengan marketplace (Shopee/Tokopedia) — dapat menjadi roadmap fase berikutnya.
+
+---
+
+## 4. TARGET PENGGUNA & STRUKTUR MULTI-LEVEL
+
+Sistem menggunakan **Role-Based Access Control (RBAC)** dengan level akses bertingkat sebagai berikut:
+
+| Level | Role | Deskripsi Akses |
+|---|---|---|
+| **Level 0** | **Superadmin** | Kontrol teknis penuh atas sistem (bukan operasional bisnis). Biasanya dipegang developer/IT internal. Bisa mengatur role & permission, konfigurasi sistem, backup/restore, audit log seluruh user, integrasi teknis, dan reset akses darurat. |
+| **Level 1** | **Owner/Direktur** | Akses penuh ke semua data, laporan, dan dashboard bisnis. Bisa melihat seluruh divisi, namun tidak mengurus konfigurasi teknis sistem. |
+| **Level 2** | **Admin/Manajer Operasional** | Mengelola order masuk, assign ke divisi, memantau seluruh alur produksi, membuat laporan. |
+| **Level 3** | **Kepala Divisi** (Produksi, Desain, Printing, Pemasangan, Pembelian, Gudang, Keuangan & Akuntansi, Pemasaran) | Mengelola tim & pekerjaan dalam divisinya, approve/reject hasil kerja staf, update status ke level berikutnya. |
+| **Level 4** | **Staf/Operator Divisi** | Mengerjakan tugas yang di-assign, update progres tugas masing-masing, upload bukti kerja (foto/file). |
+| **Level 5** | **Customer (opsional/read-only)** | Melihat status order miliknya saja, tanpa bisa mengubah data (fitur opsional untuk fase 2). |
+
+### 4.1 Daftar Divisi dalam Sistem
+1. **Divisi Penjualan/Pemasaran** — input order baru, data customer, follow-up
+2. **Divisi Produksi** — koordinator/supervisor keseluruhan proses produksi (mengawasi & menyinkronkan Desain, Printing, Pemasangan agar berjalan sesuai jadwal)
+3. **Divisi Desain** — pembuatan & approval mockup desain
+4. **Divisi Printing/Produksi Cetak** — sablon/DTF/DTG, quality control cetakan
+5. **Divisi Pemasangan/Aplikasi** — heat press, curing, QC akhir
+6. **Divisi Pembelian/Procurement** — pengadaan bahan baku, manajemen supplier, purchase order (PO)
+7. **Divisi Gudang & Logistik** — stok bahan baku, stok opname, packing, pengiriman
+8. **Divisi Keuangan & Akuntansi** — pencatatan pembayaran, invoice, biaya produksi, laporan laba rugi dasar
+9. **Divisi HR/Personalia** *(opsional, bisa fase 2)* — data karyawan, absensi
+
+> **Catatan:** Divisi Produksi bersifat koordinatif — bertugas memantau progres Desain → Printing → Pemasangan secara keseluruhan, menyelesaikan bottleneck antar sub-divisi, dan melapor ke Admin/Owner. Divisi Desain, Printing, dan Pemasangan tetap berjalan sebagai unit kerja teknis masing-masing.
+
+---
+
+## 5. ALUR KERJA SISTEM (BUSINESS PROCESS FLOW)
+
+```
+[Customer Order] 
+      ↓
+[Divisi Pemasaran] → Input data order (jenis kaus, jumlah, desain, deadline, DP)
+      ↓
+[Divisi Desain] → Buat/upload mockup → Approval Customer/Owner
+      ↓ (approved)
+[Divisi Pembelian/Procurement] → Cek ketersediaan bahan baku → PO ke supplier bila stok kurang
+      ↓
+[Divisi Produksi] → Koordinasi & jadwalkan pengerjaan ke Printing dan Pemasangan
+      ↓
+[Divisi Printing] → Proses cetak (sablon/DTF/DTG) → Update status "Selesai Cetak"
+      ↓
+[Divisi Pemasangan] → Heat press/curing → QC → Update status "Selesai Pasang"
+      ↓
+[Divisi Gudang] → Packing → Update status "Siap Kirim"
+      ↓
+[Pengiriman ke Customer] → Update status "Selesai/Delivered"
+      ↓
+[Divisi Keuangan & Akuntansi] → Update pelunasan pembayaran → Order Closed
+```
+
+Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya dan ke Admin/Owner.
+
+> **Catatan:** Alur Pembelian/Procurement hanya aktif jika bahan baku untuk order tersebut kurang dari stok minimum; jika stok mencukupi, proses bisa langsung lanjut dari Desain ke Produksi tanpa menunggu PO.
+
+---
+
+## 6. FITUR UTAMA PER MODUL
+
+### 6.1 Modul Superadmin (Kontrol Teknis Sistem)
+- Kelola master role & permission (membuat/mengubah struktur hak akses tiap role, bukan sekadar assign user)
+- Kelola konfigurasi umum sistem (nama perusahaan, logo, format invoice, dll)
+- Kelola struktur divisi (tambah/hapus/ubah divisi tanpa perlu development ulang)
+- Kelola integrasi teknis (API key, integrasi pihak ketiga)
+- Reset akses darurat (reset password/unlock akun user manapun jika terjadi masalah login)
+- Monitoring kesehatan sistem (uptime, error log, kapasitas penyimpanan)
+
+### 6.2 Modul Dashboard (Owner & Admin)
+- Ringkasan jumlah order aktif, selesai, terlambat
+- Grafik produksi per divisi (beban kerja, waktu rata-rata pengerjaan)
+- Grafik omzet & status pembayaran (lunas/DP/belum bayar)
+- Notifikasi order yang mendekati deadline atau macet di satu divisi
+
+### 6.3 Modul Manajemen Order
+- Input order baru (nama customer, kontak, jenis produk, jumlah, ukuran, desain, deadline, harga, DP)
+- Nomor order otomatis & tracking status real-time
+- Riwayat perubahan status (log/timeline order)
+- Upload file pendukung (desain, referensi, bukti pembayaran)
+
+### 6.4 Modul Divisi Produksi (Koordinator)
+- Dashboard progres seluruh order yang sedang berjalan di Desain, Printing, dan Pemasangan
+- Penjadwalan & alokasi target harian/mingguan per sub-divisi
+- Deteksi bottleneck (order yang tertahan lama di satu tahap)
+- Laporan kapasitas produksi vs jumlah order masuk
+- Eskalasi otomatis ke Admin/Owner bila ada order berisiko telat
+
+### 6.5 Modul Divisi Desain
+- Daftar tugas desain yang masuk dari order
+- Upload mockup, revisi, dan versi desain
+- Status: Menunggu, Dikerjakan, Revisi, Disetujui
+- Approval dari Admin/Customer sebelum lanjut ke Printing
+
+### 6.6 Modul Divisi Printing
+- Daftar order yang sudah di-approve desainnya
+- Input jenis metode cetak (sablon manual/DTF/DTG), jumlah warna, estimasi waktu
+- Checklist quality control hasil cetak (foto sebagai bukti)
+- Update status ke "Selesai Cetak"
+
+### 6.7 Modul Divisi Pemasangan
+- Daftar order siap pasang
+- Input parameter proses (suhu heat press, waktu curing)
+- Checklist QC akhir (kerekatan, kerapian, kebersihan)
+- Update status ke "Selesai Pasang"
+
+### 6.8 Modul Divisi Pembelian/Procurement
+- Daftar kebutuhan bahan baku otomatis (berdasarkan order yang masuk & sisa stok)
+- Manajemen data supplier (nama, kontak, harga, riwayat transaksi)
+- Pembuatan Purchase Order (PO) ke supplier
+- Tracking status PO (dipesan, dikirim, diterima)
+- Perbandingan harga antar supplier untuk bahan yang sama
+- Riwayat pembelian per periode (untuk evaluasi supplier terbaik)
+
+### 6.9 Modul Divisi Gudang & Logistik
+- Manajemen stok bahan baku (kain, tinta, film DTF, dll) — stok masuk/keluar
+- Checklist packing per order
+- Input data pengiriman (kurir, resi, tanggal kirim)
+- Peringatan stok menipis (low stock alert)
+- **Stok Opname:**
+  - Jadwal opname periodik (mingguan/bulanan) atau manual sewaktu-waktu
+  - Form input hasil hitung stok fisik oleh staf gudang
+  - Perbandingan otomatis stok sistem vs stok fisik, menampilkan selisih
+  - Kolom catatan alasan selisih (rusak, susut, salah input, hilang, dll)
+  - Approval penyesuaian stok oleh Kepala Divisi Gudang/Admin
+  - Riwayat & log hasil opname untuk audit dan analisa tren selisih dari waktu ke waktu
+
+### 6.10 Modul Divisi Keuangan & Akuntansi
+- Pencatatan pembayaran (DP, pelunasan)
+- Generate invoice otomatis per order
+- Rekap biaya produksi vs harga jual (margin sederhana)
+- Laporan kas masuk/keluar harian, mingguan, bulanan
+- Pencatatan biaya pembelian bahan baku (terhubung dengan modul Procurement)
+- Laporan laba rugi sederhana per periode (pendapatan − biaya produksi − biaya operasional)
+- Rekap piutang customer (order yang belum lunas)
+
+### 6.11 Modul Manajemen Pengguna & Hak Akses
+- Tambah/edit/nonaktifkan akun pengguna
+- Assign role & divisi per pengguna
+
+### 6.12 Modul Laporan & Analitik
+- Laporan produksi per periode
+- Laporan performa per divisi/karyawan (jumlah tugas selesai, rata-rata waktu pengerjaan, keterlambatan)
+- Laporan penjualan & keuangan dasar
+- Laporan hasil stok opname & selisih stok
+- Export laporan ke Excel/PDF
+
+### 6.13 Modul Notifikasi
+- Notifikasi in-app untuk hand-off antar divisi
+- Notifikasi deadline mendekat/terlewat
+
+---
+
+## 7. USER STORIES (CONTOH)
+
+| ID | Sebagai | Saya ingin | Agar |
+|---|---|---|---|
+| US-01 | Staf Pemasaran | menginput order baru dengan detail lengkap | data order tercatat rapi dan bisa langsung diteruskan ke Desain |
+| US-02 | Kepala Divisi Desain | melihat daftar tugas desain yang masuk | bisa membagi tugas ke staf desain |
+| US-03 | Staf Desain | upload mockup dan menandai status "siap approval" | Admin/Customer bisa segera mengecek dan menyetujui |
+| US-04 | Staf Printing | melihat order yang sudah disetujui desainnya | langsung bisa mulai proses cetak tanpa menunggu info manual |
+| US-05 | Kepala Divisi Pemasangan | approve hasil kerja stafnya sebelum lanjut ke gudang | kualitas terjaga sebelum sampai ke customer |
+| US-06 | Owner | melihat dashboard status semua order secara real-time | bisa mengambil keputusan cepat tanpa menanyakan satu per satu |
+| US-07 | Staf Gudang | mendapat notifikasi otomatis saat order siap packing | proses packing & pengiriman tidak tertunda |
+| US-08 | Staf Keuangan & Akuntansi | melihat status pembayaran tiap order | bisa follow-up pelunasan ke customer tepat waktu |
+| US-09 | Kepala Divisi Produksi | melihat progres semua order di Desain, Printing, dan Pemasangan dalam satu layar | bisa mendeteksi order yang berisiko telat lebih awal |
+| US-10 | Staf Pembelian/Procurement | mendapat daftar kebutuhan bahan baku otomatis dari sistem | tidak perlu mengecek manual stok yang menipis |
+| US-11 | Staf Gudang | melakukan stok opname dan mencatat selisih stok fisik vs sistem | data stok selalu akurat dan penyebab selisih terdokumentasi |
+| US-12 | Owner | melihat laporan laba rugi sederhana per periode | bisa mengevaluasi kesehatan bisnis secara berkala |
+| US-13 | Superadmin | mengatur hak akses & menambah divisi baru langsung dari sistem | struktur organisasi bisa berubah tanpa perlu development ulang |
+
+---
+
+## 8. FUNCTIONAL REQUIREMENTS
+
+1. Sistem harus mendukung minimal 5 level role dengan hak akses berbeda.
+2. Sistem harus mencatat log setiap perubahan status order (siapa, kapan, status apa).
+3. Sistem harus mengirim notifikasi otomatis saat status order berubah/berpindah divisi.
+4. Sistem harus memungkinkan upload file (gambar/dokumen) di setiap tahap.
+5. Sistem harus menyediakan dashboard ringkasan berbeda sesuai role (Owner melihat semua, Kepala Divisi melihat divisinya, Staf melihat tugasnya sendiri).
+6. Sistem harus dapat menghasilkan laporan (produksi, keuangan, kinerja) dalam format yang bisa diunduh.
+7. Sistem harus memiliki fitur pencarian & filter order (berdasarkan status, customer, tanggal, divisi).
+8. Sistem harus mendukung multi-user secara bersamaan tanpa konflik data.
+
+---
+
+## 9. NON-FUNCTIONAL REQUIREMENTS
+
+| Kategori | Requirement |
+|---|---|
+| **Performa** | Waktu load halaman < 3 detik untuk operasi normal |
+| **Keamanan** | Autentikasi login (username/password, opsional 2FA), enkripsi data sensitif |
+| **Skalabilitas** | Mendukung penambahan divisi/role baru tanpa perombakan besar |
+| **Ketersediaan** | Uptime sistem minimal 99% (jika berbasis cloud/web) |
+| **Kompatibilitas** | Dapat diakses via browser desktop & mobile (responsive web) |
+| **Usability** | Antarmuka sederhana, mudah dipakai oleh staf non-teknis |
+
+---
+
+## 10. GAMBARAN DATA UTAMA (ENTITAS)
+
+- **User** (id, nama, email, role, divisi, level_akses [0=Superadmin, 1=Owner, 2=Admin, 3=Kepala Divisi, 4=Staf, 5=Customer], status aktif)
+- **Order** (id, no_order, customer_id, tanggal_order, deadline, status, total_harga, dp, sisa_bayar)
+- **Customer** (id, nama, kontak, alamat, riwayat_order)
+- **Desain** (id, order_id, file_mockup, versi, status_approval)
+- **Produksi_Printing** (id, order_id, metode_cetak, tanggal_mulai, tanggal_selesai, status_qc)
+- **Produksi_Pemasangan** (id, order_id, tanggal_proses, status_qc)
+- **Stok_Bahan** (id, nama_bahan, jumlah_stok, satuan, minimum_stok)
+- **Supplier** (id, nama, kontak, alamat, daftar_bahan_yang_disediakan)
+- **Purchase_Order** (id, supplier_id, tanggal_po, daftar_bahan, jumlah, harga, status_po)
+- **Stok_Opname** (id, tanggal, bahan_id, stok_sistem, stok_fisik, selisih, keterangan, status_approval)
+- **Pembayaran** (id, order_id, jumlah, tanggal, metode, status)
+
+---
+
+## 11. REKOMENDASI TEKNOLOGI (OPSIONAL)
+
+Karena ini sistem internal UMKM dengan kebutuhan multi-user & multi-role, opsi yang bisa dipertimbangkan:
+
+- **Web App berbasis cloud**: lebih mudah diakses semua divisi dari device masing-masing (HP/laptop) tanpa instalasi.
+- **Database terpusat**: agar semua divisi bekerja dengan data yang sama secara real-time.
+- **Skala bertahap**: bisa dimulai dari versi sederhana (order tracking + role akses) sebelum menambah modul keuangan/laporan lanjutan.
+
+*(Pemilihan platform/tech stack spesifik sebaiknya didiskusikan dengan tim developer sesuai budget dan target rilis.)*
+
+---
+
+## 12. METRIK KEBERHASILAN (SUCCESS METRICS)
+
+1. Pengurangan waktu rata-rata proses order (dari masuk hingga selesai) minimal 20-30%.
+2. Pengurangan kesalahan produksi akibat miskomunikasi antar divisi.
+3. Owner dapat memantau status seluruh order tanpa perlu bertanya manual ke tiap divisi.
+4. Tersedianya laporan performa divisi secara berkala (mingguan/bulanan).
+5. Tingkat adopsi sistem oleh seluruh divisi minimal 90% dalam 1 bulan setelah peluncuran.
+
+---
+
+## 13. ASUMSI & RISIKO
+
+**Asumsi:**
+- Seluruh staf memiliki akses ke smartphone/komputer untuk mengoperasikan sistem.
+- Ada pelatihan singkat untuk staf sebelum sistem digunakan penuh.
+
+**Risiko:**
+- Resistensi staf yang terbiasa cara manual → mitigasi dengan pelatihan & pendampingan awal.
+- Data lama (order sebelumnya) tidak tercatat digital → perlu proses migrasi/input manual data historis penting.
+- Ketergantungan pada koneksi internet jika berbasis cloud.
+
+---
+
+## 14. ROADMAP PENGEMBANGAN (SARAN BERTAHAP)
+
+| Fase | Fokus | Estimasi |
+|---|---|---|
+| **Fase 1 (MVP)** | Manajemen order, role dasar (Owner, Admin, Produksi, Desain, Printing, Pemasangan, Gudang), notifikasi status | 4-6 minggu |
+| **Fase 2** | Modul Keuangan & Akuntansi, Pembelian/Procurement, Stok Opname, laporan & analitik | 4-5 minggu |
+| **Fase 3** | Portal customer (read-only status order) | 3-4 minggu |
+| **Fase 4** | Modul HR/absensi, integrasi marketplace (opsional) | Sesuai kebutuhan |
+
+---
+
+## 15. LAMPIRAN — CATATAN TAMBAHAN
+
+Dokumen ini adalah draft awal dan dapat disesuaikan lebih lanjut berdasarkan:
+- Diskusi lebih rinci dengan tiap kepala divisi mengenai kebutuhan spesifik
+- Anggaran & timeline yang tersedia untuk pengembangan sistem
+- Jumlah pengguna aktual yang akan menggunakan sistem
+
+---
+
+*Dokumen ini disusun sebagai dasar diskusi antara Owner Capolista Apparel dengan tim pengembang (internal/eksternal) sebelum masuk ke tahap desain sistem (wireframe/UI) dan pengembangan teknis.*
