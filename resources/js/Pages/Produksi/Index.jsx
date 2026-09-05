@@ -1,15 +1,35 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Alert from '@/Components/Alert';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import KanbanBoard from '@/Components/Kanban/KanbanBoard';
+import KanbanColumn from '@/Components/Kanban/KanbanColumn';
+import KanbanCard from '@/Components/Kanban/KanbanCard';
 
 export default function Index({ ordersByStatus, bottlenecks }) {
   const columns = [
-    { key: 'desain', title: 'Desain', bg: 'bg-blue-50', border: 'border-blue-200', link: 'desain.show' },
-    { key: 'printing', title: 'Printing', bg: 'bg-purple-50', border: 'border-purple-200', link: 'printing.show' },
-    { key: 'pemasangan', title: 'Pemasangan', bg: 'bg-pink-50', border: 'border-pink-200', link: 'pemasangan.show' }
+    { key: 'desain', title: 'Desain', color: 'blue', link: 'desain.show' },
+    { key: 'produksi', title: 'Menunggu Jadwal (Produksi)', color: 'gray', link: 'orders.show' },
+    { key: 'cutting', title: 'Cutting', color: 'orange', link: 'cutting.show' },
+    { key: 'jahit', title: 'Jahit', color: 'green', link: 'jahit.show' },
+    { key: 'printing', title: 'Printing', color: 'indigo', link: 'printing.show' },
+    { key: 'pemasangan', title: 'Pemasangan', color: 'yellow', link: 'pemasangan.show' }
   ];
+
+  const forwardToCutting = (orderId, e) => {
+    e.stopPropagation(); // Mencegah klik card memicu navigasi
+    if (confirm('Jadwalkan order ini untuk mulai dikerjakan di Divisi Cutting?')) {
+        router.post(route('orders.update-status', orderId), {
+            status: 'cutting',
+            catatan: 'Dijadwalkan untuk cutting'
+        });
+    }
+  };
+
+  const handleCardClick = (link, orderId) => {
+      router.visit(route(link, orderId));
+  };
 
   return (
     <AppLayout title="Dashboard Koordinator Produksi">
@@ -19,38 +39,47 @@ export default function Index({ ordersByStatus, bottlenecks }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {columns.map(col => (
-          <div key={col.key} className={`rounded-lg border ${col.border} ${col.bg} p-4`}>
-            <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200/50">
-              <h2 className="font-semibold text-gray-800 capitalize">{col.title}</h2>
-              <span className="bg-white text-gray-700 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-                {ordersByStatus[col.key]?.length || 0}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {(ordersByStatus[col.key] || []).map(order => {
-                const isBottleneck = bottlenecks?.some(b => b.id === order.id);
-                return (
-                  <Link key={order.id} href={route(col.link, order.id)} className={`block bg-white p-3 rounded-md shadow-sm border ${isBottleneck ? 'border-red-400' : 'border-gray-200'} hover:shadow-md transition-shadow`}>
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-bold text-sm text-indigo-600">{order.no_order}</span>
-                      {isBottleneck && <ExclamationTriangleIcon className="w-4 h-4 text-red-500" />}
+      <div className="flex h-[calc(100vh-12rem)] relative">
+        <div className="flex-1 overflow-hidden">
+          <KanbanBoard>
+            {columns.map(col => (
+              <KanbanColumn 
+                key={col.key} 
+                title={col.title} 
+                count={ordersByStatus[col.key]?.length || 0} 
+                color={col.color}
+              >
+                {(ordersByStatus[col.key] || []).map(order => {
+                  const isBottleneck = bottlenecks?.some(b => b.id === order.id);
+                  return (
+                    <div key={order.id} className="relative">
+                        <KanbanCard 
+                            order={order}
+                            imagePlaceholder={false}
+                            badgeText={isBottleneck ? "Tertahan" : `${order.hari_di_status} hari di status ini`}
+                            badgeColor={isBottleneck ? "red" : "gray"}
+                            onClick={() => handleCardClick(col.link, order.id)}
+                        />
+                        {isBottleneck && (
+                            <div className="absolute top-3 right-3 text-red-500" title="Tertahan terlalu lama!">
+                                <ExclamationTriangleIcon className="w-5 h-5" />
+                            </div>
+                        )}
+                        {col.key === 'produksi' && (
+                            <button 
+                                onClick={(e) => forwardToCutting(order.id, e)}
+                                className="absolute bottom-3 right-3 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1.5 rounded font-medium transition-colors border border-indigo-200 shadow-sm"
+                            >
+                                Mulai Cutting
+                            </button>
+                        )}
                     </div>
-                    <p className="text-sm text-gray-700 mb-2 truncate">{order.customer?.nama}</p>
-                    <div className="flex justify-between items-center text-xs text-gray-500">
-                      <span>DL: {new Date(order.deadline).toLocaleDateString('id-ID')}</span>
-                      <span>{order.hari_di_status} hari</span>
-                    </div>
-                  </Link>
-                );
-              })}
-              {(!ordersByStatus[col.key] || ordersByStatus[col.key].length === 0) && (
-                <p className="text-center text-sm text-gray-400 py-4">Tidak ada order</p>
-              )}
-            </div>
-          </div>
-        ))}
+                  );
+                })}
+              </KanbanColumn>
+            ))}
+          </KanbanBoard>
+        </div>
       </div>
     </AppLayout>
   );

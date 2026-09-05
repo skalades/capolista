@@ -18,7 +18,7 @@ class DesainController extends Controller
             abort(403, 'Anda tidak memiliki akses ke modul Desain.');
         }
 
-        $orders = Order::with(['customer', 'desain'])
+        $orders = Order::with(['customer', 'desain.pekerja', 'desain.penyetuju', 'orderLogs.user', 'orderFiles'])
             ->where(fn($q) => $q->where('status', 'desain')
                 ->orWhereHas('desain')
             )
@@ -27,8 +27,7 @@ class DesainController extends Controller
                   ->orWhereHas('customer', fn($q2) => $q2->where('nama', 'like', "%{$s}%"))
             )
             ->latest()
-            ->paginate(15)
-            ->withQueryString();
+            ->get();
 
         return Inertia::render('Desain/Index', [
             'orders'  => $orders,

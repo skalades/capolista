@@ -62,13 +62,48 @@ class OrderController extends Controller
         $dp = $validated['dp'] ?? 0;
 
         $order = Order::create([
-            ...$validated,
-            'no_order'    => OrderHelper::generateNoOrder(),
-            'status'      => Order::STATUS_DRAFT,
-            'dp'          => $dp,
-            'sisa_bayar'  => $validated['total_harga'] - $dp,
-            'created_by'  => auth()->id(),
+            'customer_id'    => $validated['customer_id'],
+            'jenis_produk'   => $validated['jenis_produk'],
+            'jumlah'         => $validated['jumlah'],
+            'tanggal_order'  => $validated['tanggal_order'],
+            'deadline'       => $validated['deadline'],
+            'total_harga'    => $validated['total_harga'],
+            'catatan_desain' => $validated['catatan_desain'] ?? null,
+            'catatan'        => $validated['catatan'] ?? null,
+            'no_order'       => OrderHelper::generateNoOrder(),
+            'status'         => Order::STATUS_DRAFT,
+            'dp'             => $dp,
+            'sisa_bayar'     => $validated['total_harga'] - $dp,
+            'created_by'     => auth()->id(),
         ]);
+
+        if (!empty($validated['ukuran_detail'])) {
+            $items = [];
+            foreach ($validated['ukuran_detail'] as $ukuran => $jumlah) {
+                if ($jumlah > 0) {
+                    $items[] = [
+                        'jenis_produk' => $validated['jenis_produk'],
+                        'ukuran' => $ukuran,
+                        'jumlah_pcs' => $jumlah,
+                    ];
+                }
+            }
+            if (count($items) > 0) {
+                $order->items()->createMany($items);
+            } else {
+                $order->items()->create([
+                    'jenis_produk' => $validated['jenis_produk'],
+                    'ukuran' => null,
+                    'jumlah_pcs' => $validated['jumlah'],
+                ]);
+            }
+        } else {
+            $order->items()->create([
+                'jenis_produk' => $validated['jenis_produk'],
+                'ukuran' => null,
+                'jumlah_pcs' => $validated['jumlah'],
+            ]);
+        }
 
         OrderLog::create([
             'order_id'   => $order->id,
@@ -86,6 +121,7 @@ class OrderController extends Controller
     {
         $order->load([
             'customer',
+            'items',
             'orderLogs.user',
             'desain.pekerja',
             'desain.penyetuju',
@@ -103,7 +139,7 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         return Inertia::render('Orders/Edit', [
-            'order'     => $order->load('customer'),
+            'order'     => $order->load(['customer', 'items']),
             'customers' => Customer::orderBy('nama')->get(['id', 'nama', 'kontak']),
         ]);
     }
@@ -123,12 +159,48 @@ class OrderController extends Controller
             'catatan'        => 'nullable|string',
         ]);
 
-        $dp = $validated['dp'] ?? $order->dp;
+        $dp = $validated['dp'] ?? 0;
         $order->update([
-            ...$validated,
+            'customer_id'    => $validated['customer_id'],
+            'jenis_produk'   => $validated['jenis_produk'],
+            'jumlah'         => $validated['jumlah'],
+            'tanggal_order'  => $validated['tanggal_order'],
+            'deadline'       => $validated['deadline'],
+            'total_harga'    => $validated['total_harga'],
+            'catatan_desain' => $validated['catatan_desain'] ?? null,
+            'catatan'        => $validated['catatan'] ?? null,
             'dp'         => $dp,
             'sisa_bayar' => $validated['total_harga'] - $dp,
         ]);
+
+        $order->items()->delete();
+        if (!empty($validated['ukuran_detail'])) {
+            $items = [];
+            foreach ($validated['ukuran_detail'] as $ukuran => $jumlah) {
+                if ($jumlah > 0) {
+                    $items[] = [
+                        'jenis_produk' => $validated['jenis_produk'],
+                        'ukuran' => $ukuran,
+                        'jumlah_pcs' => $jumlah,
+                    ];
+                }
+            }
+            if (count($items) > 0) {
+                $order->items()->createMany($items);
+            } else {
+                $order->items()->create([
+                    'jenis_produk' => $validated['jenis_produk'],
+                    'ukuran' => null,
+                    'jumlah_pcs' => $validated['jumlah'],
+                ]);
+            }
+        } else {
+            $order->items()->create([
+                'jenis_produk' => $validated['jenis_produk'],
+                'ukuran' => null,
+                'jumlah_pcs' => $validated['jumlah'],
+            ]);
+        }
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Order berhasil diperbarui.');
@@ -167,6 +239,13 @@ class OrderController extends Controller
         if ($statusBaru === Order::STATUS_PACKING && !$order->packing) {
             Packing::create(['order_id' => $order->id]);
         }
+
+        // Notify
+        $notifiableUsers = \App\Models\User::whereIn('level', [0, 1])->get();
+        if ($order->creator && !$notifiableUsers->contains('id', $order->creator->id)) {
+            $notifiableUsers->push($order->creator);
+        }
+        \Illuminate\Support\Facades\Notification::send($notifiableUsers, new \App\Notifications\OrderStatusChanged($order, $statusLama, $statusBaru));
 
         return back()->with('success', 'Status order berhasil diperbarui.');
     }

@@ -51,6 +51,22 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage pemasangan',
             'update pemasangan status',
 
+            // Divisi Cutting
+            'manage cutting',
+            'update cutting status',
+
+            // Divisi Jahit
+            'manage jahit',
+            'update jahit status',
+            'manage tarif borongan',
+            'approve jahit output',
+
+            // HR / Personalia
+            'manage hr',
+            'manage absensi',
+            'manage penggajian',
+            'approve penggajian',
+
             // Divisi Produksi (Koordinator)
             'manage produksi',
             'view all production progress',
@@ -135,6 +151,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'approve desain',
             'manage printing',
             'manage pemasangan',
+            'manage cutting',
+            'manage jahit',
+            'manage tarif borongan',
+            'approve jahit output',
+            'manage hr',
+            'manage absensi',
+            'manage penggajian',
+            'approve penggajian',
             'manage produksi',
             'manage gudang',
             'manage stok',
@@ -157,6 +181,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'upload mockup',
             'update printing status',
             'update pemasangan status',
+            'update cutting status',
+            'update jahit status',
             'manage stok opname',
         ]);
 

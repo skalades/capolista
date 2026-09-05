@@ -9,12 +9,12 @@ import { PlusIcon } from '@heroicons/react/20/solid';
 
 const STATUS_COLORS = {
     draft: 'gray', desain: 'blue', procurement: 'yellow',
-    produksi: 'orange', printing: 'purple', pemasangan: 'pink',
+    cutting: 'lime', jahit: 'cyan', produksi: 'orange', printing: 'purple', pemasangan: 'pink',
     packing: 'teal', dikirim: 'indigo', selesai: 'green'
 };
 const STATUS_LABELS = {
     draft: 'Draft', desain: 'Desain', procurement: 'Procurement',
-    produksi: 'Produksi', printing: 'Printing', pemasangan: 'Pemasangan',
+    cutting: 'Cutting', jahit: 'Jahit', produksi: 'Produksi', printing: 'Printing', pemasangan: 'Pemasangan',
     packing: 'Packing', dikirim: 'Dikirim', selesai: 'Selesai'
 };
 

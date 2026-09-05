@@ -4,11 +4,17 @@ import { useForm, Link } from '@inertiajs/react';
 import { PlusIcon } from '@heroicons/react/20/solid';
 
 export default function OrderEdit({ order, customers = [] }) {
+    const defaultUkuran = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
+    const itemsMap = order?.items?.reduce((acc, item) => {
+        if (item.ukuran) acc[item.ukuran] = item.jumlah_pcs;
+        return acc;
+    }, {}) || {};
+
     const { data, setData, put, processing, errors } = useForm({
         customer_id: order?.customer_id || '',
         jenis_produk: order?.jenis_produk || '',
         jumlah: order?.jumlah || '',
-        ukuran_detail: order?.ukuran_detail || { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 },
+        ukuran_detail: { ...defaultUkuran, ...itemsMap },
         tanggal_order: order?.tanggal_order || '',
         deadline: order?.deadline || '',
         total_harga: order?.total_harga ? parseInt(order.total_harga, 10) : '',

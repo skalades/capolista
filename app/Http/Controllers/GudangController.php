@@ -73,7 +73,7 @@ class GudangController extends Controller
             'tipe'       => 'masuk',
             'jumlah'     => $request->jumlah_masuk,
             'keterangan' => 'Stok awal',
-            'created_by' => auth()->id(),
+            'mutasi_created_by' => auth()->id(),
         ]);
 
         return back()->with('success', "Bahan {$bahan->nama_bahan} berhasil ditambahkan.");
@@ -102,7 +102,7 @@ class GudangController extends Controller
             'tipe'       => $request->tipe,
             'jumlah'     => $request->jumlah,
             'keterangan' => $request->keterangan,
-            'created_by' => auth()->id(),
+            'mutasi_created_by' => auth()->id(),
         ]);
 
         return back()->with('success', 'Stok berhasil diperbarui.');
@@ -264,7 +264,7 @@ class GudangController extends Controller
                             'tipe' => $item->selisih > 0 ? 'masuk' : 'keluar',
                             'jumlah' => abs($item->selisih),
                             'keterangan' => 'Penyesuaian Stok Opname #' . $opname->id . ($item->keterangan_selisih ? ' - ' . $item->keterangan_selisih : ''),
-                            'created_by' => auth()->id(),
+                            'mutasi_created_by' => auth()->id(),
                         ]);
                     }
                 }

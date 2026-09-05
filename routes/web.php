@@ -1,13 +1,20 @@
 <?php
 
+use App\Http\Controllers\CuttingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesainController;
 use App\Http\Controllers\GudangController;
+use App\Http\Controllers\HRController;
+use App\Http\Controllers\JahitController;
+use App\Http\Controllers\KeuanganController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PemasanganController;
 use App\Http\Controllers\PrintingController;
 use App\Http\Controllers\ProduksiController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SuperadminController;
+use App\Http\Controllers\TrackOrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
 use App\Models\OrderFile;
@@ -30,7 +37,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // --- Customer ---
-    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::resource('customers', CustomerController::class);
 
     // --- Level 0,1,2 (Manajemen) ---
     Route::middleware('level:0,1,2')->group(function () {
@@ -83,6 +90,26 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::get('/produksi', [ProduksiController::class, 'index'])->name('produksi.index');
     });
 
+    // Cutting/Pemotongan
+    Route::middleware(['level:0,2,3,4', 'divisi:cutting'])->group(function () {
+        Route::get('/cutting', [CuttingController::class, 'index'])->name('cutting.index');
+        Route::get('/cutting/{order}', [CuttingController::class, 'show'])->name('cutting.show');
+        Route::post('/cutting/{order}/mulai', [CuttingController::class, 'mulai'])->name('cutting.mulai');
+        Route::patch('/cutting/{order}/update', [CuttingController::class, 'update'])->name('cutting.update');
+        Route::post('/cutting/{order}/complete', [CuttingController::class, 'complete'])->name('cutting.complete');
+    });
+
+    // Jahit
+    Route::middleware(['level:0,2,3,4', 'divisi:jahit'])->group(function () {
+        Route::get('/jahit', [JahitController::class, 'index'])->name('jahit.index');
+        Route::get('/jahit/{order}', [JahitController::class, 'show'])->name('jahit.show');
+        Route::post('/jahit/{order}/assign', [JahitController::class, 'assign'])->name('jahit.assign');
+        Route::post('/jahit/output', [JahitController::class, 'storeOutput'])->name('jahit.output.store');
+        Route::post('/jahit/output/{output}/approve', [JahitController::class, 'approveOutput'])->name('jahit.output.approve');
+        Route::post('/jahit/output/{output}/reject', [JahitController::class, 'rejectOutput'])->name('jahit.output.reject');
+        Route::post('/jahit/{order}/complete', [JahitController::class, 'complete'])->name('jahit.complete');
+    });
+
     // Gudang
     Route::middleware(['level:0,2,3,4', 'divisi:gudang'])->group(function () {
         Route::get('/gudang', [GudangController::class, 'index'])->name('gudang.index');
@@ -100,48 +127,68 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     });
 
     // Keuangan
-    Route::prefix('keuangan')->name('keuangan.')->middleware(['level:0,1,2,3,4', 'divisi:keuangan'])->group(function() {
-        Route::get('/', [\App\Http\Controllers\KeuanganController::class, 'index'])->name('index');
-        Route::get('/pembayaran', [\App\Http\Controllers\KeuanganController::class, 'pembayaranIndex'])->name('pembayaran.index');
-        Route::post('/pembayaran', [\App\Http\Controllers\KeuanganController::class, 'pembayaranStore'])->name('pembayaran.store');
-        Route::get('/pengeluaran', [\App\Http\Controllers\KeuanganController::class, 'pengeluaranIndex'])->name('pengeluaran.index');
-        Route::post('/pengeluaran', [\App\Http\Controllers\KeuanganController::class, 'pengeluaranStore'])->name('pengeluaran.store');
-        Route::get('/laporan', [\App\Http\Controllers\KeuanganController::class, 'laporanLabaRugi'])->name('laporan');
+    Route::prefix('keuangan')->name('keuangan.')->middleware(['level:0,1,2,3,4', 'divisi:keuangan'])->group(function () {
+        Route::get('/', [KeuanganController::class, 'index'])->name('index');
+        Route::get('/pembayaran', [KeuanganController::class, 'pembayaranIndex'])->name('pembayaran.index');
+        Route::post('/pembayaran', [KeuanganController::class, 'pembayaranStore'])->name('pembayaran.store');
+        Route::get('/pengeluaran', [KeuanganController::class, 'pengeluaranIndex'])->name('pengeluaran.index');
+        Route::post('/pengeluaran', [KeuanganController::class, 'pengeluaranStore'])->name('pengeluaran.store');
+        Route::get('/laporan', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan');
     });
 
     // Procurement
-    Route::prefix('procurement')->name('procurement.')->middleware(['level:0,1,2,3,4', 'divisi:pembelian'])->group(function() {
+    Route::prefix('procurement')->name('procurement.')->middleware(['level:0,1,2,3,4', 'divisi:pembelian'])->group(function () {
         Route::get('/', [\App\Http\Controllers\ProcurementController::class, 'index'])->name('index');
-        
-        // Use custom methods instead of resource to avoid conflicting names
         Route::get('/supplier', [\App\Http\Controllers\ProcurementController::class, 'supplierIndex'])->name('supplier.index');
         Route::post('/supplier', [\App\Http\Controllers\ProcurementController::class, 'supplierStore'])->name('supplier.store');
         Route::put('/supplier/{supplier}', [\App\Http\Controllers\ProcurementController::class, 'supplierUpdate'])->name('supplier.update');
         Route::delete('/supplier/{supplier}', [\App\Http\Controllers\ProcurementController::class, 'supplierDestroy'])->name('supplier.destroy');
-        
         Route::get('/po', [\App\Http\Controllers\ProcurementController::class, 'poIndex'])->name('po.index');
         Route::get('/po/create', [\App\Http\Controllers\ProcurementController::class, 'poCreate'])->name('po.create');
         Route::post('/po', [\App\Http\Controllers\ProcurementController::class, 'poStore'])->name('po.store');
         Route::get('/po/{po}', [\App\Http\Controllers\ProcurementController::class, 'poShow'])->name('po.show');
         Route::patch('/po/{po}/status', [\App\Http\Controllers\ProcurementController::class, 'poUpdateStatus'])->name('po.update-status');
     });
+
+    // HR/Personalia & Penggajian
+    Route::prefix('hr')->name('hr.')->middleware(['level:0,1,2,3,4', 'divisi:hr'])->group(function () {
+        // Absensi
+        Route::get('/absensi', [HRController::class, 'absensiIndex'])->name('absensi.index');
+        Route::post('/absensi', [HRController::class, 'absensiStore'])->name('absensi.store');
+        Route::get('/absensi/rekap', [HRController::class, 'absensiRekap'])->name('absensi.rekap');
+
+        // Penggajian
+        Route::get('/penggajian', [HRController::class, 'penggajianIndex'])->name('penggajian.index');
+        Route::get('/penggajian/create', [HRController::class, 'penggajianCreate'])->name('penggajian.create');
+        Route::post('/penggajian/generate', [HRController::class, 'penggajianGenerate'])->name('penggajian.generate');
+        Route::get('/penggajian/{penggajian}', [HRController::class, 'penggajianShow'])->name('penggajian.show');
+        Route::post('/penggajian/{penggajian}/approve', [HRController::class, 'penggajianApprove'])->name('penggajian.approve');
+        Route::post('/penggajian/{penggajian}/bayar', [HRController::class, 'penggajianBayar'])->name('penggajian.bayar');
+        Route::get('/penggajian/{penggajian}/print', [HRController::class, 'penggajianPrint'])->name('penggajian.print');
+
+        // Output rekap
+        Route::get('/output-rekap', [HRController::class, 'outputRekap'])->name('output.rekap');
+    });
+
     // Laporan
-    Route::prefix('laporan')->name('laporan.')->middleware('level:0,1,2')->group(function() {
-        Route::get('/', [\App\Http\Controllers\LaporanController::class, 'index'])->name('index');
-        Route::get('/produksi', [\App\Http\Controllers\LaporanController::class, 'produksi'])->name('produksi');
-        Route::get('/keuangan', [\App\Http\Controllers\LaporanController::class, 'keuangan'])->name('keuangan');
-        Route::get('/divisi', [\App\Http\Controllers\LaporanController::class, 'divisi'])->name('divisi');
+    Route::prefix('laporan')->name('laporan.')->middleware('level:0,1,2')->group(function () {
+        Route::get('/', [LaporanController::class, 'index'])->name('index');
+        Route::get('/produksi', [LaporanController::class, 'produksi'])->name('produksi');
+        Route::get('/keuangan', [LaporanController::class, 'keuangan'])->name('keuangan');
+        Route::get('/divisi', [LaporanController::class, 'divisi'])->name('divisi');
+        Route::get('/penggajian', [LaporanController::class, 'penggajian'])->name('penggajian');
     });
 
     // Superadmin
-    Route::prefix('superadmin')->name('superadmin.')->middleware('level:0')->group(function() {
-        Route::get('/', [\App\Http\Controllers\SuperadminController::class, 'index'])->name('index');
-        Route::get('/roles', [\App\Http\Controllers\SuperadminController::class, 'roleIndex'])->name('roles');
-        Route::post('/roles', [\App\Http\Controllers\SuperadminController::class, 'roleStore'])->name('roles.store');
-        Route::patch('/roles/{role}', [\App\Http\Controllers\SuperadminController::class, 'roleUpdate'])->name('roles.update');
-        Route::delete('/roles/{role}', [\App\Http\Controllers\SuperadminController::class, 'roleDestroy'])->name('roles.destroy');
-        Route::get('/sistem', [\App\Http\Controllers\SuperadminController::class, 'sistemInfo'])->name('sistem');
+    Route::prefix('superadmin')->name('superadmin.')->middleware('level:0')->group(function () {
+        Route::get('/', [SuperadminController::class, 'index'])->name('index');
+        Route::get('/roles', [SuperadminController::class, 'roleIndex'])->name('roles');
+        Route::post('/roles', [SuperadminController::class, 'roleStore'])->name('roles.store');
+        Route::patch('/roles/{role}', [SuperadminController::class, 'roleUpdate'])->name('roles.update');
+        Route::delete('/roles/{role}', [SuperadminController::class, 'roleDestroy'])->name('roles.destroy');
+        Route::get('/sistem', [SuperadminController::class, 'sistemInfo'])->name('sistem');
     });
 });
 
 require __DIR__ . '/auth.php';
+

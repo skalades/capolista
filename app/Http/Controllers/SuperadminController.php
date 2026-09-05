@@ -64,34 +64,45 @@ class SuperadminController extends Controller
 
     public function sistemInfo()
     {
-        $phpVersion = phpversion();
+        $phpVersion    = phpversion();
         $laravelVersion = app()->version();
-        $diskUsageBytes = disk_free_space('/');
-        $diskTotalBytes = disk_total_space('/');
-        
+        $diskFreeBytes = disk_free_space(storage_path());
+        $diskTotalBytes = disk_total_space(storage_path());
+
         $diskUsage = 0;
         if ($diskTotalBytes > 0) {
-            $diskUsage = 100 - round(($diskUsageBytes / $diskTotalBytes) * 100, 2);
+            $diskUsage = 100 - round(($diskFreeBytes / $diskTotalBytes) * 100, 2);
         }
 
-        $tables = DB::select('SHOW TABLES');
-        $dbName = env('DB_DATABASE');
+        // Database-agnostic: compatible dengan SQLite, MySQL, PostgreSQL
+        $tables = \Illuminate\Support\Facades\Schema::getTableListing();
         $recordCounts = [];
 
-        foreach ($tables as $table) {
-            $tableName = array_values((array)$table)[0];
-            $count = DB::table($tableName)->count();
-            $recordCounts[] = [
-                'table' => $tableName,
-                'count' => $count
-            ];
+        foreach ($tables as $tableName) {
+            try {
+                $count = \Illuminate\Support\Facades\DB::table($tableName)->count();
+                $recordCounts[] = [
+                    'table' => $tableName,
+                    'count' => $count,
+                ];
+            } catch (\Exception $e) {
+                $recordCounts[] = [
+                    'table' => $tableName,
+                    'count' => 'Error',
+                ];
+            }
         }
 
+        // Sort by table name
+        usort($recordCounts, fn ($a, $b) => strcmp($a['table'], $b['table']));
+
         return Inertia::render('Superadmin/Sistem', [
-            'phpVersion' => $phpVersion,
+            'phpVersion'    => $phpVersion,
             'laravelVersion' => $laravelVersion,
-            'diskUsage' => $diskUsage,
-            'recordCounts' => $recordCounts,
+            'diskUsage'     => $diskUsage,
+            'diskFreeGB'    => round($diskFreeBytes / 1024 / 1024 / 1024, 2),
+            'diskTotalGB'   => round($diskTotalBytes / 1024 / 1024 / 1024, 2),
+            'recordCounts'  => $recordCounts,
         ]);
     }
 }

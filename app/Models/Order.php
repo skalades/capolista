@@ -17,6 +17,8 @@ class Order extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_DESAIN = 'desain';
     public const STATUS_PROCUREMENT = 'procurement';
+    public const STATUS_CUTTING = 'cutting';
+    public const STATUS_JAHIT = 'jahit';
     public const STATUS_PRODUKSI = 'produksi';
     public const STATUS_PRINTING = 'printing';
     public const STATUS_PEMASANGAN = 'pemasangan';
@@ -28,6 +30,8 @@ class Order extends Model
         self::STATUS_DRAFT => 'Draft',
         self::STATUS_DESAIN => 'Desain',
         self::STATUS_PROCUREMENT => 'Procurement',
+        self::STATUS_CUTTING => 'Cutting',
+        self::STATUS_JAHIT => 'Jahit',
         self::STATUS_PRODUKSI => 'Produksi',
         self::STATUS_PRINTING => 'Printing',
         self::STATUS_PEMASANGAN => 'Pemasangan',
@@ -40,6 +44,8 @@ class Order extends Model
         self::STATUS_DRAFT => 'gray',
         self::STATUS_DESAIN => 'blue',
         self::STATUS_PROCUREMENT => 'yellow',
+        self::STATUS_CUTTING => 'lime',
+        self::STATUS_JAHIT => 'cyan',
         self::STATUS_PRODUKSI => 'orange',
         self::STATUS_PRINTING => 'purple',
         self::STATUS_PEMASANGAN => 'pink',
@@ -56,7 +62,6 @@ class Order extends Model
         'status',
         'jenis_produk',
         'jumlah',
-        'ukuran_detail',
         'catatan_desain',
         'catatan_produksi',
         'total_harga',
@@ -69,7 +74,6 @@ class Order extends Model
     protected $casts = [
         'tanggal_order' => 'date',
         'deadline' => 'date',
-        'ukuran_detail' => 'array',
         'total_harga' => 'decimal:2',
         'dp' => 'decimal:2',
         'sisa_bayar' => 'decimal:2',
@@ -97,6 +101,11 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function orderFiles(): HasMany
     {
         return $this->hasMany(OrderFile::class);
@@ -110,6 +119,21 @@ class Order extends Model
     public function desain(): HasOne
     {
         return $this->hasOne(Desain::class);
+    }
+
+    public function cutting(): HasOne
+    {
+        return $this->hasOne(ProduksiCutting::class);
+    }
+
+    public function jahitAssigns(): HasMany
+    {
+        return $this->hasMany(ProduksiJahitAssign::class);
+    }
+
+    public function jahitOutputs(): HasMany
+    {
+        return $this->hasMany(ProduksiJahitOutput::class);
     }
 
     public function printing(): HasOne
@@ -127,6 +151,11 @@ class Order extends Model
         return $this->hasOne(Packing::class);
     }
 
+    public function pembayarans(): HasMany
+    {
+        return $this->hasMany(Pembayaran::class);
+    }
+
     public function stokMutasi(): HasMany
     {
         return $this->hasMany(StokMutasi::class, 'mutasi_order_id');
@@ -134,6 +163,7 @@ class Order extends Model
 
     public function creator(): BelongsTo
     {
+
         return $this->belongsTo(User::class, 'created_by');
     }
 }

@@ -14,6 +14,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $level = $user->level_akses;
+
+        if ($level === \App\Models\User::LEVEL_STAF && $user->divisi === 'jahit') {
+            return redirect()->route('jahit.index');
+        }
         
         $stats = [
             'total_order_aktif'     => \App\Models\Order::whereNotIn('status', ['selesai'])->count(),
@@ -109,9 +113,11 @@ class DashboardController extends Controller
     {
         return match ($divisi) {
             'desain'     => [\App\Models\Order::STATUS_DESAIN],
+            'cutting'    => [\App\Models\Order::STATUS_CUTTING],
+            'jahit'      => [\App\Models\Order::STATUS_JAHIT],
             'printing'   => [\App\Models\Order::STATUS_PRINTING],
             'pemasangan' => [\App\Models\Order::STATUS_PEMASANGAN],
-            'produksi'   => [\App\Models\Order::STATUS_PRODUKSI, \App\Models\Order::STATUS_DESAIN, \App\Models\Order::STATUS_PRINTING, \App\Models\Order::STATUS_PEMASANGAN],
+            'produksi'   => [\App\Models\Order::STATUS_PRODUKSI, \App\Models\Order::STATUS_CUTTING, \App\Models\Order::STATUS_JAHIT, \App\Models\Order::STATUS_PRINTING, \App\Models\Order::STATUS_PEMASANGAN],
             'gudang'     => [\App\Models\Order::STATUS_PACKING, \App\Models\Order::STATUS_DIKIRIM],
             'pemasaran'  => [\App\Models\Order::STATUS_DRAFT, \App\Models\Order::STATUS_DESAIN],
             'keuangan'   => [\App\Models\Order::STATUS_DIKIRIM, \App\Models\Order::STATUS_SELESAI],

@@ -71,6 +71,8 @@ class User extends Authenticatable
         'pemasaran'    => 'Pemasaran',
         'produksi'     => 'Produksi',
         'desain'       => 'Desain',
+        'cutting'      => 'Cutting/Pemotongan',
+        'jahit'        => 'Jahit',
         'printing'     => 'Printing',
         'pemasangan'   => 'Pemasangan',
         'pembelian'    => 'Pembelian/Procurement',

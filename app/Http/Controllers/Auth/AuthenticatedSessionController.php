@@ -33,6 +33,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        $defaultRoute = route('dashboard', absolute: false);
+
+        // Jika user adalah Staf Jahit, langsung arahkan ke aplikasi khusus mereka
+        if ($user->level_akses == \App\Models\User::LEVEL_STAF && $user->divisi === 'jahit') {
+            return redirect(route('jahit.index', absolute: false));
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

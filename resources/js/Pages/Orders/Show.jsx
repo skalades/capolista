@@ -11,12 +11,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 
 const STATUS_COLORS = {
     draft: 'gray', desain: 'blue', procurement: 'yellow',
-    produksi: 'orange', printing: 'purple', pemasangan: 'pink',
+    cutting: 'lime', jahit: 'cyan', produksi: 'orange', printing: 'purple', pemasangan: 'pink',
     packing: 'teal', dikirim: 'indigo', selesai: 'green'
 };
 const STATUS_LABELS = {
     draft: 'Draft', desain: 'Desain', procurement: 'Procurement',
-    produksi: 'Produksi', printing: 'Printing', pemasangan: 'Pemasangan',
+    cutting: 'Cutting', jahit: 'Jahit', produksi: 'Produksi', printing: 'Printing', pemasangan: 'Pemasangan',
     packing: 'Packing', dikirim: 'Dikirim', selesai: 'Selesai'
 };
 
@@ -25,7 +25,7 @@ export default function OrderShow({ order = {} }) {
     const o = order.id ? order : {
         no_order: 'ORD-XXXX', status: 'draft', customer: { name: '-' },
         jenis_produk: '-', jumlah: 0, deadline: '-', total_harga: 0, dp: 0,
-        ukuran_detail: { S: 0, M: 0, L: 0, XL: 0 }, orderLogs: []
+        items: [], orderLogs: []
     };
 
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -116,12 +116,15 @@ export default function OrderShow({ order = {} }) {
 
                         <Card title="Detail Ukuran">
                             <div className="flex gap-4 flex-wrap">
-                                {o.ukuran_detail && Object.entries(o.ukuran_detail).map(([size, qty]) => (
-                                    <div key={size} className="border border-gray-200 rounded px-4 py-2 text-center min-w-[4rem]">
-                                        <div className="font-bold text-gray-900">{size}</div>
-                                        <div className="text-sm text-gray-500">{qty}</div>
+                                {o.items && o.items.map((item, idx) => (
+                                    <div key={idx} className="border border-gray-200 rounded px-4 py-2 text-center min-w-[4rem]">
+                                        <div className="font-bold text-gray-900">{item.ukuran || 'Total'}</div>
+                                        <div className="text-sm text-gray-500">{item.jumlah_pcs}</div>
                                     </div>
                                 ))}
+                                {(!o.items || o.items.length === 0) && (
+                                    <div className="text-sm text-gray-500">Tidak ada detail ukuran.</div>
+                                )}
                             </div>
                         </Card>
                         

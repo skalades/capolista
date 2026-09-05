@@ -10,7 +10,14 @@ class ProduksiController extends Controller
 {
     public function index()
     {
-        $statusList = [Order::STATUS_DESAIN, Order::STATUS_PRINTING, Order::STATUS_PEMASANGAN, Order::STATUS_PRODUKSI];
+        $statusList = [
+            Order::STATUS_DESAIN, 
+            Order::STATUS_PRODUKSI,
+            Order::STATUS_CUTTING, 
+            Order::STATUS_JAHIT, 
+            Order::STATUS_PRINTING, 
+            Order::STATUS_PEMASANGAN
+        ];
 
         $orders = Order::with(['customer'])
             ->whereIn('status', $statusList)
@@ -30,9 +37,11 @@ class ProduksiController extends Controller
 
         $ordersByStatus = [
             'desain'     => $orders->where('status', Order::STATUS_DESAIN)->values(),
+            'produksi'   => $orders->where('status', Order::STATUS_PRODUKSI)->values(),
+            'cutting'    => $orders->where('status', Order::STATUS_CUTTING)->values(),
+            'jahit'      => $orders->where('status', Order::STATUS_JAHIT)->values(),
             'printing'   => $orders->where('status', Order::STATUS_PRINTING)->values(),
             'pemasangan' => $orders->where('status', Order::STATUS_PEMASANGAN)->values(),
-            'produksi'   => $orders->where('status', Order::STATUS_PRODUKSI)->values(),
         ];
 
         $bottlenecks = $orders->where('is_bottleneck', true)->values();

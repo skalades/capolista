@@ -37,6 +37,8 @@ const MENU_ITEMS = [
     { name: 'Kelola Order', routeName: 'orders.index',    icon: ClipboardDocumentListIcon,  levels: [0, 1, 2] },
     { name: 'Order Saya',   routeName: 'orders.index',    icon: ClipboardDocumentListIcon,  levels: [3, 4] },
     { name: 'Desain',       routeName: 'desain.index',    icon: PaintBrushIcon,             levels: [0, 2, 3, 4], divisi: ['desain'] },
+    { name: 'Cutting',      routeName: 'cutting.index',   icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['cutting'] },
+    { name: 'Jahit',        routeName: 'jahit.index',     icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['jahit'] },
     { name: 'Printing',     routeName: 'printing.index',  icon: PrinterIcon,                levels: [0, 2, 3, 4], divisi: ['printing'] },
     { name: 'Pemasangan',   routeName: 'pemasangan.index',icon: WrenchScrewdriverIcon,      levels: [0, 2, 3, 4], divisi: ['pemasangan'] },
     { name: 'Produksi',     routeName: 'produksi.index',  icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['produksi'] },
