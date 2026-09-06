@@ -22,7 +22,7 @@ export default function UserIndex({ users, roles = [], filters = {} }) {
             headerActions={
                 <Link
                     href={route('users.create')}
-                    className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
+                    className="inline-flex items-center gap-2 rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
                 >
                     <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                     Tambah Pengguna
@@ -37,7 +37,7 @@ export default function UserIndex({ users, roles = [], filters = {} }) {
                     <select
                         value={filters.role || ''}
                         onChange={handleRoleFilter}
-                        className="block w-48 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-48 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                     >
                         <option value="">Semua Role</option>
                         {roles.map(r => (

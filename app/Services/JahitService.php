@@ -182,4 +182,32 @@ class JahitService
 
         return ucfirst($data['next_divisi']);
     }
+
+    /**
+     * Tandai reject pada final QC (membuat tanggungan reject)
+     */
+    public function submitQcReject(Order $order, array $data, int $mandorId): void
+    {
+        if ($order->status !== Order::STATUS_JAHIT) {
+            throw new Exception('Order tidak dalam status Jahit.');
+        }
+
+        $assign = ProduksiJahitAssign::where('order_id', $order->id)
+            ->where('operator_id', $data['operator_id'])
+            ->first();
+
+        if (!$assign) {
+            throw new Exception('Penjahit tersebut tidak di-assign ke order ini.');
+        }
+
+        \App\Models\ProduksiJahitQcReject::create([
+            'order_id'    => $order->id,
+            'operator_id' => $data['operator_id'],
+            'assign_id'   => $assign->id,
+            'jumlah'      => $data['jumlah'],
+            'alasan'      => $data['alasan'],
+            'status'      => 'pending',
+            'dibuat_oleh' => $mandorId,
+        ]);
+    }
 }

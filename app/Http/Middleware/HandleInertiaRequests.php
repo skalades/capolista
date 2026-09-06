@@ -42,6 +42,10 @@ class HandleInertiaRequests extends Middleware
                 'error'   => fn () => $request->session()->get('error'),
                 'warning' => fn () => $request->session()->get('warning'),
             ],
+            'appSettings' => fn () => [
+                'company_name' => \App\Helpers\SettingsHelper::get('company.name', 'CAPOLISTA'),
+                'company_logo' => \App\Helpers\SettingsHelper::get('company.logo'),
+            ],
         ];
     }
 }

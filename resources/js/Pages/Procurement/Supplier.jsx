@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
-import { Label } from '@/Components/ui/label';
-
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
+import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
+import InputError from '@/Components/InputError';
+import Modal from '@/Components/Modal';
+import Table from '@/Components/Table';
 export default function Supplier({ auth, suppliers }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -59,26 +61,25 @@ export default function Supplier({ auth, suppliers }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Manajemen Supplier</h2>}
+        <AppLayout
+            title="Manajemen Supplier"
         >
-            <Head title="Supplier" />
+            
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     <div className="flex justify-end">
-                        <Button onClick={openCreate}>Tambah Supplier</Button>
+                        <PrimaryButton onClick={openCreate}>Tambah Supplier</PrimaryButton>
                     </div>
                     
-                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>{isEdit ? 'Edit Supplier' : 'Tambah Supplier'}</DialogTitle>
-                            </DialogHeader>
+                    <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+                        <div className="p-6">
+                            <div className="mb-4">
+                                <h2 className="text-lg font-medium text-gray-900">{isEdit ? 'Edit Supplier' : 'Tambah Supplier'}</h2>
+                            </div>
                             <form onSubmit={submit} className="space-y-4">
                                 <div>
-                                    <Label htmlFor="nama">Nama Supplier</Label>
+                                    <TextInputLabel htmlFor="nama" value="Nama Supplier"  />
                                     <Input
                                         id="nama"
                                         value={data.nama}
@@ -88,7 +89,7 @@ export default function Supplier({ auth, suppliers }) {
                                     {errors.nama && <p className="text-red-500 text-sm">{errors.nama}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="kontak">Kontak</Label>
+                                    <TextInputLabel htmlFor="kontak" value="Kontak"  />
                                     <Input
                                         id="kontak"
                                         value={data.kontak}
@@ -96,7 +97,7 @@ export default function Supplier({ auth, suppliers }) {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="email">Email</Label>
+                                    <TextInputLabel htmlFor="email" value="Email"  />
                                     <Input
                                         id="email"
                                         type="email"
@@ -105,7 +106,7 @@ export default function Supplier({ auth, suppliers }) {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="alamat">Alamat</Label>
+                                    <TextInputLabel htmlFor="alamat" value="Alamat"  />
                                     <Input
                                         id="alamat"
                                         value={data.alamat}
@@ -113,7 +114,7 @@ export default function Supplier({ auth, suppliers }) {
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="catatan">Catatan</Label>
+                                    <TextInputLabel htmlFor="catatan" value="Catatan"  />
                                     <Input
                                         id="catatan"
                                         value={data.catatan}
@@ -121,49 +122,49 @@ export default function Supplier({ auth, suppliers }) {
                                     />
                                 </div>
                                 <div className="flex justify-end space-x-2 pt-4">
-                                    <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Batal</Button>
-                                    <Button type="submit" disabled={processing}>Simpan</Button>
+                                    <SecondaryButton type="button" onClick={() => setIsOpen(false)}>Batal</SecondaryButton>
+                                    <PrimaryButton type="submit" disabled={processing}>Simpan</PrimaryButton>
                                 </div>
                             </form>
-                        </DialogContent>
-                    </Dialog>
+                        </div>
+                    </Modal>
 
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Nama</TableHead>
-                                    <TableHead>Kontak</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Alamat</TableHead>
-                                    <TableHead>Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
+                            <Table.Head>
+                                <Table.Row>
+                                    <Table.HeadCell>Nama</Table.HeadCell>
+                                    <Table.HeadCell>Kontak</Table.HeadCell>
+                                    <Table.HeadCell>Email</Table.HeadCell>
+                                    <Table.HeadCell>Alamat</Table.HeadCell>
+                                    <Table.HeadCell>Aksi</Table.HeadCell>
+                                </Table.Row>
+                            </Table.Head>
+                            <Table.Body>
                                 {suppliers.map((sup) => (
-                                    <TableRow key={sup.id}>
-                                        <TableCell>{sup.nama}</TableCell>
-                                        <TableCell>{sup.kontak}</TableCell>
-                                        <TableCell>{sup.email}</TableCell>
-                                        <TableCell>{sup.alamat}</TableCell>
-                                        <TableCell>
+                                    <Table.Row key={sup.id}>
+                                        <Table.Cell>{sup.nama}</Table.Cell>
+                                        <Table.Cell>{sup.kontak}</Table.Cell>
+                                        <Table.Cell>{sup.email}</Table.Cell>
+                                        <Table.Cell>{sup.alamat}</Table.Cell>
+                                        <Table.Cell>
                                             <div className="flex space-x-2">
-                                                <Button variant="outline" size="sm" onClick={() => openEdit(sup)}>Edit</Button>
-                                                <Button variant="destructive" size="sm" onClick={() => handleDelete(sup.id)}>Hapus</Button>
+                                                <SecondaryButton size="sm" onClick={() => openEdit(sup)}>Edit</SecondaryButton>
+                                                <DangerButton size="sm" onClick={() => handleDelete(sup.id)}>Hapus</DangerButton>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
+                                        </Table.Cell>
+                                    </Table.Row>
                                 ))}
                                 {suppliers.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center py-4">Belum ada supplier</TableCell>
-                                    </TableRow>
+                                    <Table.Row>
+                                        <Table.Cell colSpan={5} className="text-center py-4">Belum ada supplier</Table.Cell>
+                                    </Table.Row>
                                 )}
-                            </TableBody>
+                            </Table.Body>
                         </Table>
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

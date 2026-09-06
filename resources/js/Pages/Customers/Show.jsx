@@ -32,7 +32,7 @@ export default function CustomerShow({ customer }) {
                                 <p className="mt-1 text-sm text-gray-900">{customer.catatan || '-'}</p>
                             </div>
                             <div className="pt-4 border-t border-gray-200">
-                                <Link href={route('customers.edit', customer.id)} className="text-indigo-600 hover:text-indigo-900 font-medium text-sm">
+                                <Link href={route('customers.edit', customer.id)} className="text-brand-600 hover:text-brand-900 font-medium text-sm">
                                     Edit Customer
                                 </Link>
                             </div>
@@ -63,7 +63,7 @@ export default function CustomerShow({ customer }) {
                                                 <Badge color="gray">{order.status}</Badge>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <Link href={route('orders.show', order.id)} className="text-indigo-600 hover:text-indigo-900">Lihat Order</Link>
+                                                <Link href={route('orders.show', order.id)} className="text-brand-600 hover:text-brand-900">Lihat Order</Link>
                                             </td>
                                         </tr>
                                     ))}

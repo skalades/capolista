@@ -13,12 +13,12 @@ export default function ConfirmModal({
 }) {
     const colors = {
         red: 'bg-red-600 hover:bg-red-700 focus-visible:outline-red-600 text-white',
-        indigo: 'bg-indigo-600 hover:bg-indigo-700 focus-visible:outline-indigo-600 text-white',
+        indigo: 'bg-brand-600 hover:bg-brand-700 focus-visible:outline-brand-600 text-white',
     };
 
     const iconColors = {
         red: 'text-red-600 bg-red-100',
-        indigo: 'text-indigo-600 bg-indigo-100',
+        indigo: 'text-brand-600 bg-brand-100',
     };
 
     return (

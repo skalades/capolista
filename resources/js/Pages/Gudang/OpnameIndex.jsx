@@ -26,7 +26,7 @@ export default function OpnameIndex({ opnameList }) {
     <AppLayout 
       title="Stok Opname"
       headerActions={
-        <Link href={route('gudang.opname.create')} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+        <Link href={route('gudang.opname.create')} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
           Buat Stok Opname
         </Link>
       }
@@ -52,7 +52,7 @@ export default function OpnameIndex({ opnameList }) {
                   <Badge color={getStatusColor(opname.status)}>{formatStatus(opname.status)}</Badge>
                 </Table.Cell>
                 <Table.Cell>
-                  <Link href={route('gudang.opname.show', opname.id)} className="text-indigo-600 hover:text-indigo-900 font-medium">
+                  <Link href={route('gudang.opname.show', opname.id)} className="text-brand-600 hover:text-brand-900 font-medium">
                     Detail
                   </Link>
                 </Table.Cell>

@@ -122,7 +122,7 @@ export default function Show({ order }) {
                                                     min="0"
                                                     value={data.pcs_per_ukuran[size] || ''}
                                                     onChange={e => handlePcsChange(size, e.target.value)}
-                                                    className="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                                    className="w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                                                 />
                                             </div>
                                         ))}
@@ -139,15 +139,15 @@ export default function Show({ order }) {
                                     <h4 className="font-medium text-gray-700 mb-3 border-b pb-2">Checklist QC</h4>
                                     <div className="space-y-3">
                                         <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_akurasi_ukuran} onChange={e => setData('qc_akurasi_ukuran', e.target.checked)} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                            <input type="checkbox" checked={data.qc_akurasi_ukuran} onChange={e => setData('qc_akurasi_ukuran', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
                                             <span className="ml-2 text-sm text-gray-600">Akurasi pola/ukuran sesuai SPK</span>
                                         </label>
                                         <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_arah_kain} onChange={e => setData('qc_arah_kain', e.target.checked)} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                            <input type="checkbox" checked={data.qc_arah_kain} onChange={e => setData('qc_arah_kain', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
                                             <span className="ml-2 text-sm text-gray-600">Arah serat kain / motif benar</span>
                                         </label>
                                         <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_tidak_cacat} onChange={e => setData('qc_tidak_cacat', e.target.checked)} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                                            <input type="checkbox" checked={data.qc_tidak_cacat} onChange={e => setData('qc_tidak_cacat', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
                                             <span className="ml-2 text-sm text-gray-600">Tidak ada cacat kain (bolong, noda)</span>
                                         </label>
                                     </div>
@@ -159,7 +159,7 @@ export default function Show({ order }) {
                                         value={data.catatan_qc}
                                         onChange={e => setData('catatan_qc', e.target.value)}
                                         rows={2}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        className="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                                     />
                                 </div>
 
@@ -167,7 +167,7 @@ export default function Show({ order }) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
                                     >
                                         Simpan Progress
                                     </button>

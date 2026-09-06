@@ -79,11 +79,6 @@ class Order extends Model
         'sisa_bayar' => 'decimal:2',
     ];
 
-    public function getSisaBayarAttribute(): float
-    {
-        return (float) ($this->total_harga - $this->dp);
-    }
-
     public function getNextStatus(): ?string
     {
         $statuses = array_keys(self::STATUS_LABELS);

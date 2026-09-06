@@ -10,7 +10,7 @@ export default function KanbanCard({ order, imagePlaceholder, badgeText, badgeCo
     return (
         <div 
             onClick={onClick}
-            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-200"
+            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:border-brand-400 hover:shadow-md transition-all duration-200"
         >
             {imagePlaceholder && (
                 <div className="bg-gray-100 rounded-md h-24 w-full flex items-center justify-center mb-3">

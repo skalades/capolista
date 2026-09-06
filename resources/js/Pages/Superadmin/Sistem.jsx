@@ -1,15 +1,12 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head } from '@inertiajs/react';
 
 export default function Sistem({ auth, phpVersion, laravelVersion, diskUsage, recordCounts }) {
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Informasi Sistem</h2>}
+        <AppLayout
+            title="Informasi Sistem"
         >
-            <Head title="Informasi Sistem" />
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     
@@ -29,7 +26,7 @@ export default function Sistem({ auth, phpVersion, laravelVersion, diskUsage, re
                                 <div className="mt-2">
                                     <div className="w-full bg-gray-200 rounded-full h-4">
                                         <div 
-                                            className={`h-4 rounded-full ${diskUsage > 80 ? 'bg-red-600' : (diskUsage > 60 ? 'bg-yellow-400' : 'bg-blue-600')}`} 
+                                            className={`h-4 rounded-full ${diskUsage > 80 ? 'bg-red-600' : (diskUsage > 60 ? 'bg-yellow-400' : 'bg-brand-600')}`} 
                                             style={{ width: `${diskUsage}%` }}
                                         ></div>
                                     </div>
@@ -67,6 +64,6 @@ export default function Sistem({ auth, phpVersion, laravelVersion, diskUsage, re
 
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

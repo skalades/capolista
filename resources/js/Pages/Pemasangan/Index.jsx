@@ -45,7 +45,7 @@ export default function Index({ orders, filters }) {
                       </Badge>
                     </Table.Cell>
                     <Table.Cell>
-                      <Link href={route('pemasangan.show', order.id)} className="text-indigo-600 hover:text-indigo-900 font-medium mr-3">
+                      <Link href={route('pemasangan.show', order.id)} className="text-brand-600 hover:text-brand-900 font-medium mr-3">
                         Detail
                       </Link>
                     </Table.Cell>

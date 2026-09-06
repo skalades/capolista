@@ -47,7 +47,7 @@ export default function CustomerIndex({ customers, filters }) {
                                     <td className="px-6 py-4 whitespace-nowrap">{customer.kontak}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{customer.email || '-'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <Link href={route('customers.show', customer.id)} className="text-indigo-600 hover:text-indigo-900 mr-4">Lihat</Link>
+                                        <Link href={route('customers.show', customer.id)} className="text-brand-600 hover:text-brand-900 mr-4">Lihat</Link>
                                         <Link href={route('customers.edit', customer.id)} className="text-blue-600 hover:text-blue-900 mr-4">Edit</Link>
                                         <button 
                                             onClick={() => {

@@ -18,7 +18,7 @@ const colorClasses = {
     purple: { bg: 'bg-purple-100', text: 'text-purple-800', badge: 'bg-purple-500' },
     pink: { bg: 'bg-pink-100', text: 'text-pink-800', badge: 'bg-pink-500' },
     teal: { bg: 'bg-teal-100', text: 'text-teal-800', badge: 'bg-teal-500' },
-    indigo: { bg: 'bg-indigo-100', text: 'text-indigo-800', badge: 'bg-indigo-500' },
+    indigo: { bg: 'bg-brand-100', text: 'text-brand-800', badge: 'bg-brand-500' },
     green: { bg: 'bg-green-100', text: 'text-green-800', badge: 'bg-green-500' },
 };
 

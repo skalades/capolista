@@ -19,23 +19,74 @@ class KeuanganController extends Controller
 
         $omzet = Pembayaran::whereBetween('tanggal', [$startOfMonth, $endOfMonth])->sum('jumlah');
         $kasKeluar = Pengeluaran::whereBetween('tanggal', [$startOfMonth, $endOfMonth])->sum('jumlah');
-        $piutang = Order::sum('sisa_bayar');
+        $piutang = Order::where('sisa_bayar', '>', 0)->sum('sisa_bayar');
+        $labaBersih = $omzet - $kasKeluar;
 
-        $recentPembayarans = Pembayaran::with(['order', 'pencatat'])->latest()->take(5)->get();
+        $recentPembayarans = Pembayaran::with(['order.customer', 'pencatat'])->latest()->take(5)->get();
         $recentPengeluarans = Pengeluaran::with(['pencatat'])->latest()->take(5)->get();
+
+        // Piutang Menunggak (sisa_bayar > 0), ordered by tanggal_order ASC to get the oldest
+        $piutangMenunggak = Order::where('sisa_bayar', '>', 0)
+            ->with('customer')
+            ->orderBy('tanggal_order', 'asc')
+            ->take(3)
+            ->get()
+            ->map(function ($order) {
+                $days = (int) Carbon::parse($order->tanggal_order)->diffInDays(Carbon::now());
+                return [
+                    'id' => $order->id,
+                    'no_order' => $order->no_order,
+                    'customer' => $order->customer->nama ?? 'Unknown',
+                    'sisa_bayar' => $order->sisa_bayar,
+                    'hari' => $days
+                ];
+            });
+
+        // Kontribusi Omzet Tertinggi
+        $topOmzet = Order::whereBetween('tanggal_order', [$startOfMonth, $endOfMonth])
+            ->with('customer')
+            ->orderBy('total_harga', 'desc')
+            ->take(3)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'no_order' => $order->no_order,
+                    'customer' => $order->customer->nama ?? 'Unknown',
+                    'total_harga' => $order->total_harga
+                ];
+            });
+
+        // Arus Kas 7 Hari Terakhir
+        $arusKas = collect();
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->toDateString();
+            $pemasukan = Pembayaran::whereDate('tanggal', $date)->sum('jumlah');
+            $pengeluaran = Pengeluaran::whereDate('tanggal', $date)->sum('jumlah');
+            
+            $arusKas->push([
+                'date' => Carbon::parse($date)->format('d M'),
+                'pemasukan' => $pemasukan,
+                'pengeluaran' => $pengeluaran
+            ]);
+        }
 
         return Inertia::render('Keuangan/Index', [
             'omzet' => (float) $omzet,
             'kasKeluar' => (float) $kasKeluar,
             'piutang' => (float) $piutang,
+            'labaBersih' => (float) $labaBersih,
             'recentPembayarans' => $recentPembayarans,
             'recentPengeluarans' => $recentPengeluarans,
+            'piutangMenunggak' => $piutangMenunggak,
+            'topOmzet' => $topOmzet,
+            'arusKas' => $arusKas
         ]);
     }
 
     public function pembayaranIndex(Request $request)
     {
-        $query = Pembayaran::with(['order.customer', 'pencatat'])->latest('tanggal')->latest('id');
+        $query = Pembayaran::with(['order.customer', 'pencatat'])->latest();
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('tanggal', [$request->start_date, $request->end_date]);
@@ -73,6 +124,13 @@ class KeuanganController extends Controller
         });
 
         return back()->with('success', 'Pembayaran berhasil dicatat.');
+    }
+
+    public function pembayaranKwitansi(Pembayaran $pembayaran)
+    {
+        $pembayaran->load(['order.customer', 'pencatat']);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.kwitansi', compact('pembayaran'));
+        return $pdf->stream("KWITANSI-{$pembayaran->order->no_order}-{$pembayaran->id}.pdf");
     }
 
     public function pengeluaranIndex(Request $request)

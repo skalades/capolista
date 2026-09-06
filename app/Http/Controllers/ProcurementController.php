@@ -8,6 +8,7 @@ use App\Models\Supplier;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\StokBahan;
+use App\Models\StokMutasi;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,17 +18,12 @@ class ProcurementController extends Controller
     {
         $aktifPoCount = PurchaseOrder::whereIn('status', ['draft', 'dikirim'])->count();
         $supplierCount = Supplier::count();
-        
-        // Example: alert kebutuhan bahan (you can customize logic based on what is 'kebutuhan bahan')
-        // Maybe find items with low stock. Assuming StokBahan has 'stok_minimal' and 'stok'
-        // $kebutuhanBahan = StokBahan::whereColumn('stok', '<', 'stok_minimal')->get();
-        // Here we just return an empty array or basic data if the table structure is not fully known.
-        
+
         return Inertia::render('Procurement/Index', [
             'stats' => [
-                'aktifPoCount' => $aktifPoCount,
+                'aktifPoCount'  => $aktifPoCount,
                 'supplierCount' => $supplierCount,
-                'kebutuhanBahan' => [] // to be populated
+                'kebutuhanBahan' => StokBahan::whereColumn('jumlah_stok', '<=', 'minimum_stok')->get(['id', 'nama_bahan', 'satuan', 'jumlah_stok', 'minimum_stok']),
             ]
         ]);
     }
@@ -43,58 +39,61 @@ class ProcurementController extends Controller
     public function supplierStore(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'kontak' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'alamat' => 'nullable|string',
+            'nama'    => 'required|string|max:255',
+            'kontak'  => 'nullable|string|max:255',
+            'email'   => 'nullable|email|max:255',
+            'alamat'  => 'nullable|string',
             'catatan' => 'nullable|string',
         ]);
 
         Supplier::create($validated);
-        return redirect()->back()->with('success', 'Supplier created successfully.');
+        // Fix #13: pesan dalam Bahasa Indonesia
+        return redirect()->back()->with('success', 'Supplier berhasil ditambahkan.');
     }
 
     public function supplierUpdate(Request $request, Supplier $supplier)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'kontak' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'alamat' => 'nullable|string',
+            'nama'    => 'required|string|max:255',
+            'kontak'  => 'nullable|string|max:255',
+            'email'   => 'nullable|email|max:255',
+            'alamat'  => 'nullable|string',
             'catatan' => 'nullable|string',
         ]);
 
         $supplier->update($validated);
-        return redirect()->back()->with('success', 'Supplier updated successfully.');
+        // Fix #13: pesan dalam Bahasa Indonesia
+        return redirect()->back()->with('success', 'Supplier berhasil diperbarui.');
     }
 
     public function supplierDestroy(Supplier $supplier)
     {
         $supplier->delete();
-        return redirect()->back()->with('success', 'Supplier deleted successfully.');
+        // Fix #13: pesan dalam Bahasa Indonesia
+        return redirect()->back()->with('success', 'Supplier berhasil dihapus.');
     }
 
     public function poIndex(Request $request)
     {
         $query = PurchaseOrder::with(['supplier', 'creator']);
-        
+
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
         }
 
-        $purchaseOrders = $query->orderBy('tanggal_po', 'desc')->paginate(10);
+        $purchaseOrders = $query->orderBy('tanggal_po', 'desc')->paginate(10)->withQueryString();
         return Inertia::render('Procurement/PoIndex', [
             'purchaseOrders' => $purchaseOrders,
-            'filters' => $request->only('status')
+            'filters'        => $request->only('status')
         ]);
     }
 
     public function poCreate()
     {
-        $suppliers = Supplier::all();
-        $stokBahans = class_exists(StokBahan::class) ? StokBahan::all() : [];
+        $suppliers  = Supplier::all();
+        $stokBahans = StokBahan::orderBy('nama_bahan')->get(['id', 'nama_bahan', 'satuan']);
         return Inertia::render('Procurement/PoCreate', [
-            'suppliers' => $suppliers,
+            'suppliers'  => $suppliers,
             'stokBahans' => $stokBahans
         ]);
     }
@@ -102,33 +101,34 @@ class ProcurementController extends Controller
     public function poStore(Request $request)
     {
         $validated = $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'tanggal_po' => 'required|date',
-            'catatan' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.bahan_id' => 'nullable|integer',
-            'items.*.nama_bahan' => 'required|string',
-            'items.*.jumlah' => 'required|numeric|min:0.01',
-            'items.*.satuan' => 'required|string',
-            'items.*.harga_satuan' => 'required|numeric|min:0',
+            'supplier_id'            => 'required|exists:suppliers,id',
+            'tanggal_po'             => 'required|date',
+            'catatan'                => 'nullable|string',
+            'items'                  => 'required|array|min:1',
+            'items.*.bahan_id'       => 'nullable|integer|exists:stok_bahans,id',
+            'items.*.nama_bahan'     => 'required|string',
+            'items.*.jumlah'         => 'required|numeric|min:0.01',
+            'items.*.satuan'         => 'required|string',
+            'items.*.harga_satuan'   => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated) {
-            // Generate NO PO
-            $noPo = 'PO-' . date('Ymd') . '-' . str_pad(PurchaseOrder::count() + 1, 4, '0', STR_PAD_LEFT);
-            
-            $totalHarga = collect($validated['items'])->sum(function($item) {
-                return $item['jumlah'] * $item['harga_satuan'];
-            });
+            // Fix race condition: gunakan lockForUpdate saat generate nomor PO
+            $lastPo = PurchaseOrder::lockForUpdate()->latest('id')->first();
+            $nextNum = $lastPo ? $lastPo->id + 1 : 1;
+            $noPo = 'PO-' . date('Ymd') . '-' . str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+
+            $totalHarga = collect($validated['items'])->sum(fn ($item) => $item['jumlah'] * $item['harga_satuan']);
 
             $po = PurchaseOrder::create([
-                'no_po' => $noPo,
-                'supplier_id' => $validated['supplier_id'],
-                'tanggal_po' => $validated['tanggal_po'],
-                'status' => 'draft',
-                'total_harga' => $totalHarga,
-                'catatan' => $validated['catatan'] ?? null,
-                'dibuat_oleh' => Auth::id() ?? 1, // Fallback if no auth
+                'no_po'        => $noPo,
+                'supplier_id'  => $validated['supplier_id'],
+                'tanggal_po'   => $validated['tanggal_po'],
+                'status'       => 'draft',
+                'total_harga'  => $totalHarga,
+                'catatan'      => $validated['catatan'] ?? null,
+                // Fix #19: hapus fallback ?? 1, middleware sudah memastikan user login
+                'dibuat_oleh'  => Auth::id(),
             ]);
 
             foreach ($validated['items'] as $item) {
@@ -136,7 +136,7 @@ class ProcurementController extends Controller
             }
         });
 
-        return redirect()->route('procurement.po.index')->with('success', 'Purchase Order created.');
+        return redirect()->route('procurement.po.index')->with('success', 'Purchase Order berhasil dibuat.');
     }
 
     public function poShow(PurchaseOrder $po)
@@ -154,28 +154,31 @@ class ProcurementController extends Controller
         ]);
 
         DB::transaction(function () use ($po, $validated) {
-            $po->status = $validated['status'];
-            $po->save();
+            $po->update(['status' => $validated['status']]);
 
-            // if status is received, update stock
-            if ($po->status === 'diterima' && class_exists(StokBahan::class)) {
+            // Fix #4: Saat PO diterima, update stok dengan field yang benar (jumlah_stok)
+            // dan buat StokMutasi sebagai audit trail
+            if ($validated['status'] === 'diterima') {
                 foreach ($po->items as $item) {
                     if ($item->bahan_id) {
-                        $bahan = StokBahan::find($item->bahan_id);
+                        $bahan = StokBahan::lockForUpdate()->find($item->bahan_id);
                         if ($bahan) {
-                            // Assuming StokBahan has a field 'jumlah' or 'stok'. I'll use 'jumlah' as a guess or simply skip.
-                            // The exact field name depends on their schema.
-                            // For safety, let's assume it has 'stok' or 'jumlah'
-                            $field = \Schema::hasColumn('stok_bahans', 'stok') ? 'stok' : (\Schema::hasColumn('stok_bahans', 'jumlah') ? 'jumlah' : null);
-                            if ($field) {
-                                $bahan->increment($field, $item->jumlah);
-                            }
+                            $bahan->increment('jumlah_stok', $item->jumlah);
+
+                            // Buat audit trail mutasi stok
+                            StokMutasi::create([
+                                'bahan_id'          => $bahan->id,
+                                'tipe'              => 'masuk',
+                                'jumlah'            => $item->jumlah,
+                                'keterangan'        => "Penerimaan PO #{$po->no_po} dari {$po->supplier->nama}",
+                                'mutasi_created_by' => Auth::id(),
+                            ]);
                         }
                     }
                 }
             }
         });
 
-        return redirect()->back()->with('success', 'Status PO updated.');
+        return redirect()->back()->with('success', 'Status PO berhasil diperbarui.');
     }
 }

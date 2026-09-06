@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import Modal from '@/Components/Modal';
 import InputError from '@/Components/InputError';
@@ -65,12 +65,9 @@ export default function Roles({ auth, roles }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Kelola Roles</h2>}
+        <AppLayout
+            title="Kelola Roles"
         >
-            <Head title="Kelola Roles" />
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -97,7 +94,7 @@ export default function Roles({ auth, roles }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{role.name}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{role.guard_name}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <button onClick={() => openEditModal(role)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                    <button onClick={() => openEditModal(role)} className="text-brand-600 hover:text-brand-900 mr-4">Edit</button>
                                                     <button onClick={() => openDeleteModal(role)} className="text-red-600 hover:text-red-900">Hapus</button>
                                                 </td>
                                             </tr>
@@ -179,6 +176,6 @@ export default function Roles({ auth, roles }) {
                 </form>
             </Modal>
 
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

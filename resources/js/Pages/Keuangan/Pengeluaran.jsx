@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import CurrencyInput from '@/Components/CurrencyInput';
 
 export default function Pengeluaran({ pengeluarans }) {
     const fmtRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
@@ -63,48 +65,51 @@ export default function Pengeluaran({ pengeluarans }) {
                 </table>
             </div>
 
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-lg">
-                        <h3 className="text-lg font-bold mb-4">Catat Pengeluaran</h3>
-                        <form onSubmit={submit} className="space-y-4">
-                            <div>
-                                <label className="block mb-1 text-sm font-medium">Kategori</label>
-                                <select className="w-full border-gray-300 rounded" value={data.kategori} onChange={e => setData('kategori', e.target.value)}>
-                                    <option value="operasional">Operasional</option>
-                                    <option value="bahan_baku">Bahan Baku</option>
-                                    <option value="lainnya">Lainnya</option>
-                                </select>
-                            </div>
-                            
-                            <div>
-                                <label className="block mb-1 text-sm font-medium">Deskripsi</label>
-                                <input type="text" className="w-full border-gray-300 rounded" value={data.deskripsi} onChange={e => setData('deskripsi', e.target.value)} required />
-                            </div>
+            <Modal show={showModal} onClose={() => setShowModal(false)} maxWidth="lg">
+                <div className="p-6">
+                    <h3 className="text-lg font-bold mb-4">Catat Pengeluaran</h3>
+                    <form onSubmit={submit} className="space-y-4">
+                        <div>
+                            <label className="block mb-1 text-sm font-medium">Kategori</label>
+                            <select className="w-full border-gray-300 rounded" value={data.kategori} onChange={e => setData('kategori', e.target.value)}>
+                                <option value="operasional">Operasional</option>
+                                <option value="bahan_baku">Bahan Baku</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block mb-1 text-sm font-medium">Deskripsi</label>
+                            <input type="text" className="w-full border-gray-300 rounded" value={data.deskripsi} onChange={e => setData('deskripsi', e.target.value)} required />
+                        </div>
 
-                            <div>
-                                <label className="block mb-1 text-sm font-medium">Jumlah (Rp)</label>
-                                <input type="number" className="w-full border-gray-300 rounded" value={data.jumlah} onChange={e => setData('jumlah', e.target.value)} required />
-                            </div>
+                        <div>
+                            <label className="block mb-1 text-sm font-medium">Jumlah (Rp)</label>
+                            <CurrencyInput 
+                                className="w-full border-gray-300 rounded" 
+                                value={data.jumlah} 
+                                onChange={e => setData('jumlah', e.target.value)} 
+                                required 
+                            />
+                        </div>
 
-                            <div>
-                                <label className="block mb-1 text-sm font-medium">Order Terkait (Opsional)</label>
-                                <input type="number" className="w-full border-gray-300 rounded" placeholder="ID Order" value={data.order_id} onChange={e => setData('order_id', e.target.value)} />
-                            </div>
+                        <div>
+                            <label className="block mb-1 text-sm font-medium">Order Terkait (Opsional)</label>
+                            <input type="number" className="w-full border-gray-300 rounded" placeholder="ID Order" value={data.order_id} onChange={e => setData('order_id', e.target.value)} />
+                        </div>
 
-                            <div>
-                                <label className="block mb-1 text-sm font-medium">Tanggal</label>
-                                <input type="date" className="w-full border-gray-300 rounded" value={data.tanggal} onChange={e => setData('tanggal', e.target.value)} required />
-                            </div>
+                        <div>
+                            <label className="block mb-1 text-sm font-medium">Tanggal</label>
+                            <input type="date" className="w-full border-gray-300 rounded" value={data.tanggal} onChange={e => setData('tanggal', e.target.value)} required />
+                        </div>
 
-                            <div className="flex justify-end gap-2 mt-6">
-                                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded">Batal</button>
-                                <button type="submit" disabled={processing} className="px-4 py-2 text-white bg-red-600 rounded">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
+                        <div className="flex justify-end gap-2 mt-6">
+                            <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded">Batal</button>
+                            <button type="submit" disabled={processing} className="px-4 py-2 text-white bg-red-600 rounded">Simpan</button>
+                        </div>
+                    </form>
                 </div>
-            )}
+            </Modal>
         </AppLayout>
     );
 }

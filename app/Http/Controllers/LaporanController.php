@@ -70,7 +70,8 @@ class LaporanController extends Controller
         $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
 
         $omzet = \App\Models\Pembayaran::whereBetween('tanggal', [$startDate, $endDate])->sum('jumlah');
-        $biayaOperasional = \App\Models\Pengeluaran::whereBetween('tanggal', [$startDate, $endDate])->sum('nominal');
+        // Fix #3: field yang benar adalah 'jumlah', bukan 'nominal'
+        $biayaOperasional = \App\Models\Pengeluaran::whereBetween('tanggal', [$startDate, $endDate])->sum('jumlah');
         $biayaGaji = \App\Models\Penggajian::whereIn('status_bayar', [\App\Models\Penggajian::STATUS_DISETUJUI, \App\Models\Penggajian::STATUS_DIBAYAR])
             ->whereBetween('periode_selesai', [$startDate, $endDate])->sum('total_upah_bersih');
         
@@ -93,16 +94,70 @@ class LaporanController extends Controller
     }
 
     /**
-     * Laporan performa per divisi
+     * Laporan performa per divisi — jumlah order masuk/keluar dan rata-rata durasi
      */
     public function divisi(Request $request)
     {
+        $startDate = $request->input('start_date', now()->startOfMonth()->toDateString());
+        $endDate   = $request->input('end_date', now()->endOfMonth()->toDateString());
+
+        // Mapping status order ke divisi yang bertanggung jawab
+        $divisiStatusMap = [
+            'desain'     => Order::STATUS_DESAIN,
+            'cutting'    => Order::STATUS_CUTTING,
+            'jahit'      => Order::STATUS_JAHIT,
+            'printing'   => Order::STATUS_PRINTING,
+            'pemasangan' => Order::STATUS_PEMASANGAN,
+            'gudang'     => Order::STATUS_PACKING,
+            'pembelian'  => Order::STATUS_PROCUREMENT,
+        ];
+
+        $performaDivisi = [];
+        foreach ($divisiStatusMap as $divisi => $status) {
+            // Order yang pernah masuk ke status divisi ini dalam periode
+            $masuk = \App\Models\OrderLog::where('status_baru', $status)
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->count();
+
+            // Order yang sudah selesai dari status divisi ini (pindah ke status berikutnya)
+            $selesai = \App\Models\OrderLog::where('status_lama', $status)
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->count();
+
+            // Rata-rata durasi di divisi ini (dalam jam)
+            $avgDurasi = 0;
+            $logsMasuk = \App\Models\OrderLog::where('status_baru', $status)
+                ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+                ->pluck('order_id');
+
+            if ($logsMasuk->isNotEmpty()) {
+                $durasiTotal = 0;
+                $durasiCount = 0;
+                foreach ($logsMasuk as $orderId) {
+                    $logMasuk  = \App\Models\OrderLog::where('order_id', $orderId)->where('status_baru', $status)->first();
+                    $logKeluar = \App\Models\OrderLog::where('order_id', $orderId)->where('status_lama', $status)->first();
+                    if ($logMasuk && $logKeluar) {
+                        $durasiTotal += $logMasuk->created_at->diffInHours($logKeluar->created_at);
+                        $durasiCount++;
+                    }
+                }
+                $avgDurasi = $durasiCount > 0 ? round($durasiTotal / $durasiCount, 1) : 0;
+            }
+
+            $performaDivisi[$divisi] = [
+                'masuk'      => $masuk,
+                'selesai'    => $selesai,
+                'avg_durasi_jam' => $avgDurasi,
+                'terlambat'  => Order::whereIn('status', [$status])
+                    ->where('deadline', '<', now()->toDateString())
+                    ->count(),
+            ];
+        }
+
         return Inertia::render('Laporan/Divisi', [
-            'filters' => $request->only(['start_date', 'end_date']),
-            'performa_divisi' => [
-                // example
-                // 'desain' => ['diproses' => 0, 'avg_waktu' => 0, 'terlambat' => 0]
-            ]
+            'filters'          => ['start_date' => $startDate, 'end_date' => $endDate],
+            'performa_divisi'  => $performaDivisi,
+            'divisiList'       => \App\Models\User::DIVISI_LIST,
         ]);
     }
 

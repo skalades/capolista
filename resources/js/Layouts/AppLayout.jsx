@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import {
     HomeIcon,
     ClipboardDocumentListIcon,
@@ -12,7 +13,13 @@ import {
     ArrowRightOnRectangleIcon,
     BellIcon,
     Bars3Icon,
-    XMarkIcon
+    XMarkIcon,
+    ClockIcon,
+    ExclamationTriangleIcon,
+    ShoppingCartIcon,
+    UserGroupIcon,
+    ChartBarIcon,
+    ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 // Panggil route() dengan aman — kembalikan '#' jika route belum terdaftar
@@ -33,18 +40,22 @@ function isActive(name) {
 }
 
 const MENU_ITEMS = [
-    { name: 'Dashboard',    routeName: 'dashboard',       icon: HomeIcon,                   levels: [0, 1, 2, 3, 4] },
-    { name: 'Kelola Order', routeName: 'orders.index',    icon: ClipboardDocumentListIcon,  levels: [0, 1, 2] },
-    { name: 'Order Saya',   routeName: 'orders.index',    icon: ClipboardDocumentListIcon,  levels: [3, 4] },
-    { name: 'Desain',       routeName: 'desain.index',    icon: PaintBrushIcon,             levels: [0, 2, 3, 4], divisi: ['desain'] },
-    { name: 'Cutting',      routeName: 'cutting.index',   icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['cutting'] },
-    { name: 'Jahit',        routeName: 'jahit.index',     icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['jahit'] },
-    { name: 'Printing',     routeName: 'printing.index',  icon: PrinterIcon,                levels: [0, 2, 3, 4], divisi: ['printing'] },
-    { name: 'Pemasangan',   routeName: 'pemasangan.index',icon: WrenchScrewdriverIcon,      levels: [0, 2, 3, 4], divisi: ['pemasangan'] },
-    { name: 'Produksi',     routeName: 'produksi.index',  icon: Cog6ToothIcon,              levels: [0, 2, 3, 4], divisi: ['produksi'] },
-    { name: 'Gudang & Stok',routeName: 'gudang.index',    icon: ArchiveBoxIcon,             levels: [0, 2, 3, 4], divisi: ['gudang'] },
-    { name: 'Keuangan',     routeName: 'keuangan.index',  icon: ClipboardDocumentListIcon,  levels: [0, 1, 2, 3, 4], divisi: ['keuangan'] },
-    { name: 'Pengguna',     routeName: 'users.index',     icon: UsersIcon,                  levels: [0, 2] },
+    { name: 'Dashboard',         routeName: 'dashboard',          icon: HomeIcon,                   levels: [0, 1, 2, 3, 4] },
+    { name: 'Kelola Order',      routeName: 'orders.index',       icon: ClipboardDocumentListIcon,  levels: [0, 1, 2] },
+    { name: 'Order Saya',        routeName: 'orders.index',       icon: ClipboardDocumentListIcon,  levels: [3, 4] },
+    { name: 'Desain',            routeName: 'desain.index',       icon: PaintBrushIcon,             levels: [0, 1, 2, 3, 4], divisi: ['desain'] },
+    { name: 'Cutting',           routeName: 'cutting.index',      icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['cutting'] },
+    { name: 'Jahit',             routeName: 'jahit.index',        icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['jahit'] },
+    { name: 'Printing',          routeName: 'printing.index',     icon: PrinterIcon,                levels: [0, 1, 2, 3, 4], divisi: ['printing'] },
+    { name: 'Pemasangan',        routeName: 'pemasangan.index',   icon: WrenchScrewdriverIcon,      levels: [0, 1, 2, 3, 4], divisi: ['pemasangan'] },
+    { name: 'Produksi',          routeName: 'produksi.index',     icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['produksi'] },
+    { name: 'Procurement',       routeName: 'procurement.index',  icon: ShoppingCartIcon,           levels: [0, 1, 2, 3, 4], divisi: ['pembelian'] },
+    { name: 'Gudang & Stok',     routeName: 'gudang.index',       icon: ArchiveBoxIcon,             levels: [0, 1, 2, 3, 4], divisi: ['gudang'] },
+    { name: 'Keuangan',          routeName: 'keuangan.index',     icon: ClipboardDocumentListIcon,  levels: [0, 1, 2, 3, 4], divisi: ['keuangan'] },
+    { name: 'HR & Gaji',         routeName: 'hr.penggajian.index',icon: UserGroupIcon,              levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
+    { name: 'Laporan',           routeName: 'laporan.index',      icon: ChartBarIcon,               levels: [0, 1, 2] },
+    { name: 'Pengguna',          routeName: 'users.index',        icon: UsersIcon,                  levels: [0, 2] },
+    { name: 'Superadmin',        routeName: 'superadmin.index',   icon: ShieldCheckIcon,            levels: [0] },
 ];
 
 export default function AppLayout({ children, title = '', headerActions }) {
@@ -53,6 +64,49 @@ export default function AppLayout({ children, title = '', headerActions }) {
     const levelAkses = user?.level_akses ?? -1;
     
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // ——— Notification Bell State ———
+    const [notifOpen, setNotifOpen]           = useState(false);
+    const [notifData, setNotifData]           = useState({ count: 0, orders: [] });
+    const notifRef                            = useRef(null);
+
+    const fetchDeadlines = async () => {
+        try {
+            const { data } = await axios.get(route('notifications.deadlines'));
+            setNotifData(data);
+        } catch {
+            // silent fail — topbar tidak boleh crash
+        }
+    };
+
+    useEffect(() => {
+        fetchDeadlines();
+        const interval = setInterval(fetchDeadlines, 5 * 60 * 1000); // refresh tiap 5 menit
+        return () => clearInterval(interval);
+    }, []);
+
+    // Tutup dropdown notifikasi jika klik di luar
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (notifRef.current && !notifRef.current.contains(e.target)) {
+                setNotifOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const getDayLabel = (days) => {
+        if (days === 0) return 'Hari ini!';
+        if (days === 1) return 'Besok';
+        return `${days} hari lagi`;
+    };
+
+    const getDayColor = (days) => {
+        if (days === 0) return 'text-red-600';
+        if (days === 1) return 'text-orange-500';
+        return 'text-yellow-600';
+    };
 
     const visibleMenu = MENU_ITEMS.filter(item => {
         if (!item.levels.includes(levelAkses)) return false;
@@ -151,13 +205,95 @@ export default function AppLayout({ children, title = '', headerActions }) {
                                 {headerActions}
                             </div>
                         )}
-                        <button
-                            className="p-2 text-gray-400 hover:text-brand-600 rounded-full hover:bg-gray-100 transition-colors relative"
-                            title="Notifikasi"
-                        >
-                            <BellIcon className="h-6 w-6" />
-                            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                        </button>
+
+                        {/* ——— Notification Bell Dropdown ——— */}
+                        <div className="relative" ref={notifRef}>
+                            <button
+                                onClick={() => setNotifOpen((o) => !o)}
+                                className="p-2 text-gray-400 hover:text-brand-600 rounded-full hover:bg-gray-100 transition-colors relative"
+                                title="Notifikasi Deadline"
+                            >
+                                <BellIcon className={`h-6 w-6 ${notifData.count > 0 ? 'text-orange-500' : ''}`} />
+                                {notifData.count > 0 && (
+                                    <span className="absolute top-1 right-1 min-w-[18px] h-[18px] rounded-full bg-red-500 ring-2 ring-white text-white text-[10px] font-bold flex items-center justify-center px-0.5">
+                                        {notifData.count > 9 ? '9+' : notifData.count}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Dropdown Panel */}
+                            {notifOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                                    {/* Header dropdown */}
+                                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-orange-50">
+                                        <div className="flex items-center gap-2">
+                                            <ExclamationTriangleIcon className="h-4 w-4 text-orange-500" />
+                                            <p className="text-sm font-semibold text-orange-800">
+                                                Deadline dalam 3 Hari
+                                            </p>
+                                        </div>
+                                        {notifData.count > 0 && (
+                                            <span className="text-xs bg-orange-200 text-orange-800 font-medium px-2 py-0.5 rounded-full">
+                                                {notifData.count} order
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* List */}
+                                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                                        {notifData.orders.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                                                <BellIcon className="h-10 w-10 mb-2 opacity-30" />
+                                                <p className="text-sm">Tidak ada deadline mendekat</p>
+                                            </div>
+                                        ) : (
+                                            notifData.orders.map((order) => (
+                                                <div
+                                                    key={order.id}
+                                                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                                            order.days_remaining === 0 ? 'bg-red-500' :
+                                                            order.days_remaining === 1 ? 'bg-orange-500' : 'bg-yellow-400'
+                                                        }`} />
+                                                        <div className="min-w-0">
+                                                            <p className="text-sm font-semibold text-gray-800 truncate">
+                                                                {order.no_order}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500 truncate">
+                                                                {order.customer_nama}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="ml-2 shrink-0 text-right">
+                                                        <p className={`text-xs font-semibold ${getDayColor(order.days_remaining)}`}>
+                                                            {getDayLabel(order.days_remaining)}
+                                                        </p>
+                                                        <p className="text-xs text-gray-400 capitalize">
+                                                            {order.status_label}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    {/* Footer */}
+                                    {notifData.count > 0 && (
+                                        <div className="border-t border-gray-100 px-4 py-2.5 bg-gray-50">
+                                            <Link
+                                                href={route('orders.index')}
+                                                onClick={() => setNotifOpen(false)}
+                                                className="text-xs font-medium text-brand-600 hover:text-brand-800 hover:underline"
+                                            >
+                                                Lihat semua order →
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </header>
 

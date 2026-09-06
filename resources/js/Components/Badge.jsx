@@ -5,7 +5,7 @@ export default function Badge({ color = 'gray', dot = false, size = 'md', childr
         yellow: 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
         green: 'bg-green-50 text-green-700 ring-green-600/20',
         blue: 'bg-blue-50 text-blue-700 ring-blue-700/10',
-        indigo: 'bg-indigo-50 text-indigo-700 ring-indigo-700/10',
+        indigo: 'bg-brand-50 text-brand-700 ring-brand-700/10',
         purple: 'bg-purple-50 text-purple-700 ring-purple-700/10',
         pink: 'bg-pink-50 text-pink-700 ring-pink-700/10',
         teal: 'bg-teal-50 text-teal-700 ring-teal-700/10',

@@ -56,7 +56,7 @@ export default function OpnameCreate({ stokList }) {
                     value={data.tanggal} 
                     onChange={e => setData('tanggal', e.target.value)}
                     required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                   />
                   {errors.tanggal && <div className="text-red-500 text-xs mt-1">{errors.tanggal}</div>}
                 </div>
@@ -66,7 +66,7 @@ export default function OpnameCreate({ stokList }) {
                     value={data.catatan}
                     onChange={e => setData('catatan', e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                   />
                 </div>
               </div>
@@ -100,7 +100,7 @@ export default function OpnameCreate({ stokList }) {
                               step="0.01"
                               value={item.stok_fisik}
                               onChange={e => handleItemChange(index, 'stok_fisik', e.target.value)}
-                              className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                              className="block w-24 rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                               placeholder="Fisik"
                             />
                           </Table.Cell>
@@ -117,7 +117,7 @@ export default function OpnameCreate({ stokList }) {
                               value={item.keterangan_selisih}
                               onChange={e => handleItemChange(index, 'keterangan_selisih', e.target.value)}
                               disabled={selisih === 0}
-                              className={`block w-full rounded-md border-gray-300 shadow-sm sm:text-sm ${selisih === 0 ? 'bg-gray-100 cursor-not-allowed' : 'focus:border-indigo-500 focus:ring-indigo-500'}`}
+                              className={`block w-full rounded-md border-gray-300 shadow-sm sm:text-sm ${selisih === 0 ? 'bg-gray-100 cursor-not-allowed' : 'focus:border-brand-500 focus:ring-brand-500'}`}
                               placeholder={selisih !== 0 ? 'Wajib jika selisih' : ''}
                             />
                           </Table.Cell>
@@ -131,7 +131,7 @@ export default function OpnameCreate({ stokList }) {
                 <Link href={route('gudang.opname.index')} className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
                   Batal
                 </Link>
-                <button type="submit" disabled={processing} className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="submit" disabled={processing} className="px-4 py-2 bg-brand-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
                   Simpan Draft
                 </button>
               </div>

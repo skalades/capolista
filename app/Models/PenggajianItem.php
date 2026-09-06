@@ -16,6 +16,7 @@ class PenggajianItem extends Model
 
     public const TIPE_BORONGAN  = 'borongan';
     public const TIPE_HARIAN    = 'harian';
+    public const TIPE_POKOK     = 'pokok';    // Gaji pokok bulanan
     public const TIPE_LEMBUR    = 'lembur';
     public const TIPE_TUNJANGAN = 'tunjangan';
     public const TIPE_POTONGAN  = 'potongan';

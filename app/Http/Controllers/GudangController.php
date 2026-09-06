@@ -15,13 +15,8 @@ use Inertia\Inertia;
 
 class GudangController extends Controller
 {
-        public function index(Request $request)
+    public function index(Request $request)
     {
-        $user = $request->user();
-        if ($user->level_akses === 4 && $user->divisi !== 'gudang' && $user->level_akses !== 3) {
-            abort(403, 'Anda tidak memiliki akses ke modul Gudang.');
-        }
-
         $ordersPacking = Order::with(['customer', 'packing'])
             ->whereIn('status', [Order::STATUS_PACKING, Order::STATUS_DIKIRIM])
             ->latest()

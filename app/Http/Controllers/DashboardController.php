@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-        public function index(Request $request)
+    public function index(Request $request)
     {
         $user = $request->user();
         $level = $user->level_akses;
@@ -28,14 +28,22 @@ class DashboardController extends Controller
             'total_customer'        => \App\Models\Customer::count(),
         ];
         
+        $today = now()->startOfDay();
         $recentOrders = \App\Models\Order::with('customer')->latest()->take(5)->get();
         $upcomingDeadlines = \App\Models\Order::with('customer')
-            ->whereNotIn('status', ['selesai'])
-            ->whereBetween('deadline', [now()->toDateString(), now()->addDays(7)->toDateString()])
+            ->whereNotIn('status', ['selesai', 'dikirim'])
+            ->whereBetween('deadline', [$today->toDateString(), $today->copy()->addDays(3)->toDateString()])
             ->orderBy('deadline')
-            ->take(5)
-            ->get();
+            ->take(10)
+            ->get()
+            ->map(function ($order) use ($today) {
+                $deadlineDay   = $order->deadline->copy()->startOfDay();
+                $daysRemaining = (int) $today->diffInDays($deadlineDay, false);
+                $order->days_remaining = max(0, $daysRemaining);
+                return $order;
+            });
         $lowStockCount = \App\Models\StokBahan::whereColumn('jumlah_stok', '<=', 'minimum_stok')->count();
+
 
         $extraData = [];
 

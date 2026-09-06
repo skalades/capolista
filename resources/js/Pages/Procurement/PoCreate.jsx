@@ -1,11 +1,14 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { Textarea } from '@/Components/ui/textarea';
-import { Trash2, Plus } from 'lucide-react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
+import TextInput from '@/Components/TextInput';
+import InputLabel from '@/Components/InputLabel';
+import InputError from '@/Components/InputError';
+import CurrencyInput from '@/Components/CurrencyInput';
+import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 export default function PoCreate({ auth, suppliers, stokBahans }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -54,11 +57,10 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
     const totalHarga = data.items.reduce((acc, item) => acc + (parseFloat(item.jumlah || 0) * parseFloat(item.harga_satuan || 0)), 0);
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Buat Purchase Order Baru</h2>}
+        <AppLayout
+            title="Buat Purchase Order Baru"
         >
-            <Head title="Buat PO" />
+            
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -67,7 +69,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="supplier_id">Supplier</Label>
+                                    <TextInputLabel htmlFor="supplier_id" value="Supplier"  />
                                     <select 
                                         id="supplier_id" 
                                         className="w-full border-gray-300 rounded-md shadow-sm"
@@ -83,7 +85,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                     {errors.supplier_id && <p className="text-red-500 text-sm">{errors.supplier_id}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="tanggal_po">Tanggal PO</Label>
+                                    <TextInputLabel htmlFor="tanggal_po" value="Tanggal PO"  />
                                     <Input
                                         type="date"
                                         id="tanggal_po"
@@ -96,7 +98,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                             </div>
 
                             <div>
-                                <Label htmlFor="catatan">Catatan / Keterangan</Label>
+                                <TextInputLabel htmlFor="catatan" value="Catatan / Keterangan"  />
                                 <Textarea
                                     id="catatan"
                                     value={data.catatan}
@@ -107,16 +109,16 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                             <div className="border-t pt-4">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="font-bold text-lg">Item Barang</h3>
-                                    <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                                        <Plus className="w-4 h-4 mr-2" /> Tambah Item
-                                    </Button>
+                                    <SecondaryButton type="button" size="sm" onClick={addItem}>
+                                        <PlusIcon className="w-4 h-4 mr-2" /> Tambah Item
+                                    </SecondaryButton>
                                 </div>
 
                                 {data.items.map((item, index) => (
                                     <div key={index} className="flex flex-wrap md:flex-nowrap gap-4 items-end mb-4 border p-4 rounded bg-gray-50">
                                         
                                         <div className="w-full md:w-1/4">
-                                            <Label>Pilih Bahan (Opsional)</Label>
+                                            <TextInputLabel value="Pilih Bahan (Opsional)"  />
                                             <select 
                                                 className="w-full border-gray-300 rounded-md shadow-sm text-sm"
                                                 value={item.bahan_id}
@@ -130,7 +132,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                         </div>
 
                                         <div className="w-full md:w-1/4">
-                                            <Label>Nama Bahan</Label>
+                                            <TextInputLabel value="Nama Bahan"  />
                                             <Input 
                                                 value={item.nama_bahan} 
                                                 onChange={e => handleItemChange(index, 'nama_bahan', e.target.value)} 
@@ -139,7 +141,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                         </div>
 
                                         <div className="w-full md:w-1/6">
-                                            <Label>Jumlah</Label>
+                                            <TextInputLabel value="Jumlah"  />
                                             <Input 
                                                 type="number" 
                                                 step="0.01" 
@@ -151,7 +153,7 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                         </div>
 
                                         <div className="w-full md:w-1/6">
-                                            <Label>Satuan</Label>
+                                            <TextInputLabel value="Satuan"  />
                                             <Input 
                                                 value={item.satuan} 
                                                 onChange={e => handleItemChange(index, 'satuan', e.target.value)} 
@@ -160,9 +162,9 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                         </div>
 
                                         <div className="w-full md:w-1/4">
-                                            <Label>Harga Satuan</Label>
-                                            <Input 
-                                                type="number" 
+                                            <TextInputLabel value="Harga Satuan"  />
+                                            <CurrencyInput 
+                                                className="border rounded px-3 py-2 w-full"
                                                 min="0"
                                                 value={item.harga_satuan} 
                                                 onChange={e => handleItemChange(index, 'harga_satuan', e.target.value)} 
@@ -171,9 +173,9 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                         </div>
                                         
                                         <div>
-                                            <Button type="button" variant="destructive" size="icon" onClick={() => removeItem(index)} disabled={data.items.length === 1}>
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
+                                            <DangerButton type="button" size="icon" onClick={() => removeItem(index)} disabled={data.items.length === 1}>
+                                                <TrashIcon className="w-4 h-4" />
+                                            </DangerButton>
                                         </div>
                                     </div>
                                 ))}
@@ -184,14 +186,14 @@ export default function PoCreate({ auth, suppliers, stokBahans }) {
                                 <div className="text-xl font-bold">
                                     Total Harga: Rp {totalHarga.toLocaleString()}
                                 </div>
-                                <Button type="submit" disabled={processing} className="bg-blue-600 hover:bg-blue-700">
+                                <PrimaryButton type="submit" disabled={processing} className="bg-brand-600 hover:bg-brand-700">
                                     Simpan Purchase Order
-                                </Button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

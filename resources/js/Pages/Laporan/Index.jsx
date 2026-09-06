@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { 
     DocumentChartBarIcon, 
@@ -33,10 +33,7 @@ export default function Index({ auth }) {
     ];
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Laporan & Analitik</h2>}
-        >
+        <AppLayout title="Laporan & Analitik">
             <Head title="Laporan & Analitik" />
 
             <div className="py-12">
@@ -54,7 +51,7 @@ export default function Index({ auth }) {
                                             <report.icon className="w-8 h-8" />
                                         </div>
                                         <div className="ml-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">
                                                 {report.title}
                                             </h3>
                                         </div>
@@ -68,6 +65,6 @@ export default function Index({ auth }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

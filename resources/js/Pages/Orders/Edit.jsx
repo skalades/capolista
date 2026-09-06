@@ -60,7 +60,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                     <select
                                         value={data.customer_id}
                                         onChange={e => setData('customer_id', e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                     >
                                         <option value="">Pilih Customer</option>
                                         {customers.map(c => (
@@ -77,7 +77,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                     type="text"
                                     value={data.jenis_produk}
                                     onChange={e => setData('jenis_produk', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -87,7 +87,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                     type="number"
                                     value={data.jumlah}
                                     onChange={e => setData('jumlah', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
                             
@@ -102,7 +102,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                                 min="0"
                                                 value={data.ukuran_detail[size] || ''}
                                                 onChange={e => handleUkuranChange(size, e.target.value)}
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                             />
                                         </div>
                                     ))}
@@ -118,7 +118,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                         type="date"
                                         value={data.tanggal_order}
                                         onChange={e => setData('tanggal_order', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
                                 <div>
@@ -127,7 +127,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                         type="date"
                                         value={data.deadline}
                                         onChange={e => setData('deadline', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
                             </div>
@@ -139,7 +139,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                         type="text"
                                         value={formatRupiahInput(data.total_harga)}
                                         onChange={e => handleNumberChange('total_harga', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                     />
                                     {errors.total_harga && <p className="mt-2 text-sm text-red-600">{errors.total_harga}</p>}
                                 </div>
@@ -149,7 +149,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                         type="text"
                                         value={formatRupiahInput(data.dp)}
                                         onChange={e => handleNumberChange('dp', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                     />
                                     {errors.dp && <p className="mt-2 text-sm text-red-600">{errors.dp}</p>}
                                 </div>
@@ -161,7 +161,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                     rows={3}
                                     value={data.catatan_desain}
                                     onChange={e => setData('catatan_desain', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -171,7 +171,7 @@ export default function OrderEdit({ order, customers = [] }) {
                                     rows={3}
                                     value={data.catatan}
                                     onChange={e => setData('catatan', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -184,7 +184,7 @@ export default function OrderEdit({ order, customers = [] }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+                            className="rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50"
                         >
                             Simpan Perubahan
                         </button>

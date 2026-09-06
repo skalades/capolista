@@ -240,8 +240,8 @@ class OrderController extends Controller
             Packing::create(['order_id' => $order->id]);
         }
 
-        // Notify
-        $notifiableUsers = \App\Models\User::whereIn('level', [0, 1])->get();
+        // Notify level 0 (Superadmin) dan level 1 (Owner)
+        $notifiableUsers = \App\Models\User::whereIn('level_akses', [0, 1])->get();
         if ($order->creator && !$notifiableUsers->contains('id', $order->creator->id)) {
             $notifiableUsers->push($order->creator);
         }
@@ -273,6 +273,13 @@ class OrderController extends Controller
 
     public function deleteFile(OrderFile $file)
     {
+        $user = auth()->user();
+
+        // Hanya manajemen (level ≤ 2) atau uploader file itu sendiri yang boleh hapus
+        if ($user->level_akses > 2 && $file->uploaded_by !== $user->id) {
+            abort(403, 'Anda tidak berhak menghapus file ini.');
+        }
+
         Storage::disk('public')->delete($file->path);
         $file->delete();
         return back()->with('success', 'File berhasil dihapus.');
@@ -294,9 +301,29 @@ class OrderController extends Controller
 
     public function printInvoice(Order $order)
     {
-        $order->load(['customer', 'creator']);
+        $order->load(['customer', 'creator', 'pembayarans']);
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('order'));
         return $pdf->stream("INVOICE-{$order->no_order}.pdf");
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\OrdersImport, $request->file('file'));
+            return back()->with('success', 'Data order berhasil diimpor dari Excel.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Import error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengimpor data. Pastikan format sesuai.');
+        }
+    }
+
+    public function template()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\OrdersTemplateExport, 'Template_Import_Order.xlsx');
     }
 }
 

@@ -35,7 +35,7 @@ export default function Show({ order }) {
   return (
     <AppLayout title={`Printing ${order.no_order}`}>
       <div className="mb-6 flex space-x-2 text-sm text-gray-500">
-        <Link href={route('printing.index')} className="hover:text-indigo-600">Printing</Link>
+        <Link href={route('printing.index')} className="hover:text-brand-600">Printing</Link>
         <span>/</span>
         <span className="text-gray-900">{order.no_order}</span>
       </div>
@@ -55,7 +55,7 @@ export default function Show({ order }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Metode Cetak</label>
-                  <select value={updateData.metode_cetak} onChange={e => setUpdateData('metode_cetak', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                  <select value={updateData.metode_cetak} onChange={e => setUpdateData('metode_cetak', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="">Pilih Metode</option>
                     <option value="sablon">Sablon</option>
                     <option value="dtf">DTF</option>
@@ -65,22 +65,22 @@ export default function Show({ order }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Jumlah Warna</label>
-                  <input type="number" value={updateData.jumlah_warna} onChange={e => setUpdateData('jumlah_warna', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                  <input type="number" value={updateData.jumlah_warna} onChange={e => setUpdateData('jumlah_warna', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
                   {updateErrors.jumlah_warna && <p className="text-red-500 text-xs mt-1">{updateErrors.jumlah_warna}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                  <input type="date" value={updateData.tanggal_mulai} onChange={e => setUpdateData('tanggal_mulai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                  <input type="date" value={updateData.tanggal_mulai} onChange={e => setUpdateData('tanggal_mulai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
                   {updateErrors.tanggal_mulai && <p className="text-red-500 text-xs mt-1">{updateErrors.tanggal_mulai}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Estimasi Selesai</label>
-                  <input type="date" value={updateData.estimasi_selesai} onChange={e => setUpdateData('estimasi_selesai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                  <input type="date" value={updateData.estimasi_selesai} onChange={e => setUpdateData('estimasi_selesai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
                   {updateErrors.estimasi_selesai && <p className="text-red-500 text-xs mt-1">{updateErrors.estimasi_selesai}</p>}
                 </div>
               </div>
               {printing.status !== 'selesai' && (
-                <button type="submit" disabled={updateProcessing} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <button type="submit" disabled={updateProcessing} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   Simpan Perubahan
                 </button>
               )}
@@ -94,11 +94,11 @@ export default function Show({ order }) {
                   <label className="block text-sm font-medium text-gray-700">Status QC</label>
                   <div className="mt-2 space-x-4">
                     <label className="inline-flex items-center">
-                      <input type="radio" value="lulus" checked={completeData.status_qc === 'lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-indigo-600" />
+                      <input type="radio" value="lulus" checked={completeData.status_qc === 'lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Lulus</span>
                     </label>
                     <label className="inline-flex items-center">
-                      <input type="radio" value="gagal" checked={completeData.status_qc === 'gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-indigo-600" />
+                      <input type="radio" value="gagal" checked={completeData.status_qc === 'gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Gagal</span>
                     </label>
                   </div>
@@ -106,7 +106,7 @@ export default function Show({ order }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Catatan QC</label>
-                  <textarea value={completeData.catatan_qc} onChange={e => setCompleteData('catatan_qc', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                  <textarea value={completeData.catatan_qc} onChange={e => setCompleteData('catatan_qc', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
                   {completeErrors.catatan_qc && <p className="text-red-500 text-xs mt-1">{completeErrors.catatan_qc}</p>}
                 </div>
                 <div>

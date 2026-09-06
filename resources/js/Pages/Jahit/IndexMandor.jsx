@@ -12,6 +12,9 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
     const [qcItem, setQcItem] = useState(null);
     const [qcSizes, setQcSizes] = useState({});
     
+    // Final QC Modal State
+    const [showFinalQcModal, setShowFinalQcModal] = useState(false);
+    
     const openQcModal = (item) => {
         setQcItem(item);
         if (item.rincian_ukuran) {
@@ -400,7 +403,10 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                             >
                                                 Kirim ke Printing
                                             </button>
-                                            <button className="flex-1 bg-white border border-[#e8e4db] hover:bg-gray-50 text-red-600 font-medium py-2.5 rounded text-sm transition-colors">
+                                            <button 
+                                                onClick={() => setShowFinalQcModal(true)}
+                                                className="flex-1 bg-white border border-[#e8e4db] hover:bg-gray-50 text-red-600 font-medium py-2.5 rounded text-sm transition-colors"
+                                            >
                                                 Tandai reject
                                             </button>
                                         </div>
@@ -506,6 +512,48 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                         </div>
                     </form>
                 )}
+            </Modal>
+            {/* Final QC Reject Modal */}
+            <Modal show={showFinalQcModal} onClose={() => setShowFinalQcModal(false)} maxWidth="sm">
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    router.post(route('jahit.qc-reject', selectedOrder.id), {
+                        operator_id: formData.get('operator_id'),
+                        jumlah: formData.get('jumlah'),
+                        alasan: formData.get('alasan')
+                    }, {
+                        onSuccess: () => setShowFinalQcModal(false)
+                    });
+                }} className="p-6">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4">Tandai Reject (Final QC)</h2>
+                    <p className="text-sm text-gray-600 mb-4">Masukan barang yang tidak lolos QC akhir untuk diperbaiki kembali oleh penjahit terkait.</p>
+
+                    <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Penjahit yang mengerjakan</label>
+                        <select name="operator_id" required className="w-full border-gray-300 rounded text-sm focus:border-teal-500 focus:ring-teal-500">
+                            <option value="">-- Pilih Penjahit --</option>
+                            {selectedOrder?.jahit_assigns?.map(a => (
+                                <option key={a.operator?.id} value={a.operator?.id}>{a.operator?.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Jumlah Reject (Pcs)</label>
+                        <input type="number" name="jumlah" min="1" required className="w-full border-gray-300 rounded text-sm focus:border-teal-500 focus:ring-teal-500" />
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Alasan / Penyebab</label>
+                        <textarea name="alasan" required rows="2" className="w-full border-gray-300 rounded text-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Misal: Jahitan kerah miring"></textarea>
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                        <button type="button" onClick={() => setShowFinalQcModal(false)} className="px-4 py-2 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">Batal</button>
+                        <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium">Tandai Reject</button>
+                    </div>
+                </form>
             </Modal>
         </AppLayout>
     );

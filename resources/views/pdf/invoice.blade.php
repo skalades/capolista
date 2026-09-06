@@ -28,8 +28,11 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <div class="company-name">CAPOLISTA</div>
-            <p style="margin:0;">Jl. Contoh Alamat No. 123<br>Kota, Provinsi, 12345<br>Telp: 0812-3456-7890</p>
+            @if(\App\Helpers\SettingsHelper::get('company.logo'))
+                <img src="{{ public_path('storage/' . \App\Helpers\SettingsHelper::get('company.logo')) }}" alt="Logo" style="max-height: 50px; margin-bottom: 10px;">
+            @endif
+            <div class="company-name">{{ \App\Helpers\SettingsHelper::get('company.name', 'CAPOLISTA') }}</div>
+            <p style="margin:0;">{!! nl2br(e(\App\Helpers\SettingsHelper::get('company.address', 'Alamat Perusahaan'))) !!}</p>
         </div>
         <div class="header-right">
             <h1>INVOICE</h1>
@@ -99,6 +102,34 @@
     
     <div class="clearfix"></div>
 
+    @if($order->pembayarans && $order->pembayarans->count() > 0)
+    <div style="margin-top: 20px;">
+        <h4 style="margin-bottom: 5px;">Riwayat Pembayaran</h4>
+        <table class="details-table" style="width: 60%; margin-top: 0;">
+            <thead>
+                <tr>
+                    <th style="padding: 4px;">Tanggal</th>
+                    <th style="padding: 4px;">Tipe</th>
+                    <th style="padding: 4px;">Metode</th>
+                    <th style="padding: 4px; text-align: right;">Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($order->pembayarans as $pembayaran)
+                <tr>
+                    <td style="padding: 4px; text-align: center;">{{ \Carbon\Carbon::parse($pembayaran->tanggal)->format('d M Y') }}</td>
+                    <td style="padding: 4px; text-align: center;">{{ ucfirst($pembayaran->tipe) }}</td>
+                    <td style="padding: 4px; text-align: center;">{{ ucfirst($pembayaran->metode) }}</td>
+                    <td style="padding: 4px; text-align: right;">Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+
+    <div class="clearfix"></div>
+
     <div class="signature-box">
         Hormat Kami,<br>
         <div class="signature-line"></div>
@@ -108,7 +139,7 @@
     <div class="clearfix"></div>
 
     <div class="footer">
-        Pembayaran dapat ditransfer ke Rekening BCA: 123456789 a.n. Capolista.<br>
+        Pembayaran dapat ditransfer ke Rekening {{ \App\Helpers\SettingsHelper::get('company.bank_account', 'BCA: 123456789 a.n. Capolista') }}<br>
         Terima kasih atas kepercayaan Anda.
     </div>
 </body>

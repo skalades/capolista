@@ -4,7 +4,7 @@ import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/20/solid';
 export default function StatsCard({ title, value, subtitle, icon: Icon, color = 'brand', trend }) {
     const colorClasses = {
         brand: 'bg-brand-50 text-brand-600',
-        indigo: 'bg-indigo-50 text-indigo-600',
+        indigo: 'bg-brand-50 text-brand-600',
         green: 'bg-green-50 text-green-600',
         yellow: 'bg-yellow-50 text-yellow-600',
         red: 'bg-red-50 text-red-600',

@@ -1,1 +1,0 @@
-export const Card = (props) => <div className='bg-white shadow rounded p-4' {...props} />; export const CardHeader = (props) => <div className='mb-4' {...props} />; export const CardContent = (props) => <div {...props} />; export const CardTitle = (props) => <h3 className='font-bold' {...props} />

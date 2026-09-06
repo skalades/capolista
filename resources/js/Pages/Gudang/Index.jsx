@@ -18,7 +18,7 @@ export default function Index({ ordersPacking, lowStockCount }) {
           <Link href={route('gudang.opname.index')} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">
             Stok Opname
           </Link>
-          <Link href={route('gudang.stok')} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <Link href={route('gudang.stok')} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
             Kelola Stok Bahan
           </Link>
         </div>
@@ -59,7 +59,7 @@ export default function Index({ ordersPacking, lowStockCount }) {
                 <Table.Cell>{order.packing?.no_resi || '-'}</Table.Cell>
                 <Table.Cell>{order.packing?.tanggal_kirim ? new Date(order.packing.tanggal_kirim).toLocaleDateString('id-ID') : '-'}</Table.Cell>
                 <Table.Cell>
-                  <Link href={route('gudang.packing.show', order.id)} className="text-indigo-600 hover:text-indigo-900 font-medium">
+                  <Link href={route('gudang.packing.show', order.id)} className="text-brand-600 hover:text-brand-900 font-medium">
                     Kelola Packing
                   </Link>
                 </Table.Cell>

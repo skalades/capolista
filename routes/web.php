@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DesainController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\HRController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\JahitController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\LaporanController;
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     // --- Dashboard ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // --- Notifications ---
+    Route::get('/notifications/deadlines', [NotificationController::class, 'deadlines'])->name('notifications.deadlines');
+
     // --- Profile ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -51,6 +55,8 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::delete('/order-files/{file}', [OrderController::class, 'deleteFile'])->name('orders.delete-file');
         Route::get('/orders/{order}/spk', [OrderController::class, 'printSpk'])->name('orders.spk');
         Route::get('/orders/{order}/invoice', [OrderController::class, 'printInvoice'])->name('orders.invoice');
+        Route::get('/orders/template', [OrderController::class, 'template'])->name('orders.template');
+        Route::post('/orders/import', [OrderController::class, 'import'])->name('orders.import');
     });
 
     // Orders Show (Accessible to all staffs that might need it)
@@ -88,6 +94,12 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     // Produksi (Koordinator)
     Route::middleware(['level:0,2,3,4', 'divisi:produksi'])->group(function () {
         Route::get('/produksi', [ProduksiController::class, 'index'])->name('produksi.index');
+        Route::post('/produksi/eskalasi/{order}', [ProduksiController::class, 'eskalasi'])->name('produksi.eskalasi');
+        Route::patch('/produksi/target', [ProduksiController::class, 'updateTarget'])->name('produksi.target.update');
+        // Hanya manajemen (0,1,2) yang boleh ubah threshold
+        Route::middleware('level:0,1,2')->group(function () {
+            Route::patch('/produksi/threshold', [ProduksiController::class, 'updateThreshold'])->name('produksi.threshold.update');
+        });
     });
 
     // Cutting/Pemotongan
@@ -107,6 +119,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::post('/jahit/output', [JahitController::class, 'storeOutput'])->name('jahit.output.store');
         Route::post('/jahit/output/{output}/approve', [JahitController::class, 'approveOutput'])->name('jahit.output.approve');
         Route::post('/jahit/output/{output}/reject', [JahitController::class, 'rejectOutput'])->name('jahit.output.reject');
+        Route::post('/jahit/{order}/qc-reject', [JahitController::class, 'qcReject'])->name('jahit.qc-reject');
         Route::post('/jahit/{order}/complete', [JahitController::class, 'complete'])->name('jahit.complete');
     });
 
@@ -131,6 +144,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::get('/', [KeuanganController::class, 'index'])->name('index');
         Route::get('/pembayaran', [KeuanganController::class, 'pembayaranIndex'])->name('pembayaran.index');
         Route::post('/pembayaran', [KeuanganController::class, 'pembayaranStore'])->name('pembayaran.store');
+        Route::get('/pembayaran/{pembayaran}/kwitansi', [KeuanganController::class, 'pembayaranKwitansi'])->name('pembayaran.kwitansi');
         Route::get('/pengeluaran', [KeuanganController::class, 'pengeluaranIndex'])->name('pengeluaran.index');
         Route::post('/pengeluaran', [KeuanganController::class, 'pengeluaranStore'])->name('pengeluaran.store');
         Route::get('/laporan', [KeuanganController::class, 'laporanLabaRugi'])->name('laporan');
@@ -177,6 +191,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::get('/keuangan', [LaporanController::class, 'keuangan'])->name('keuangan');
         Route::get('/divisi', [LaporanController::class, 'divisi'])->name('divisi');
         Route::get('/penggajian', [LaporanController::class, 'penggajian'])->name('penggajian');
+        Route::get('/stok-opname', [LaporanController::class, 'stokOpname'])->name('stok-opname');
     });
 
     // Superadmin
@@ -187,6 +202,8 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::patch('/roles/{role}', [SuperadminController::class, 'roleUpdate'])->name('roles.update');
         Route::delete('/roles/{role}', [SuperadminController::class, 'roleDestroy'])->name('roles.destroy');
         Route::get('/sistem', [SuperadminController::class, 'sistemInfo'])->name('sistem');
+        Route::get('/settings', [SuperadminController::class, 'settingsIndex'])->name('settings');
+        Route::post('/settings', [SuperadminController::class, 'settingsUpdate'])->name('settings.update');
     });
 });
 

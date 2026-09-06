@@ -7,7 +7,7 @@ export default function KanbanColumn({ title, count, color = 'gray', children })
         yellow: 'border-yellow-400 text-yellow-700',
         green: 'border-green-500 text-green-700',
         red: 'border-red-400 text-red-700',
-        indigo: 'border-indigo-500 text-indigo-700',
+        indigo: 'border-brand-500 text-brand-700',
     };
 
     const borderClass = colorClasses[color] || colorClasses.gray;

@@ -40,7 +40,7 @@ export default function Show({ order }) {
   return (
     <AppLayout title={`Desain ${order.no_order}`}>
       <div className="mb-6 flex space-x-2 text-sm text-gray-500">
-        <Link href={route('desain.index')} className="hover:text-indigo-600">Desain</Link>
+        <Link href={route('desain.index')} className="hover:text-brand-600">Desain</Link>
         <span>/</span>
         <span className="text-gray-900">{order.no_order}</span>
       </div>
@@ -104,9 +104,9 @@ export default function Show({ order }) {
               <form onSubmit={handleMockupSubmit} className="mb-4 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Upload Mockup</label>
-                  <input type="file" onChange={(e) => setMockupData('file_mockup', e.target.files[0])} className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                  <input type="file" onChange={(e) => setMockupData('file_mockup', e.target.files[0])} className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
                 </div>
-                <button type="submit" disabled={mockupProcessing} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <button type="submit" disabled={mockupProcessing} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   Upload
                 </button>
               </form>
@@ -128,7 +128,7 @@ export default function Show({ order }) {
             <ul className="space-y-2">
               {order.orderFiles?.map((file) => (
                 <li key={file.id}>
-                  <a href={`/storage/${file.path}`} className="text-indigo-600 hover:underline text-sm">{file.nama_file}</a>
+                  <a href={`/storage/${file.path}`} className="text-brand-600 hover:underline text-sm">{file.nama_file}</a>
                 </li>
               ))}
               {(!order.orderFiles || order.orderFiles.length === 0) && <p className="text-sm text-gray-500">Tidak ada file pendukung.</p>}
@@ -154,7 +154,7 @@ export default function Show({ order }) {
             <textarea
               value={rejectData.catatan_revisi}
               onChange={(e) => setRejectData('catatan_revisi', e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
               rows="3"
               required
             ></textarea>

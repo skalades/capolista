@@ -68,39 +68,46 @@ class JahitController extends Controller
         
         $rataRata = $activeOperators > 0 ? round($approvedToday / $activeOperators) : 0;
         
-        // Progres per penjahit (berdasarkan tugas/assign aktif)
-        $progresPenjahit = $operatorList->flatMap(function ($operator) use ($outputsToday) {
-            $activeAssigns = ProduksiJahitAssign::with('order')->where('operator_id', $operator->id)->where('is_active', true)->get();
-            
+        // Fix N+1: Eager load semua assigns aktif untuk semua operator sekaligus,
+        // bukan query per-operator di dalam loop.
+        $operatorIds    = $operatorList->pluck('id');
+        $allActiveAssigns = ProduksiJahitAssign::with('order')
+            ->whereIn('operator_id', $operatorIds)
+            ->where('is_active', true)
+            ->get()
+            ->groupBy('operator_id');
+
+        $progresPenjahit = $operatorList->flatMap(function ($operator) use ($outputsToday, $allActiveAssigns) {
+            $activeAssigns = $allActiveAssigns->get($operator->id, collect());
+
             if ($activeAssigns->isEmpty()) {
                 return [[
-                    'id' => $operator->id,
-                    'name' => $operator->name,
+                    'id'              => $operator->id,
+                    'name'            => $operator->name,
                     'active_order_no' => null,
-                    'target' => 0,
-                    'pcs_selesai' => 0,
-                    'pcs_reject' => 0,
-                    'order_id' => null,
-                    'assign_id' => null,
+                    'target'          => 0,
+                    'pcs_selesai'     => 0,
+                    'pcs_reject'      => 0,
+                    'order_id'        => null,
+                    'assign_id'       => null,
                 ]];
             }
 
             return $activeAssigns->map(function ($assign) use ($operator, $outputsToday) {
-                // Filter output khusus untuk assign ini
                 $assignOutputs = $outputsToday->where('assign_id', $assign->id);
-                $pcsSelesai = $assignOutputs->where('status', ProduksiJahitOutput::STATUS_APPROVED)->sum('pcs_approved');
-                $pcsReject = $assignOutputs->where('status', ProduksiJahitOutput::STATUS_REJECTED)->sum('pcs_klaim');
+                $pcsSelesai    = $assignOutputs->where('status', ProduksiJahitOutput::STATUS_APPROVED)->sum('pcs_approved');
+                $pcsReject     = $assignOutputs->where('status', ProduksiJahitOutput::STATUS_REJECTED)->sum('pcs_klaim');
 
                 return [
-                    'id' => $operator->id . '-' . $assign->id, // unique key for frontend
-                    'real_id' => $operator->id, // actual operator id
-                    'name' => $operator->name,
+                    'id'              => $operator->id . '-' . $assign->id,
+                    'real_id'         => $operator->id,
+                    'name'            => $operator->name,
                     'active_order_no' => $assign->order->no_order,
-                    'target' => $assign->order->jumlah,
-                    'pcs_selesai' => $pcsSelesai,
-                    'pcs_reject' => $pcsReject,
-                    'order_id' => $assign->order_id,
-                    'assign_id' => $assign->id,
+                    'target'          => $assign->order->jumlah,
+                    'pcs_selesai'     => $pcsSelesai,
+                    'pcs_reject'      => $pcsReject,
+                    'order_id'        => $assign->order_id,
+                    'assign_id'       => $assign->id,
                 ];
             });
         })->sortByDesc('pcs_selesai')->values();
@@ -117,16 +124,34 @@ class JahitController extends Controller
             'target_harian_per_orang' => $activeOperators > 0 ? round($totalTarget / $activeOperators) : 0
         ];
         
-        // Catatan Reject
+        // Catatan Reject (Gabungan dari daily output reject dan final QC reject)
         $catatanReject = $outputsToday->where('status', ProduksiJahitOutput::STATUS_REJECTED)->map(function ($out) {
             return [
-                'id' => $out->id,
+                'id' => 'out_' . $out->id,
                 'no_order' => $out->order->no_order,
                 'jumlah' => $out->pcs_klaim,
-                'penyebab' => $out->catatan_mandor ?? 'Butuh perbaikan',
+                'penyebab' => $out->catatan_mandor ?? 'Butuh perbaikan (Klaim Harian)',
                 'penjahit' => $out->operator->name,
+                'jenis' => 'harian'
             ];
         })->values();
+
+        // Ambil final QC rejects yang masih pending
+        $finalQcRejects = \App\Models\ProduksiJahitQcReject::with(['order', 'operator'])
+            ->where('status', 'pending')
+            ->get()
+            ->map(function ($qc) {
+                return [
+                    'id' => 'qc_' . $qc->id,
+                    'no_order' => $qc->order->no_order,
+                    'jumlah' => $qc->jumlah,
+                    'penyebab' => $qc->alasan ?? 'QC Final Failed',
+                    'penjahit' => $qc->operator->name,
+                    'jenis' => 'final_qc'
+                ];
+            });
+
+        $catatanReject = $catatanReject->merge($finalQcRejects)->values();
 
         $menungguApproval = ProduksiJahitOutput::with(['order', 'operator'])
             ->where('status', ProduksiJahitOutput::STATUS_MENUNGGU_APPROVAL)
@@ -244,6 +269,22 @@ class JahitController extends Controller
             $nextDivisi = $this->jahitService->completeOrder($order, $request->validated(), auth()->id());
             return redirect()->route('jahit.index')
                 ->with('success', "Order #{$order->no_order} selesai jahit → dilanjutkan ke {$nextDivisi}.");
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function qcReject(Request $request, Order $order)
+    {
+        $data = $request->validate([
+            'operator_id' => 'required|exists:users,id',
+            'jumlah'      => 'required|integer|min:1',
+            'alasan'      => 'required|string|max:255',
+        ]);
+
+        try {
+            $this->jahitService->submitQcReject($order, $data, auth()->id());
+            return back()->with('success', 'Berhasil mencatat reject final QC. Barang dikembalikan ke penjahit untuk direvisi.');
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

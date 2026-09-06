@@ -44,22 +44,40 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email',
-            'password'    => 'required|string|min:8|confirmed',
-            'role'        => 'required|string|exists:roles,name',
-            'divisi'      => 'nullable|string',
-            'level_akses' => 'required|integer|between:0,5',
-            'is_active'   => 'boolean',
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|string|min:8|confirmed',
+            'role'          => 'required|string|exists:roles,name',
+            'divisi'        => 'nullable|string',
+            'level_akses'   => 'required|integer|between:0,5',
+            'is_active'     => 'boolean',
+            'nik'           => 'nullable|string|max:255',
+            'jabatan'       => 'nullable|string|max:255',
+            'tanggal_masuk' => 'nullable|date',
+            'tipe_gaji'     => 'nullable|in:borongan,harian,bulanan',
+            'tarif_default' => 'nullable|numeric|min:0',
+            'tarif_lembur'  => 'nullable|numeric|min:0',
+            'no_hp'         => 'nullable|string|max:255',
+            'alamat'        => 'nullable|string',
+            'mesin_pos'     => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
-            'name'        => $validated['name'],
-            'email'       => $validated['email'],
-            'password'    => Hash::make($validated['password']),
-            'level_akses' => $validated['level_akses'],
-            'divisi'      => $validated['divisi'] ?? null,
-            'is_active'   => $validated['is_active'] ?? true,
+            'name'          => $validated['name'],
+            'email'         => $validated['email'],
+            'password'      => Hash::make($validated['password']),
+            'level_akses'   => $validated['level_akses'],
+            'divisi'        => $validated['divisi'] ?? null,
+            'is_active'     => $validated['is_active'] ?? true,
+            'nik'           => $validated['nik'] ?? null,
+            'jabatan'       => $validated['jabatan'] ?? null,
+            'tanggal_masuk' => $validated['tanggal_masuk'] ?? null,
+            'tipe_gaji'     => $validated['tipe_gaji'] ?? null,
+            'tarif_default' => $validated['tarif_default'] ?? null,
+            'tarif_lembur'  => $validated['tarif_lembur'] ?? null,
+            'no_hp'         => $validated['no_hp'] ?? null,
+            'alamat'        => $validated['alamat'] ?? null,
+            'mesin_pos'     => $validated['mesin_pos'] ?? null,
         ]);
 
         $user->assignRole($validated['role']);
@@ -81,20 +99,38 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => "required|email|unique:users,email,{$user->id}",
-            'role'        => 'required|string|exists:roles,name',
-            'divisi'      => 'nullable|string',
-            'level_akses' => 'required|integer|between:0,5',
-            'is_active'   => 'boolean',
+            'name'          => 'required|string|max:255',
+            'email'         => "required|email|unique:users,email,{$user->id}",
+            'role'          => 'required|string|exists:roles,name',
+            'divisi'        => 'nullable|string',
+            'level_akses'   => 'required|integer|between:0,5',
+            'is_active'     => 'boolean',
+            'nik'           => 'nullable|string|max:255',
+            'jabatan'       => 'nullable|string|max:255',
+            'tanggal_masuk' => 'nullable|date',
+            'tipe_gaji'     => 'nullable|in:borongan,harian,bulanan',
+            'tarif_default' => 'nullable|numeric|min:0',
+            'tarif_lembur'  => 'nullable|numeric|min:0',
+            'no_hp'         => 'nullable|string|max:255',
+            'alamat'        => 'nullable|string',
+            'mesin_pos'     => 'nullable|string|max:255',
         ]);
 
         $user->update([
-            'name'        => $validated['name'],
-            'email'       => $validated['email'],
-            'level_akses' => $validated['level_akses'],
-            'divisi'      => $validated['divisi'] ?? null,
-            'is_active'   => $validated['is_active'] ?? $user->is_active,
+            'name'          => $validated['name'],
+            'email'         => $validated['email'],
+            'level_akses'   => $validated['level_akses'],
+            'divisi'        => $validated['divisi'] ?? null,
+            'is_active'     => $validated['is_active'] ?? $user->is_active,
+            'nik'           => $validated['nik'] ?? null,
+            'jabatan'       => $validated['jabatan'] ?? null,
+            'tanggal_masuk' => $validated['tanggal_masuk'] ?? null,
+            'tipe_gaji'     => $validated['tipe_gaji'] ?? null,
+            'tarif_default' => $validated['tarif_default'] ?? null,
+            'tarif_lembur'  => $validated['tarif_lembur'] ?? null,
+            'no_hp'         => $validated['no_hp'] ?? null,
+            'alamat'        => $validated['alamat'] ?? null,
+            'mesin_pos'     => $validated['mesin_pos'] ?? null,
         ]);
 
         $user->syncRoles([$validated['role']]);

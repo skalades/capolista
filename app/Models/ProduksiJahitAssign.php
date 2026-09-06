@@ -57,12 +57,19 @@ class ProduksiJahitAssign extends Model
         return $this->hasMany(TarifBoronganHistory::class, 'assign_id');
     }
 
+    public function qcRejects(): HasMany
+    {
+        return $this->hasMany(ProduksiJahitQcReject::class, 'assign_id');
+    }
+
     /**
      * Total pcs yang sudah diapprove untuk assign ini.
      */
     public function getTotalPcsApprovedAttribute(): int
     {
-        return (int) $this->outputs()->where('status', ProduksiJahitOutput::STATUS_APPROVED)->sum('pcs_approved');
+        $approved = (int) $this->outputs()->where('status', ProduksiJahitOutput::STATUS_APPROVED)->sum('pcs_approved');
+        $pendingRejects = (int) $this->qcRejects()->where('status', 'pending')->sum('jumlah');
+        return max(0, $approved - $pendingRejects);
     }
 
     /**

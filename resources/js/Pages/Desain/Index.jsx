@@ -174,7 +174,7 @@ export default function Index({ orders }) {
                                       className="max-w-full h-auto max-h-64 object-contain rounded"
                                   />
                               ) : (
-                                  <a href={`/storage/${selectedOrder.desain.file_mockup}`} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">
+                                  <a href={`/storage/${selectedOrder.desain.file_mockup}`} target="_blank" rel="noreferrer" className="text-brand-600 hover:underline">
                                       Unduh File Mockup
                                   </a>
                               )
@@ -200,9 +200,9 @@ export default function Index({ orders }) {
                               <input 
                                   type="file" 
                                   onChange={(e) => setMockupData('file_mockup', e.target.files[0])} 
-                                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 mb-3" 
+                                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 mb-3" 
                               />
-                              <button type="submit" disabled={mockupProcessing || !mockupData.file_mockup} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50">
+                              <button type="submit" disabled={mockupProcessing || !mockupData.file_mockup} className="w-full bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50">
                                   Ajukan approval
                               </button>
                           </form>

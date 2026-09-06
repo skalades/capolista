@@ -218,7 +218,7 @@ class PenggajianService
 
         $items = [];
         $items[] = [
-            'tipe_item'    => PenggajianItem::TIPE_HARIAN, // reuse untuk gaji pokok
+            'tipe_item'    => PenggajianItem::TIPE_POKOK,
             'tanggal'      => null,
             'order_id'     => null,
             'jenis_produk' => null,

@@ -26,10 +26,38 @@ export default function Index({ penggajians, summary, divisiList, filters }) {
             <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">Manajemen Penggajian</h3>
+                    <div>
+                        <h3 className="text-lg font-medium text-gray-900">Manajemen Penggajian & HR</h3>
+                        <div className="mt-2 flex gap-2">
+                            <Link
+                                href={route('hr.penggajian.index')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-sm"
+                            >
+                                Daftar Gaji
+                            </Link>
+                            <Link
+                                href={route('hr.absensi.index')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            >
+                                Input Absensi
+                            </Link>
+                            <Link
+                                href={route('hr.absensi.rekap')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            >
+                                Rekap Absensi
+                            </Link>
+                            <Link
+                                href={route('hr.output.rekap')}
+                                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            >
+                                Rekap Output
+                            </Link>
+                        </div>
+                    </div>
                     <Link
                         href={route('hr.penggajian.create')}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"
+                        className="inline-flex items-center px-4 py-2 bg-brand-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-brand-700"
                     >
                         + Generate Slip Gaji
                     </Link>
@@ -50,7 +78,7 @@ export default function Index({ penggajians, summary, divisiList, filters }) {
                 <Card title="Daftar Slip Gaji">
                     <div className="flex flex-col sm:flex-row gap-4 mb-4">
                         <select 
-                            className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            className="border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                             value={filters.divisi || ''}
                             onChange={e => router.get(route('hr.penggajian.index'), { ...filters, divisi: e.target.value }, { preserveState: true })}
                         >
@@ -61,7 +89,7 @@ export default function Index({ penggajians, summary, divisiList, filters }) {
                         </select>
                         
                         <select 
-                            className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            className="border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                             value={filters.tipe_gaji || ''}
                             onChange={e => router.get(route('hr.penggajian.index'), { ...filters, tipe_gaji: e.target.value }, { preserveState: true })}
                         >

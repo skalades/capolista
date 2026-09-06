@@ -97,7 +97,7 @@ export default function OpnameShow({ opname }) {
                 <button 
                   onClick={handleSubmit} 
                   disabled={submitProcessing}
-                  className="w-full justify-center inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="w-full justify-center inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Submit untuk Approval
                 </button>

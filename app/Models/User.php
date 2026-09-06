@@ -26,6 +26,16 @@ class User extends Authenticatable
         'divisi',
         'level_akses',
         'is_active',
+        // HR fields
+        'nik',
+        'jabatan',
+        'tanggal_masuk',
+        'tipe_gaji',
+        'tarif_default',
+        'tarif_lembur',
+        'no_hp',
+        'alamat',
+        'mesin_pos',
     ];
 
     /**
@@ -50,6 +60,9 @@ class User extends Authenticatable
             'password'          => 'hashed',
             'is_active'         => 'boolean',
             'level_akses'       => 'integer',
+            'tanggal_masuk'     => 'date',
+            'tarif_default'     => 'decimal:2',
+            'tarif_lembur'      => 'decimal:2',
         ];
     }
 

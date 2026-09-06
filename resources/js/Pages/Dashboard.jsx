@@ -9,6 +9,9 @@ import AdminView from './Dashboard/AdminView';
 import KepalaView from './Dashboard/KepalaView';
 import StafView from './Dashboard/StafView';
 
+// Import Notification Banner
+import DeadlineNotificationBanner from '@/Components/DeadlineNotificationBanner';
+
 export default function Dashboard({ stats = {}, recentOrders = [], upcomingDeadlines = [], lowStockCount = 0, extraData = {} }) {
     const { auth } = usePage().props;
     const user = auth.user;
@@ -58,6 +61,9 @@ export default function Dashboard({ stats = {}, recentOrders = [], upcomingDeadl
                     </div>
                 </div>
             </div>
+
+            {/* Deadline Notification Banner — muncul jika ada order ≤ 3 hari */}
+            <DeadlineNotificationBanner upcomingDeadlines={upcomingDeadlines} />
 
             {/* Render Dashboard Content Based on Role */}
             {renderRoleView()}

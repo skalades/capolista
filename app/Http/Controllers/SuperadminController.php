@@ -105,4 +105,42 @@ class SuperadminController extends Controller
             'recordCounts'  => $recordCounts,
         ]);
     }
+
+    public function settingsIndex()
+    {
+        $settings = DB::table('system_settings')->get();
+        return Inertia::render('Superadmin/Settings', [
+            'settings' => $settings
+        ]);
+    }
+
+    public function settingsUpdate(Request $request)
+    {
+        $data = $request->validate([
+            'settings' => 'required|array',
+            'settings.*.key' => 'required|string|exists:system_settings,key',
+            'settings.*.value' => 'nullable',
+            'settings.*.type' => 'required|string',
+        ]);
+
+        foreach ($data['settings'] as $index => $setting) {
+            $value = $setting['value'];
+
+            if ($setting['type'] === 'image' && $request->hasFile("settings.$index.value")) {
+                $file = $request->file("settings.$index.value");
+                $path = $file->store('settings', 'public');
+                $value = $path;
+            }
+
+            DB::table('system_settings')
+                ->where('key', $setting['key'])
+                ->update([
+                    'value' => $value,
+                    'updated_at' => now(),
+                    'updated_by' => auth()->id(),
+                ]);
+        }
+
+        return redirect()->back()->with('success', 'Pengaturan berhasil diperbarui.');
+    }
 }

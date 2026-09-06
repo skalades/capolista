@@ -1,7 +1,9 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' }) {
+    const appSettings = usePage().props.appSettings || {};
+
     return (
         <div className="flex min-h-screen bg-gray-50">
             {/* Left Panel - Branding (Hidden on mobile) */}
@@ -13,8 +15,14 @@ export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' })
 
                 <div className="relative z-10">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <ApplicationLogo className="h-10 w-10 text-white" />
-                        <span className="text-2xl font-bold tracking-wider text-white">CAPOLISTA</span>
+                        {appSettings.company_logo ? (
+                            <img src={`/storage/${appSettings.company_logo}`} alt={appSettings.company_name} className="h-10 w-auto object-contain" />
+                        ) : (
+                            <ApplicationLogo className="h-10 w-10 text-white" />
+                        )}
+                        <span className="text-2xl font-bold tracking-wider text-white">
+                            {appSettings.company_name || 'CAPOLISTA'}
+                        </span>
                     </Link>
                 </div>
                 
@@ -33,10 +41,14 @@ export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' })
                 <div className={`mx-auto w-full ${maxWidth}`}>
                     <div className="lg:hidden mb-8 text-center">
                         <Link href="/" className="inline-flex flex-col items-center gap-2">
-                            <div className="h-16 w-16 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg">
-                                <ApplicationLogo className="h-10 w-10 text-white" />
-                            </div>
-                            <span className="text-2xl font-bold tracking-wider text-gray-900">CAPOLISTA</span>
+                            {appSettings.company_logo ? (
+                                <img src={`/storage/${appSettings.company_logo}`} alt={appSettings.company_name} className="h-16 w-auto object-contain" />
+                            ) : (
+                                <div className="h-16 w-16 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <ApplicationLogo className="h-10 w-10 text-white" />
+                                </div>
+                            )}
+                            <span className="text-2xl font-bold tracking-wider text-gray-900">{appSettings.company_name || 'CAPOLISTA'}</span>
                         </Link>
                     </div>
                     {children}

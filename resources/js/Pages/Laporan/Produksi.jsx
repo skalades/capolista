@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, router } from '@inertiajs/react';
 
 export default function Produksi({ auth, filters, orders, stats }) {
@@ -15,10 +15,7 @@ export default function Produksi({ auth, filters, orders, stats }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Laporan Produksi</h2>}
-        >
+        <AppLayout title="Laporan Produksi">
             <Head title="Laporan Produksi" />
 
             <div className="py-12">
@@ -32,7 +29,7 @@ export default function Produksi({ auth, filters, orders, stats }) {
                                     type="date" 
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                                 />
                             </div>
                             <div>
@@ -41,10 +38,10 @@ export default function Produksi({ auth, filters, orders, stats }) {
                                     type="date" 
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                                 />
                             </div>
-                            <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                            <button type="submit" className="bg-brand-600 text-white px-4 py-2 rounded-md hover:bg-brand-700">
                                 Filter
                             </button>
                         </form>
@@ -103,6 +100,6 @@ export default function Produksi({ auth, filters, orders, stats }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
+import Table from '@/Components/Table';
 
 export default function PoIndex({ auth, purchaseOrders, filters }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
-    const handleFilterChange = (val) => {
+    const handleFilterChange = (e) => {
+        const val = e.target.value;
         const newStatus = val === 'all' ? '' : val;
         setStatusFilter(newStatus);
         
@@ -19,76 +21,74 @@ export default function PoIndex({ auth, purchaseOrders, filters }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Daftar Purchase Order</h2>}
+        <AppLayout
+            title="Daftar Purchase Order"
         >
-            <Head title="Purchase Orders" />
+            
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
                         <div className="flex items-center space-x-2">
                             <span className="text-sm font-medium">Filter Status:</span>
-                            <Select value={statusFilter || 'all'} onValueChange={handleFilterChange}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Semua Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Semua Status</SelectItem>
-                                    <SelectItem value="draft">Draft</SelectItem>
-                                    <SelectItem value="dikirim">Dikirim</SelectItem>
-                                    <SelectItem value="diterima">Diterima</SelectItem>
-                                    <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <select 
+                                value={statusFilter || 'all'} 
+                                onChange={handleFilterChange}
+                                className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            >
+                                <option value="all">Semua Status</option>
+                                <option value="draft">Draft</option>
+                                <option value="dikirim">Dikirim</option>
+                                <option value="diterima">Diterima</option>
+                                <option value="dibatalkan">Dibatalkan</option>
+                            </select>
                         </div>
-                        <Button asChild>
+                        <PrimaryButton asChild>
                             <Link href={route('procurement.po.create')}>Buat PO Baru</Link>
-                        </Button>
+                        </PrimaryButton>
                     </div>
 
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>No. PO</TableHead>
-                                    <TableHead>Tanggal</TableHead>
-                                    <TableHead>Supplier</TableHead>
-                                    <TableHead>Total Harga</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
+                            <Table.Head>
+                                <Table.Row>
+                                    <Table.HeadCell>No. PO</Table.HeadCell>
+                                    <Table.HeadCell>Tanggal</Table.HeadCell>
+                                    <Table.HeadCell>Supplier</Table.HeadCell>
+                                    <Table.HeadCell>Total Harga</Table.HeadCell>
+                                    <Table.HeadCell>Status</Table.HeadCell>
+                                    <Table.HeadCell>Aksi</Table.HeadCell>
+                                </Table.Row>
+                            </Table.Head>
+                            <Table.Body>
                                 {purchaseOrders.data.map((po) => (
-                                    <TableRow key={po.id}>
-                                        <TableCell className="font-medium">{po.no_po}</TableCell>
-                                        <TableCell>{po.tanggal_po}</TableCell>
-                                        <TableCell>{po.supplier?.nama}</TableCell>
-                                        <TableCell>Rp {Number(po.total_harga).toLocaleString()}</TableCell>
-                                        <TableCell>
+                                    <Table.Row key={po.id}>
+                                        <Table.Cell className="font-medium">{po.no_po}</Table.Cell>
+                                        <Table.Cell>{po.tanggal_po}</Table.Cell>
+                                        <Table.Cell>{po.supplier?.nama}</Table.Cell>
+                                        <Table.Cell>Rp {Number(po.total_harga).toLocaleString()}</Table.Cell>
+                                        <Table.Cell>
                                             <span className={`px-2 py-1 rounded text-xs text-white ${po.status === 'draft' ? 'bg-gray-500' : po.status === 'dikirim' ? 'bg-blue-500' : po.status === 'diterima' ? 'bg-green-500' : 'bg-red-500'}`}>
                                                 {po.status.toUpperCase()}
                                             </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm" asChild>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <SecondaryButton size="sm" asChild>
                                                 <Link href={route('procurement.po.show', po.id)}>Detail</Link>
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
+                                            </SecondaryButton>
+                                        </Table.Cell>
+                                    </Table.Row>
                                 ))}
                                 {purchaseOrders.data.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="text-center py-4">Belum ada Purchase Order</TableCell>
-                                    </TableRow>
+                                    <Table.Row>
+                                        <Table.Cell colSpan={6} className="text-center py-4">Belum ada Purchase Order</Table.Cell>
+                                    </Table.Row>
                                 )}
-                            </TableBody>
+                            </Table.Body>
                         </Table>
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

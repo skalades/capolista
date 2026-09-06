@@ -49,7 +49,7 @@ export default function Show({ order, operatorList }) {
                         <div className="space-y-2">
                             <p className="text-sm"><strong>Customer:</strong> {order.customer?.nama}</p>
                             <p className="text-sm"><strong>Produk:</strong> {order.jenis_produk} ({order.jumlah} pcs)</p>
-                            <p className="text-sm"><strong>Status:</strong> <span className="uppercase font-semibold text-indigo-600">{order.status}</span></p>
+                            <p className="text-sm"><strong>Status:</strong> <span className="uppercase font-semibold text-brand-600">{order.status}</span></p>
                             <p className="text-sm"><strong>Deadline:</strong> {order.deadline}</p>
                         </div>
                     </Card>
@@ -60,7 +60,7 @@ export default function Show({ order, operatorList }) {
                                 <InputLabel htmlFor="next_divisi" value="Lanjutkan Ke Divisi" />
                                 <select 
                                     id="next_divisi"
-                                    className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1 block"
+                                    className="border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm w-full mt-1 block"
                                     value={completeData.next_divisi}
                                     onChange={e => setCompleteData('next_divisi', e.target.value)}
                                 >
@@ -119,7 +119,7 @@ export default function Show({ order, operatorList }) {
                                 <select
                                     id="operator_id"
                                     required
-                                    className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1 block"
+                                    className="border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm w-full mt-1 block"
                                     value={assignData.operator_id}
                                     onChange={e => setAssignData('operator_id', e.target.value)}
                                 >

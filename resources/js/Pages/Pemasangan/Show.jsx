@@ -42,7 +42,7 @@ export default function Show({ order }) {
   return (
     <AppLayout title={`Pemasangan ${order.no_order}`}>
       <div className="mb-6 flex space-x-2 text-sm text-gray-500">
-        <Link href={route('pemasangan.index')} className="hover:text-indigo-600">Pemasangan</Link>
+        <Link href={route('pemasangan.index')} className="hover:text-brand-600">Pemasangan</Link>
         <span>/</span>
         <span className="text-gray-900">{order.no_order}</span>
       </div>
@@ -62,15 +62,15 @@ export default function Show({ order }) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Suhu Heat Press</label>
-                  <input type="text" value={updateData.suhu_heat_press} onChange={e => setUpdateData('suhu_heat_press', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Misal: 150 C" />
+                  <input type="text" value={updateData.suhu_heat_press} onChange={e => setUpdateData('suhu_heat_press', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" placeholder="Misal: 150 C" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Waktu Curing</label>
-                  <input type="text" value={updateData.waktu_curing} onChange={e => setUpdateData('waktu_curing', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Misal: 15 detik" />
+                  <input type="text" value={updateData.waktu_curing} onChange={e => setUpdateData('waktu_curing', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" placeholder="Misal: 15 detik" />
                 </div>
               </div>
               {pemasangan.status !== 'selesai' && (
-                <button type="submit" disabled={updateProcessing} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <button type="submit" disabled={updateProcessing} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                   Simpan Parameter
                 </button>
               )}
@@ -85,7 +85,7 @@ export default function Show({ order }) {
                   <div className="space-y-2">
                     {['kerekatan', 'kerapian', 'kebersihan', 'warna_sesuai'].map((item) => (
                       <label key={item} className="flex items-center">
-                        <input type="checkbox" checked={qcChecklist[item]} onChange={() => handleQcChange(item)} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                        <input type="checkbox" checked={qcChecklist[item]} onChange={() => handleQcChange(item)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200 focus:ring-opacity-50" />
                         <span className="ml-2 text-sm text-gray-700 capitalize">{item.replace('_', ' ')}</span>
                       </label>
                     ))}
@@ -96,18 +96,18 @@ export default function Show({ order }) {
                   <label className="block text-sm font-medium text-gray-700">Status QC</label>
                   <div className="mt-2 space-x-4">
                     <label className="inline-flex items-center">
-                      <input type="radio" value="Lulus" checked={completeData.status_qc === 'Lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-indigo-600" />
+                      <input type="radio" value="Lulus" checked={completeData.status_qc === 'Lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Lulus</span>
                     </label>
                     <label className="inline-flex items-center">
-                      <input type="radio" value="Gagal" checked={completeData.status_qc === 'Gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-indigo-600" />
+                      <input type="radio" value="Gagal" checked={completeData.status_qc === 'Gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Gagal</span>
                     </label>
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Catatan</label>
-                  <textarea value={completeData.catatan} onChange={e => setCompleteData('catatan', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                  <textarea value={completeData.catatan} onChange={e => setCompleteData('catatan', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Foto QC</label>

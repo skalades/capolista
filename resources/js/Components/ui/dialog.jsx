@@ -1,1 +1,0 @@
-export const Dialog = (props) => <div {...props} />; export const DialogContent = (props) => <div {...props} />; export const DialogHeader = (props) => <div {...props} />; export const DialogTitle = (props) => <div {...props} />; export const DialogTrigger = (props) => <div {...props} />

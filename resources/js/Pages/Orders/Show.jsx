@@ -64,7 +64,7 @@ export default function OrderShow({ order = {} }) {
                                 href={route('orders.spk', o.id)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50"
+                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-brand-600 shadow-sm ring-1 ring-inset ring-brand-300 hover:bg-brand-50"
                             >
                                 Cetak SPK
                             </a>
@@ -160,7 +160,7 @@ export default function OrderShow({ order = {} }) {
                             <select
                                 value={data.status}
                                 onChange={e => setData('status', e.target.value)}
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                             >
                                 {Object.entries(STATUS_LABELS).map(([val, label]) => (
                                     <option key={val} value={val}>{label}</option>
@@ -174,7 +174,7 @@ export default function OrderShow({ order = {} }) {
                                 value={data.catatan}
                                 onChange={e => setData('catatan', e.target.value)}
                                 rows={3}
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 placeholder="Tambahkan catatan mengapa status diubah..."
                             />
                         </div>

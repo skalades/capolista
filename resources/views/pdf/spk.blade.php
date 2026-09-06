@@ -22,6 +22,10 @@
 </head>
 <body>
     <div class="header">
+        @if(\App\Helpers\SettingsHelper::get('company.logo'))
+            <img src="{{ public_path('storage/' . \App\Helpers\SettingsHelper::get('company.logo')) }}" alt="Logo" style="max-height: 50px; margin-bottom: 10px;">
+        @endif
+        <h2>{{ \App\Helpers\SettingsHelper::get('company.name', 'CAPOLISTA') }}</h2>
         <h1>SURAT PERINTAH KERJA (SPK)</h1>
         <p>No. SPK: {{ $order->no_order }} | Tanggal: {{ $order->tanggal_order->format('d M Y') }}</p>
     </div>

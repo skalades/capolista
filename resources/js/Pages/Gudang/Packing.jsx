@@ -34,7 +34,7 @@ export default function Packing({ order }) {
   return (
     <AppLayout title={`Packing ${order.no_order}`}>
       <div className="mb-6 flex space-x-2 text-sm text-gray-500">
-        <Link href={route('gudang.index')} className="hover:text-indigo-600">Gudang</Link>
+        <Link href={route('gudang.index')} className="hover:text-brand-600">Gudang</Link>
         <span>/</span>
         <span className="text-gray-900">{order.no_order}</span>
       </div>
@@ -54,7 +54,7 @@ export default function Packing({ order }) {
             <div className="space-y-3">
               {Object.keys(checklist).map(key => (
                 <label key={key} className="flex items-center p-3 border rounded-md hover:bg-gray-50 cursor-pointer">
-                  <input type="checkbox" checked={checklist[key]} onChange={() => handleChecklist(key)} className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+                  <input type="checkbox" checked={checklist[key]} onChange={() => handleChecklist(key)} className="h-5 w-5 rounded border-gray-300 text-brand-600 focus:ring-brand-500" />
                   <span className="ml-3 text-sm text-gray-700 capitalize">{key.replace('_', ' ')}</span>
                 </label>
               ))}
@@ -64,12 +64,12 @@ export default function Packing({ order }) {
           <Card title="Data Pengiriman">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-gray-700">Kurir / Ekspedisi</label><input type="text" value={data.kurir} onChange={e => setData('kurir', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" /></div>
-                <div><label className="block text-sm font-medium text-gray-700">No. Resi</label><input type="text" value={data.no_resi} onChange={e => setData('no_resi', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" /></div>
-                <div><label className="block text-sm font-medium text-gray-700">Tanggal Kirim</label><input type="date" value={data.tanggal_kirim} onChange={e => setData('tanggal_kirim', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" /></div>
+                <div><label className="block text-sm font-medium text-gray-700">Kurir / Ekspedisi</label><input type="text" value={data.kurir} onChange={e => setData('kurir', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                <div><label className="block text-sm font-medium text-gray-700">No. Resi</label><input type="text" value={data.no_resi} onChange={e => setData('no_resi', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                <div><label className="block text-sm font-medium text-gray-700">Tanggal Kirim</label><input type="date" value={data.tanggal_kirim} onChange={e => setData('tanggal_kirim', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Status Packing</label>
-                  <select value={data.status} onChange={e => setData('status', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                  <select value={data.status} onChange={e => setData('status', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="packing">Sedang Dipacking</option>
                     <option value="siap_kirim">Siap Kirim</option>
                     <option value="dikirim">Dikirim</option>
@@ -78,9 +78,9 @@ export default function Packing({ order }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Catatan</label>
-                <textarea value={data.catatan} onChange={e => setData('catatan', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                <textarea value={data.catatan} onChange={e => setData('catatan', e.target.value)} rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
               </div>
-              <button type="submit" disabled={processing} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              <button type="submit" disabled={processing} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                 Simpan Data Pengiriman
               </button>
             </form>

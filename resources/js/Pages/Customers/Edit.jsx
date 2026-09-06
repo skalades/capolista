@@ -65,7 +65,7 @@ export default function CustomerEdit({ customer }) {
                         <InputLabel htmlFor="alamat" value="Alamat (Opsional)" />
                         <textarea
                             id="alamat"
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            className="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                             value={data.alamat}
                             onChange={e => setData('alamat', e.target.value)}
                             rows={3}
@@ -77,7 +77,7 @@ export default function CustomerEdit({ customer }) {
                         <InputLabel htmlFor="catatan" value="Catatan Tambahan (Opsional)" />
                         <textarea
                             id="catatan"
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            className="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
                             value={data.catatan}
                             onChange={e => setData('catatan', e.target.value)}
                             rows={3}

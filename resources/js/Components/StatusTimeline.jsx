@@ -22,7 +22,7 @@ const getStatusConfig = (status) => {
     if (s.includes('printing')) return { icon: PrinterIcon, bg: 'bg-purple-500' };
     if (s.includes('pemasangan')) return { icon: WrenchScrewdriverIcon, bg: 'bg-pink-500' };
     if (s.includes('packing')) return { icon: ArchiveBoxIcon, bg: 'bg-teal-500' };
-    if (s.includes('dikirim')) return { icon: TruckIcon, bg: 'bg-indigo-500' };
+    if (s.includes('dikirim')) return { icon: TruckIcon, bg: 'bg-brand-500' };
     if (s.includes('selesai')) return { icon: CheckIcon, bg: 'bg-green-500' };
     
     return { icon: ClockIcon, bg: 'bg-gray-400' };

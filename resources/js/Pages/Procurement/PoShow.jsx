@@ -1,9 +1,11 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, router } from '@inertiajs/react';
-import { Card, CardHeader, CardContent, CardTitle } from '@/Components/ui/card';
-import { Button } from '@/Components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import Card from '@/Components/Card';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
+import Table from '@/Components/Table';
 
 export default function PoShow({ auth, purchaseOrder }) {
     
@@ -14,9 +16,8 @@ export default function PoShow({ auth, purchaseOrder }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Detail PO: {purchaseOrder.no_po}</h2>}
+        <AppLayout
+            title={`Detail PO: ${purchaseOrder.no_po}`}
         >
             <Head title={`Detail PO ${purchaseOrder.no_po}`} />
 
@@ -32,79 +33,68 @@ export default function PoShow({ auth, purchaseOrder }) {
                         </div>
                         <div className="flex space-x-2">
                             {purchaseOrder.status === 'draft' && (
-                                <Button onClick={() => updateStatus('dikirim')} className="bg-blue-500 hover:bg-blue-600">Tandai Dikirim</Button>
+                                <PrimaryButton onClick={() => updateStatus('dikirim')} className="bg-blue-500 hover:bg-brand-600">Tandai Dikirim</PrimaryButton>
                             )}
                             {purchaseOrder.status === 'dikirim' && (
-                                <Button onClick={() => updateStatus('diterima')} className="bg-green-500 hover:bg-green-600">Tandai Diterima</Button>
+                                <PrimaryButton onClick={() => updateStatus('diterima')} className="bg-green-500 hover:bg-green-600">Tandai Diterima</PrimaryButton>
                             )}
                             {(purchaseOrder.status === 'draft' || purchaseOrder.status === 'dikirim') && (
-                                <Button onClick={() => updateStatus('dibatalkan')} variant="destructive">Batalkan PO</Button>
+                                <PrimaryButton onClick={() => updateStatus('dibatalkan')} variant="destructive">Batalkan PO</PrimaryButton>
                             )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Informasi Supplier</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
+                        <Card title="Informasi Supplier">
+                            <div className="space-y-2">
                                 <p><strong>Nama:</strong> {purchaseOrder.supplier?.nama}</p>
                                 <p><strong>Kontak:</strong> {purchaseOrder.supplier?.kontak || '-'}</p>
                                 <p><strong>Email:</strong> {purchaseOrder.supplier?.email || '-'}</p>
                                 <p><strong>Alamat:</strong> {purchaseOrder.supplier?.alamat || '-'}</p>
-                            </CardContent>
+                            </div>
                         </Card>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Informasi PO</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
+                        <Card title="Informasi PO">
+                            <div className="space-y-2">
                                 <p><strong>No PO:</strong> {purchaseOrder.no_po}</p>
                                 <p><strong>Tanggal:</strong> {purchaseOrder.tanggal_po}</p>
                                 <p><strong>Dibuat Oleh:</strong> {purchaseOrder.creator?.name || '-'}</p>
                                 <p><strong>Catatan:</strong> {purchaseOrder.catatan || '-'}</p>
-                            </CardContent>
+                            </div>
                         </Card>
                     </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Item Pembelian</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Nama Bahan</TableHead>
-                                        <TableHead>Jumlah</TableHead>
-                                        <TableHead>Satuan</TableHead>
-                                        <TableHead>Harga Satuan</TableHead>
-                                        <TableHead>Subtotal</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {purchaseOrder.items.map(item => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>{item.nama_bahan}</TableCell>
-                                            <TableCell>{item.jumlah}</TableCell>
-                                            <TableCell>{item.satuan}</TableCell>
-                                            <TableCell>Rp {Number(item.harga_satuan).toLocaleString()}</TableCell>
-                                            <TableCell>Rp {(item.jumlah * item.harga_satuan).toLocaleString()}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="text-right font-bold">Total Keseluruhan:</TableCell>
-                                        <TableCell className="font-bold">Rp {Number(purchaseOrder.total_harga).toLocaleString()}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </CardContent>
+                    <Card title="Item Pembelian">
+                        <Table>
+                            <Table.Head>
+                                <Table.Row>
+                                    <Table.HeadCell>Nama Bahan</Table.HeadCell>
+                                    <Table.HeadCell>Jumlah</Table.HeadCell>
+                                    <Table.HeadCell>Satuan</Table.HeadCell>
+                                    <Table.HeadCell>Harga Satuan</Table.HeadCell>
+                                    <Table.HeadCell>Subtotal</Table.HeadCell>
+                                </Table.Row>
+                            </Table.Head>
+                            <Table.Body>
+                                {purchaseOrder.items.map(item => (
+                                    <Table.Row key={item.id}>
+                                        <Table.Cell>{item.nama_bahan}</Table.Cell>
+                                        <Table.Cell>{item.jumlah}</Table.Cell>
+                                        <Table.Cell>{item.satuan}</Table.Cell>
+                                        <Table.Cell>Rp {Number(item.harga_satuan).toLocaleString()}</Table.Cell>
+                                        <Table.Cell>Rp {(item.jumlah * item.harga_satuan).toLocaleString()}</Table.Cell>
+                                    </Table.Row>
+                                ))}
+                                <Table.Row>
+                                    <Table.Cell colSpan={4} className="text-right font-bold">Total Keseluruhan:</Table.Cell>
+                                    <Table.Cell className="font-bold">Rp {Number(purchaseOrder.total_harga).toLocaleString()}</Table.Cell>
+                                </Table.Row>
+                            </Table.Body>
+                        </Table>
                     </Card>
 
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

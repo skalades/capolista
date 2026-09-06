@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, router } from '@inertiajs/react';
 
 export default function Keuangan({ auth, filters, rekap, piutang }) {
@@ -19,10 +19,7 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Laporan Keuangan</h2>}
-        >
+        <AppLayout title="Laporan Keuangan">
             <Head title="Laporan Keuangan" />
 
             <div className="py-12">
@@ -36,7 +33,7 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
                                     type="date" 
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                                 />
                             </div>
                             <div>
@@ -45,10 +42,10 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
                                     type="date" 
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"
                                 />
                             </div>
-                            <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                            <button type="submit" className="bg-brand-600 text-white px-4 py-2 rounded-md hover:bg-brand-700">
                                 Filter
                             </button>
                         </form>
@@ -66,7 +63,7 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
                         </div>
                         <div className="bg-white p-4 shadow-sm sm:rounded-lg">
                             <div className="text-gray-500 text-sm">Laba Kotor</div>
-                            <div className="text-2xl font-bold text-indigo-600">{formatRupiah(rekap.laba_kotor)}</div>
+                            <div className="text-2xl font-bold text-brand-600">{formatRupiah(rekap.laba_kotor)}</div>
                         </div>
                     </div>
 
@@ -89,11 +86,11 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
                                 {piutang && piutang.length > 0 ? (
                                     piutang.map((p, i) => (
                                         <tr key={i}>
-                                            <td className="px-6 py-4 whitespace-nowrap">{p.customer_name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{p.order_id}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(p.total)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(p.paid)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-red-600">{formatRupiah(p.balance)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{p.customer?.nama || '-'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{p.no_order}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(p.total_harga)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{formatRupiah(p.dp)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-red-600">{formatRupiah(p.sisa_bayar)}</td>
                                         </tr>
                                     ))
                                 ) : (
@@ -106,6 +103,6 @@ export default function Keuangan({ auth, filters, rekap, piutang }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
