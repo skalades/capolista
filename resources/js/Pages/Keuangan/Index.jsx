@@ -57,7 +57,7 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                     <div className="bg-white rounded-lg shadow-sm p-4 border-top-dotted-yellow">
                         <p className="text-xs text-gray-500 font-medium mb-1">Total piutang</p>
                         <h3 className="text-2xl font-bold">Rp {formatShort(piutang)}</h3>
-                        <p className="text-[10px] text-red-500 mt-1">{piutangMenunggak.length} order menunggak > 7 hari</p>
+                        <p className="text-[10px] text-red-500 mt-1">{piutangMenunggak.length} order menunggak &gt; 7 hari</p>
                         <Link href={route('keuangan.pembayaran.index')} className="text-[10px] text-teal-700 hover:underline mt-1 block">Lihat detail piutang &rarr;</Link>
                     </div>
 
