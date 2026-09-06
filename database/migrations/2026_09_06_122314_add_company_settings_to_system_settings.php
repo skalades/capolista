@@ -40,10 +40,10 @@ return new class extends Migration
         ];
 
         foreach ($defaults as $setting) {
-            DB::table('system_settings')->insert(array_merge($setting, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+            DB::table('system_settings')->updateOrInsert(
+                ['key' => $setting['key']],
+                array_merge($setting, ['updated_at' => now()])
+            );
         }
     }
 
