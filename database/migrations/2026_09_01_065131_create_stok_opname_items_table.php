@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stok_opname_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('stok_opname_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('bahan_id')->constrained('stok_bahans');
+            $table->foreignId('bahan_id')->constrained('stok_bahan');
             $table->string('nama_bahan');
             $table->string('satuan');
             $table->decimal('stok_sistem', 10, 2);
