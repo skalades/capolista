@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import Card from '@/Components/Card';
 import { ClipboardDocumentListIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import HRTabs from './HRTabs';
 
 const STATUS_OPTIONS = [
     { value: 'hadir',  label: 'Hadir',  color: 'bg-green-100 text-green-800' },
@@ -56,10 +57,12 @@ export default function Absensi({ karyawanList, absensiHariIni, rekapBulan, divi
         router.get(route('hr.absensi.index'), { ...filters, [field]: value }, { preserveState: true });
 
     return (
-        <AppLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Absensi Karyawan</h2>}>
-            <Head title="Absensi" />
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
+        <AppLayout title="Input Absensi">
+            <Head title="Input Absensi" />
+            <div className="mb-6">
+                <HRTabs />
+            </div>
+            <div className="space-y-6">
                 <Card>
                     <div className="flex flex-col sm:flex-row gap-4 items-end">
                         <div>

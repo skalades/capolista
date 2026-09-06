@@ -1,7 +1,11 @@
 import React from 'react';
 import StatsCard from '@/Components/StatsCard';
 import Card from '@/Components/Card';
-import { ClipboardDocumentListIcon, ExclamationCircleIcon, ClockIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import Table from '@/Components/Table';
+import Badge from '@/Components/Badge';
+import EmptyState from '@/Components/EmptyState';
+import { Link } from '@inertiajs/react';
+import { CalendarIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 export default function AdminView({ extraData, recentOrders, upcomingDeadlines }) {
     const formatDate = (dateString) => {
@@ -9,60 +13,95 @@ export default function AdminView({ extraData, recentOrders, upcomingDeadlines }
     };
 
     return (
-        <>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                <StatsCard title="Order Aktif" value={extraData.order_aktif || 0} icon={ClipboardDocumentListIcon} color="blue" />
-                <StatsCard title="Order Terlambat" value={extraData.order_terlambat || 0} icon={ExclamationCircleIcon} color="red" />
-                <StatsCard title="Menunggu Approval" value={extraData.order_menunggu_approval || 0} icon={MagnifyingGlassIcon} color="yellow" />
-                <StatsCard title="Bottleneck (>3 Hari)" value={extraData.order_bottleneck || 0} icon={ClockIcon} color="orange" />
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatsCard 
+                    title="Order Aktif" 
+                    value={extraData.order_aktif || 0} 
+                    status="accent" 
+                />
+                <StatsCard 
+                    title="Order Terlambat" 
+                    value={extraData.order_terlambat || 0} 
+                    status="danger" 
+                />
+                <StatsCard 
+                    title="Menunggu Approval" 
+                    value={extraData.order_menunggu_approval || 0} 
+                    status="gold" 
+                />
+                <StatsCard 
+                    title="Bottleneck (>3 Hari)" 
+                    value={extraData.order_bottleneck || 0} 
+                    status="danger" 
+                />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <Card title="Upcoming Deadlines">
-                    <div className="space-y-4 mt-4">
-                        {upcomingDeadlines?.map((order) => (
-                            <div key={order.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <p className="font-semibold text-sm">{order.no_order}</p>
-                                    <p className="text-xs text-gray-500">{order.customer?.nama || 'Unknown'}</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-red-600 font-medium">
-                                        {formatDate(order.deadline)}
-                                    </p>
-                                    <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full capitalize">
-                                        {order.status}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                        {(!upcomingDeadlines || upcomingDeadlines.length === 0) && (
-                            <p className="text-center text-sm text-gray-500 py-4">Tidak ada deadline dalam waktu dekat.</p>
-                        )}
-                    </div>
+                    {(!upcomingDeadlines || upcomingDeadlines.length === 0) ? (
+                        <EmptyState 
+                            icon={CalendarIcon}
+                            title="Aman!"
+                            description="Tidak ada deadline dalam waktu dekat."
+                        />
+                    ) : (
+                        <Table>
+                            <Table.Head>
+                                <Table.HeadCell>Order ID</Table.HeadCell>
+                                <Table.HeadCell>Customer</Table.HeadCell>
+                                <Table.HeadCell>Deadline</Table.HeadCell>
+                                <Table.HeadCell>Status</Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body>
+                                {upcomingDeadlines.map((order) => (
+                                    <Table.Row key={order.id}>
+                                        <Table.Cell className="font-mono text-ink-soft">{order.no_order}</Table.Cell>
+                                        <Table.Cell className="font-medium text-ink">{order.customer?.nama || 'Unknown'}</Table.Cell>
+                                        <Table.Cell className="text-danger font-semibold">{formatDate(order.deadline)}</Table.Cell>
+                                        <Table.Cell>
+                                            <Badge status="gold">
+                                                {order.status}
+                                            </Badge>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table>
+                    )}
                 </Card>
 
-                <Card title="Recent Orders">
-                    <div className="space-y-4 mt-4">
-                        {recentOrders?.map((order) => (
-                            <div key={order.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                    <p className="font-semibold text-sm">{order.no_order}</p>
-                                    <p className="text-xs text-gray-500">{order.jenis_produk}</p>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full capitalize">
-                                        {order.status}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                        {(!recentOrders || recentOrders.length === 0) && (
-                            <p className="text-center text-sm text-gray-500 py-4">Belum ada order terbaru.</p>
-                        )}
-                    </div>
+                <Card title="Recent Orders" actions={<Link href={route('orders.index')} className="text-[11px] font-medium text-navy hover:text-accent">Semua Order &rarr;</Link>}>
+                    {(!recentOrders || recentOrders.length === 0) ? (
+                        <EmptyState 
+                            icon={ClipboardDocumentListIcon}
+                            title="Belum ada order"
+                            description="Belum ada order masuk."
+                        />
+                    ) : (
+                        <Table>
+                            <Table.Head>
+                                <Table.HeadCell>Order ID</Table.HeadCell>
+                                <Table.HeadCell>Produk</Table.HeadCell>
+                                <Table.HeadCell>Status</Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body>
+                                {recentOrders.map((order) => (
+                                    <Table.Row key={order.id}>
+                                        <Table.Cell className="font-mono text-ink-soft">{order.no_order}</Table.Cell>
+                                        <Table.Cell className="font-medium text-ink">{order.jenis_produk}</Table.Cell>
+                                        <Table.Cell>
+                                            <Badge status={order.status === 'selesai' ? 'accent' : 'neutral'}>
+                                                {order.status}
+                                            </Badge>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table>
+                    )}
                 </Card>
             </div>
-        </>
+        </div>
     );
 }

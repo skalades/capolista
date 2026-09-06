@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500&family=Oswald:wght@600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,16 +6,79 @@
 
 @layer base {
   :root {
-    --color-brand: #6366f1;
+    --bg: #F3EFE6;
+    --panel: #FBF9F4;
+    --ink: #211D1A;
+    --ink-soft: #6B655C;
+    --line: #DCD3BF;
+    --navy: #29394A;
+    --accent: #2F6F62;
+    --gold: #C9962B;
+    --danger: #A8402F;
+    --purple: #8A6A9E;
   }
   
   html {
-    @apply antialiased text-gray-900 bg-gray-50;
+    @apply antialiased text-ink bg-bg font-sans;
     scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg text-ink;
   }
   
   ::selection {
-    @apply bg-brand-200 text-brand-900;
+    @apply bg-accent/20 text-ink;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-oswald text-ink;
+  }
+}
+
+@layer components {
+  /* Panel / Card Base */
+  .panel {
+    @apply bg-panel rounded-panel border border-line;
+  }
+
+  /* Stitching accent for KPI Cards */
+  .kpi-stitch {
+    --stitch-color: var(--line);
+    background-image: linear-gradient(to right, var(--stitch-color) 50%, transparent 50%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: top;
+    padding-top: 0.75rem; /* Space for the stitch */
+    position: relative;
+  }
+
+  /* Different colors for stitches */
+  .kpi-stitch-accent {
+    --stitch-color: theme('colors.accent');
+  }
+  .kpi-stitch-gold {
+    --stitch-color: theme('colors.gold');
+  }
+  .kpi-stitch-danger {
+    --stitch-color: theme('colors.danger');
+  }
+
+  /* Badge / Pill Base */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-badge text-[10.5px] font-sans font-medium border;
+  }
+  .badge-accent {
+    @apply bg-accent/10 text-accent border-accent/20;
+  }
+  .badge-gold {
+    @apply bg-gold/10 text-gold border-gold/20;
+  }
+  .badge-danger {
+    @apply bg-danger/10 text-danger border-danger/20;
+  }
+  .badge-neutral {
+    @apply bg-gray-100 text-ink-soft border-gray-200;
   }
 }
 
@@ -26,9 +89,5 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
-  }
-  
-  .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20;
   }
 }

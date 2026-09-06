@@ -9,6 +9,10 @@ import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
 import Modal from '@/Components/Modal';
 import Table from '@/Components/Table';
+import Card from '@/Components/Card';
+import EmptyState from '@/Components/EmptyState';
+import { UsersIcon } from '@heroicons/react/24/outline';
+
 export default function Supplier({ auth, suppliers }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -61,109 +65,112 @@ export default function Supplier({ auth, suppliers }) {
     };
 
     return (
-        <AppLayout
-            title="Manajemen Supplier"
-        >
-            
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="flex justify-end">
-                        <PrimaryButton onClick={openCreate}>Tambah Supplier</PrimaryButton>
-                    </div>
-                    
-                    <Modal show={isOpen} onClose={() => setIsOpen(false)}>
-                        <div className="p-6">
-                            <div className="mb-4">
-                                <h2 className="text-lg font-medium text-gray-900">{isEdit ? 'Edit Supplier' : 'Tambah Supplier'}</h2>
-                            </div>
-                            <form onSubmit={submit} className="space-y-4">
-                                <div>
-                                    <TextInputLabel htmlFor="nama" value="Nama Supplier"  />
-                                    <Input
-                                        id="nama"
-                                        value={data.nama}
-                                        onChange={e => setData('nama', e.target.value)}
-                                        required
-                                    />
-                                    {errors.nama && <p className="text-red-500 text-sm">{errors.nama}</p>}
-                                </div>
-                                <div>
-                                    <TextInputLabel htmlFor="kontak" value="Kontak"  />
-                                    <Input
-                                        id="kontak"
-                                        value={data.kontak}
-                                        onChange={e => setData('kontak', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <TextInputLabel htmlFor="email" value="Email"  />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={data.email}
-                                        onChange={e => setData('email', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <TextInputLabel htmlFor="alamat" value="Alamat"  />
-                                    <Input
-                                        id="alamat"
-                                        value={data.alamat}
-                                        onChange={e => setData('alamat', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <TextInputLabel htmlFor="catatan" value="Catatan"  />
-                                    <Input
-                                        id="catatan"
-                                        value={data.catatan}
-                                        onChange={e => setData('catatan', e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex justify-end space-x-2 pt-4">
-                                    <SecondaryButton type="button" onClick={() => setIsOpen(false)}>Batal</SecondaryButton>
-                                    <PrimaryButton type="submit" disabled={processing}>Simpan</PrimaryButton>
-                                </div>
-                            </form>
+        <AppLayout title="Manajemen Supplier">
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-[24px] font-oswald font-bold text-ink">Daftar Supplier</h2>
+                    <PrimaryButton onClick={openCreate}>+ Tambah Supplier</PrimaryButton>
+                </div>
+                
+                <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+                    <div className="p-6">
+                        <div className="mb-4">
+                            <h2 className="text-lg font-medium font-oswald text-ink">{isEdit ? 'Edit Supplier' : 'Tambah Supplier'}</h2>
                         </div>
-                    </Modal>
+                        <form onSubmit={submit} className="space-y-4">
+                            <div>
+                                <InputLabel htmlFor="nama" value="Nama Supplier"  />
+                                <TextInput
+                                    id="nama"
+                                    className="block w-full mt-1"
+                                    value={data.nama}
+                                    onChange={e => setData('nama', e.target.value)}
+                                    required
+                                />
+                                {errors.nama && <InputError message={errors.nama} className="mt-1" />}
+                            </div>
+                            <div>
+                                <InputLabel htmlFor="kontak" value="Kontak"  />
+                                <TextInput
+                                    id="kontak"
+                                    className="block w-full mt-1"
+                                    value={data.kontak}
+                                    onChange={e => setData('kontak', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <InputLabel htmlFor="email" value="Email"  />
+                                <TextInput
+                                    id="email"
+                                    type="email"
+                                    className="block w-full mt-1"
+                                    value={data.email}
+                                    onChange={e => setData('email', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <InputLabel htmlFor="alamat" value="Alamat"  />
+                                <TextInput
+                                    id="alamat"
+                                    className="block w-full mt-1"
+                                    value={data.alamat}
+                                    onChange={e => setData('alamat', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <InputLabel htmlFor="catatan" value="Catatan"  />
+                                <TextInput
+                                    id="catatan"
+                                    className="block w-full mt-1"
+                                    value={data.catatan}
+                                    onChange={e => setData('catatan', e.target.value)}
+                                />
+                            </div>
+                            <div className="flex justify-end space-x-2 pt-4">
+                                <SecondaryButton type="button" onClick={() => setIsOpen(false)}>Batal</SecondaryButton>
+                                <PrimaryButton type="submit" disabled={processing}>Simpan</PrimaryButton>
+                            </div>
+                        </form>
+                    </div>
+                </Modal>
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <Card>
+                    {(!suppliers || suppliers.length === 0) ? (
+                        <EmptyState 
+                            title="Belum ada supplier"
+                            description="Anda belum menambahkan satupun supplier."
+                            icon={UsersIcon}
+                        />
+                    ) : (
                         <Table>
                             <Table.Head>
-                                <Table.Row>
-                                    <Table.HeadCell>Nama</Table.HeadCell>
-                                    <Table.HeadCell>Kontak</Table.HeadCell>
-                                    <Table.HeadCell>Email</Table.HeadCell>
-                                    <Table.HeadCell>Alamat</Table.HeadCell>
-                                    <Table.HeadCell>Aksi</Table.HeadCell>
-                                </Table.Row>
+                                <Table.HeadCell>Nama</Table.HeadCell>
+                                <Table.HeadCell>Kontak</Table.HeadCell>
+                                <Table.HeadCell>Email</Table.HeadCell>
+                                <Table.HeadCell>Alamat</Table.HeadCell>
+                                <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
                             </Table.Head>
                             <Table.Body>
                                 {suppliers.map((sup) => (
                                     <Table.Row key={sup.id}>
-                                        <Table.Cell>{sup.nama}</Table.Cell>
-                                        <Table.Cell>{sup.kontak}</Table.Cell>
-                                        <Table.Cell>{sup.email}</Table.Cell>
-                                        <Table.Cell>{sup.alamat}</Table.Cell>
-                                        <Table.Cell>
-                                            <div className="flex space-x-2">
-                                                <SecondaryButton size="sm" onClick={() => openEdit(sup)}>Edit</SecondaryButton>
-                                                <DangerButton size="sm" onClick={() => handleDelete(sup.id)}>Hapus</DangerButton>
-                                            </div>
+                                        <Table.Cell className="font-medium text-ink">{sup.nama}</Table.Cell>
+                                        <Table.Cell>{sup.kontak || '-'}</Table.Cell>
+                                        <Table.Cell>{sup.email || '-'}</Table.Cell>
+                                        <Table.Cell>{sup.alamat || '-'}</Table.Cell>
+                                        <Table.Cell className="text-right space-x-3">
+                                            <button onClick={() => openEdit(sup)} className="text-[12px] font-medium text-navy hover:text-navy/70">
+                                                Edit
+                                            </button>
+                                            <button onClick={() => handleDelete(sup.id)} className="text-[12px] font-medium text-danger hover:text-danger/70">
+                                                Hapus
+                                            </button>
                                         </Table.Cell>
                                     </Table.Row>
                                 ))}
-                                {suppliers.length === 0 && (
-                                    <Table.Row>
-                                        <Table.Cell colSpan={5} className="text-center py-4">Belum ada supplier</Table.Cell>
-                                    </Table.Row>
-                                )}
                             </Table.Body>
                         </Table>
-                    </div>
-                </div>
+                    )}
+                </Card>
             </div>
         </AppLayout>
     );

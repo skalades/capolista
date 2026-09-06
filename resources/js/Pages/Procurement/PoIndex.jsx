@@ -5,6 +5,10 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import Table from '@/Components/Table';
+import EmptyState from '@/Components/EmptyState';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import Badge from '@/Components/Badge';
+import Card from '@/Components/Card';
 
 export default function PoIndex({ auth, purchaseOrders, filters }) {
     const [statusFilter, setStatusFilter] = useState(filters.status || '');
@@ -20,21 +24,25 @@ export default function PoIndex({ auth, purchaseOrders, filters }) {
         );
     };
 
-    return (
-        <AppLayout
-            title="Daftar Purchase Order"
-        >
-            
+    const STATUS_SEMANTICS = {
+        draft: 'neutral',
+        dikirim: 'accent',
+        diterima: 'accent',
+        dibatalkan: 'danger'
+    };
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-                        <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">Filter Status:</span>
+    return (
+        <AppLayout title="Daftar Purchase Order">
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="flex flex-col sm:flex-row justify-between items-end gap-4 mb-6">
+                    <div>
+                        <h2 className="text-[24px] font-oswald font-bold text-ink">Daftar Purchase Order</h2>
+                        <div className="flex items-center gap-2 mt-4">
+                            <span className="text-[12px] font-medium text-ink-soft">Filter Status:</span>
                             <select 
                                 value={statusFilter || 'all'} 
                                 onChange={handleFilterChange}
-                                className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                className="rounded-md border-line py-1.5 text-ink text-[13px] focus:ring-2 focus:ring-navy focus:border-navy"
                             >
                                 <option value="all">Semua Status</option>
                                 <option value="draft">Draft</option>
@@ -43,51 +51,53 @@ export default function PoIndex({ auth, purchaseOrders, filters }) {
                                 <option value="dibatalkan">Dibatalkan</option>
                             </select>
                         </div>
-                        <PrimaryButton asChild>
-                            <Link href={route('procurement.po.create')}>Buat PO Baru</Link>
-                        </PrimaryButton>
                     </div>
+                    <Link 
+                        href={route('procurement.po.create')} 
+                        className="inline-flex items-center justify-center rounded bg-navy px-4 py-2 text-[13px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90 mb-[3px]"
+                    >
+                        + Buat PO Baru
+                    </Link>
+                </div>
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <Card>
+                    {(!purchaseOrders.data || purchaseOrders.data.length === 0) ? (
+                        <EmptyState 
+                            title="Tidak ada PO"
+                            description="Belum ada data Purchase Order dengan status tersebut."
+                            icon={DocumentTextIcon}
+                        />
+                    ) : (
                         <Table>
                             <Table.Head>
-                                <Table.Row>
-                                    <Table.HeadCell>No. PO</Table.HeadCell>
-                                    <Table.HeadCell>Tanggal</Table.HeadCell>
-                                    <Table.HeadCell>Supplier</Table.HeadCell>
-                                    <Table.HeadCell>Total Harga</Table.HeadCell>
-                                    <Table.HeadCell>Status</Table.HeadCell>
-                                    <Table.HeadCell>Aksi</Table.HeadCell>
-                                </Table.Row>
+                                <Table.HeadCell>No. PO</Table.HeadCell>
+                                <Table.HeadCell>Tanggal</Table.HeadCell>
+                                <Table.HeadCell>Supplier</Table.HeadCell>
+                                <Table.HeadCell className="text-right">Total Harga</Table.HeadCell>
+                                <Table.HeadCell className="text-center">Status</Table.HeadCell>
+                                <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
                             </Table.Head>
                             <Table.Body>
                                 {purchaseOrders.data.map((po) => (
                                     <Table.Row key={po.id}>
-                                        <Table.Cell className="font-medium">{po.no_po}</Table.Cell>
-                                        <Table.Cell>{po.tanggal_po}</Table.Cell>
-                                        <Table.Cell>{po.supplier?.nama}</Table.Cell>
-                                        <Table.Cell>Rp {Number(po.total_harga).toLocaleString()}</Table.Cell>
-                                        <Table.Cell>
-                                            <span className={`px-2 py-1 rounded text-xs text-white ${po.status === 'draft' ? 'bg-gray-500' : po.status === 'dikirim' ? 'bg-blue-500' : po.status === 'diterima' ? 'bg-green-500' : 'bg-red-500'}`}>
+                                        <Table.Cell className="font-mono text-ink font-medium">{po.no_po}</Table.Cell>
+                                        <Table.Cell className="text-ink-soft">{po.tanggal_po}</Table.Cell>
+                                        <Table.Cell className="font-medium text-ink">{po.supplier?.nama}</Table.Cell>
+                                        <Table.Cell className="text-right font-medium text-ink">Rp {Number(po.total_harga).toLocaleString('id-ID')}</Table.Cell>
+                                        <Table.Cell className="text-center">
+                                            <Badge status={STATUS_SEMANTICS[po.status] || 'neutral'}>
                                                 {po.status.toUpperCase()}
-                                            </span>
+                                            </Badge>
                                         </Table.Cell>
-                                        <Table.Cell>
-                                            <SecondaryButton size="sm" asChild>
-                                                <Link href={route('procurement.po.show', po.id)}>Detail</Link>
-                                            </SecondaryButton>
+                                        <Table.Cell className="text-right">
+                                            <Link href={route('procurement.po.show', po.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">Detail</Link>
                                         </Table.Cell>
                                     </Table.Row>
                                 ))}
-                                {purchaseOrders.data.length === 0 && (
-                                    <Table.Row>
-                                        <Table.Cell colSpan={6} className="text-center py-4">Belum ada Purchase Order</Table.Cell>
-                                    </Table.Row>
-                                )}
                             </Table.Body>
                         </Table>
-                    </div>
-                </div>
+                    )}
+                </Card>
             </div>
         </AppLayout>
     );

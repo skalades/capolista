@@ -5,13 +5,13 @@ export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' })
     const appSettings = usePage().props.appSettings || {};
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen bg-bg">
             {/* Left Panel - Branding (Hidden on mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-brand-900 p-12 relative overflow-hidden">
+            <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-navy p-12 relative overflow-hidden">
                 {/* Decorative background elements */}
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-600/20 to-brand-900/80 z-0"></div>
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-brand-500 rounded-full blur-3xl opacity-20"></div>
-                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-brand-400 rounded-full blur-3xl opacity-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-navy/80 z-0"></div>
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-accent rounded-full blur-3xl opacity-20"></div>
+                <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-gold rounded-full blur-3xl opacity-10"></div>
 
                 <div className="relative z-10">
                     <Link href="/" className="inline-flex items-center gap-3">
@@ -20,35 +20,35 @@ export default function GuestLayout({ children, maxWidth = 'max-w-sm lg:w-96' })
                         ) : (
                             <ApplicationLogo className="h-10 w-10 text-white" />
                         )}
-                        <span className="text-2xl font-bold tracking-wider text-white">
-                            {appSettings.company_name || 'CAPOLISTA'}
+                        <span className="text-[28px] font-oswald font-bold tracking-wider text-white">
+                            {appSettings.company_name || 'CAPOLISTA APPAREL'}
                         </span>
                     </Link>
                 </div>
                 
                 <div className="relative z-10 mb-12">
-                    <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+                    <h1 className="text-[42px] font-oswald font-bold text-white mb-4 leading-tight">
                         Sistem Manajemen <br /> Order & Produksi
                     </h1>
-                    <p className="text-brand-100 text-lg max-w-md">
+                    <p className="text-white/80 font-sans text-[15px] max-w-md leading-relaxed">
                         Pantau progres desain, printing, dan pemasangan dalam satu platform terintegrasi.
                     </p>
                 </div>
             </div>
 
             {/* Right Panel - Form */}
-            <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:w-1/2 lg:px-20 xl:px-24">
+            <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:w-1/2 lg:px-20 xl:px-24 bg-bg">
                 <div className={`mx-auto w-full ${maxWidth}`}>
                     <div className="lg:hidden mb-8 text-center">
                         <Link href="/" className="inline-flex flex-col items-center gap-2">
                             {appSettings.company_logo ? (
                                 <img src={`/storage/${appSettings.company_logo}`} alt={appSettings.company_name} className="h-16 w-auto object-contain" />
                             ) : (
-                                <div className="h-16 w-16 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <div className="h-16 w-16 bg-navy rounded-xl flex items-center justify-center shadow-lg">
                                     <ApplicationLogo className="h-10 w-10 text-white" />
                                 </div>
                             )}
-                            <span className="text-2xl font-bold tracking-wider text-gray-900">{appSettings.company_name || 'CAPOLISTA'}</span>
+                            <span className="text-[24px] font-oswald font-bold tracking-wider text-ink">{appSettings.company_name || 'CAPOLISTA APPAREL'}</span>
                         </Link>
                     </div>
                     {children}

@@ -3,6 +3,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import Card from '@/Components/Card';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import HRTabs from './HRTabs';
 
 const MONTH_NAMES = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -26,19 +27,12 @@ export default function AbsensiRekap({ karyawanList, rekapData, divisiList, filt
     };
 
     return (
-        <AppLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Rekap Absensi Bulanan</h2>}>
+        <AppLayout title="Rekap Absensi Bulanan">
             <Head title="Rekap Absensi" />
-
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <div className="flex justify-between items-center">
-                    <Link
-                        href={route('hr.absensi.index')}
-                        className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
-                    >
-                        <ArrowLeftIcon className="h-4 w-4 mr-1" />
-                        Kembali ke Input Absensi
-                    </Link>
-                </div>
+            <div className="mb-6">
+                <HRTabs />
+            </div>
+            <div className="space-y-6">
 
                 <Card>
                     <div className="flex flex-col sm:flex-row gap-4 items-end">

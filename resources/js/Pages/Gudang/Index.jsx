@@ -5,9 +5,11 @@ import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import Table from '@/Components/Table';
 import Badge from '@/Components/Badge';
+import EmptyState from '@/Components/EmptyState';
+import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ ordersPacking, lowStockCount }) {
-  const PACKING_STATUS_COLORS = { packing: 'yellow', siap_kirim: 'blue', dikirim: 'green' };
+  const PACKING_STATUS_COLORS = { packing: 'gold', siap_kirim: 'accent', dikirim: 'accent' };
   const PACKING_STATUS_LABELS = { packing: 'Packing', siap_kirim: 'Siap Kirim', dikirim: 'Dikirim' };
 
   return (
@@ -15,10 +17,10 @@ export default function Index({ ordersPacking, lowStockCount }) {
       title="Gudang & Pengiriman"
       headerActions={
         <div className="flex gap-2">
-          <Link href={route('gudang.opname.index')} className="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <Link href={route('gudang.opname.index')} className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12.5px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20">
             Stok Opname
           </Link>
-          <Link href={route('gudang.stok')} className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+          <Link href={route('gudang.stok')} className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90">
             Kelola Stok Bahan
           </Link>
         </div>
@@ -31,43 +33,50 @@ export default function Index({ ordersPacking, lowStockCount }) {
       )}
 
       <Card title="Daftar Order untuk Dipacking/Dikirim">
-        <Table>
-          <Table.Head>
-              <Table.HeadCell>No. Order</Table.HeadCell>
-              <Table.HeadCell>Customer</Table.HeadCell>
-              <Table.HeadCell>Produk</Table.HeadCell>
-              <Table.HeadCell>Jumlah</Table.HeadCell>
-              <Table.HeadCell>Status Packing</Table.HeadCell>
-              <Table.HeadCell>Kurir</Table.HeadCell>
-              <Table.HeadCell>No. Resi</Table.HeadCell>
-              <Table.HeadCell>Tgl Kirim</Table.HeadCell>
-              <Table.HeadCell>Aksi</Table.HeadCell>
-          </Table.Head>
-          <Table.Body>
-            {(ordersPacking?.data || []).map(order => (
-              <Table.Row key={order.id}>
-                <Table.Cell className="font-medium">{order.no_order}</Table.Cell>
-                <Table.Cell>{order.customer?.nama}</Table.Cell>
-                <Table.Cell>{order.jenis_produk}</Table.Cell>
-                <Table.Cell>{order.jumlah}</Table.Cell>
-                <Table.Cell>
-                  <Badge color={PACKING_STATUS_COLORS[order.packing?.status || 'packing']}>
-                    {PACKING_STATUS_LABELS[order.packing?.status || 'packing']}
-                  </Badge>
-                </Table.Cell>
-                <Table.Cell>{order.packing?.kurir || '-'}</Table.Cell>
-                <Table.Cell>{order.packing?.no_resi || '-'}</Table.Cell>
-                <Table.Cell>{order.packing?.tanggal_kirim ? new Date(order.packing.tanggal_kirim).toLocaleDateString('id-ID') : '-'}</Table.Cell>
-                <Table.Cell>
-                  <Link href={route('gudang.packing.show', order.id)} className="text-brand-600 hover:text-brand-900 font-medium">
-                    Kelola Packing
-                  </Link>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-        {ordersPacking?.data?.length === 0 && <p className="text-center text-sm text-gray-500 py-4">Tidak ada order yang sedang dipacking.</p>}
+        {(!ordersPacking?.data || ordersPacking.data.length === 0) ? (
+          <EmptyState 
+            title="Tidak ada order" 
+            description="Tidak ada order yang sedang dalam antrean packing atau pengiriman."
+            icon={ArchiveBoxIcon} 
+          />
+        ) : (
+          <Table>
+            <Table.Head>
+                <Table.HeadCell>No. Order</Table.HeadCell>
+                <Table.HeadCell>Customer</Table.HeadCell>
+                <Table.HeadCell>Produk</Table.HeadCell>
+                <Table.HeadCell>Jumlah</Table.HeadCell>
+                <Table.HeadCell>Status Packing</Table.HeadCell>
+                <Table.HeadCell>Kurir</Table.HeadCell>
+                <Table.HeadCell>No. Resi</Table.HeadCell>
+                <Table.HeadCell>Tgl Kirim</Table.HeadCell>
+                <Table.HeadCell>Aksi</Table.HeadCell>
+            </Table.Head>
+            <Table.Body>
+              {ordersPacking.data.map(order => (
+                <Table.Row key={order.id}>
+                  <Table.Cell className="font-medium font-mono text-ink text-[13px]">{order.no_order}</Table.Cell>
+                  <Table.Cell>{order.customer?.nama}</Table.Cell>
+                  <Table.Cell>{order.jenis_produk}</Table.Cell>
+                  <Table.Cell>{order.jumlah}</Table.Cell>
+                  <Table.Cell>
+                    <Badge status={PACKING_STATUS_COLORS[order.packing?.status || 'packing']}>
+                      {PACKING_STATUS_LABELS[order.packing?.status || 'packing']}
+                    </Badge>
+                  </Table.Cell>
+                  <Table.Cell>{order.packing?.kurir || '-'}</Table.Cell>
+                  <Table.Cell className="font-mono text-[12px]">{order.packing?.no_resi || '-'}</Table.Cell>
+                  <Table.Cell>{order.packing?.tanggal_kirim ? new Date(order.packing.tanggal_kirim).toLocaleDateString('id-ID') : '-'}</Table.Cell>
+                  <Table.Cell>
+                    <Link href={route('gudang.packing.show', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70 transition-colors">
+                      Kelola Packing
+                    </Link>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        )}
       </Card>
     </AppLayout>
   );

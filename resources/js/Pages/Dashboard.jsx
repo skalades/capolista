@@ -30,7 +30,7 @@ export default function Dashboard({ stats = {}, recentOrders = [], upcomingDeadl
                 return <StafView extraData={extraData} />;
             default:
                 return (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-ink-soft">
                         <p>Akses ke dashboard tidak tersedia untuk peran Anda.</p>
                     </div>
                 );
@@ -40,21 +40,18 @@ export default function Dashboard({ stats = {}, recentOrders = [], upcomingDeadl
     return (
         <AppLayout title="Dashboard">
             {/* Welcome Section */}
-            <div className="relative overflow-hidden rounded-2xl bg-brand-900 px-6 py-10 shadow-lg sm:px-12 mb-8">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-600/40 to-brand-900/90 mix-blend-multiply" />
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-brand-400 rounded-full blur-3xl opacity-30" />
-                
+            <div className="relative overflow-hidden rounded-panel bg-navy px-6 py-8 shadow-card mb-8">
                 <div className="relative z-10 flex items-center gap-6">
-                    <div className="hidden sm:flex h-20 w-20 items-center justify-center rounded-full bg-white/10 p-2 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                        <div className="flex h-full w-full items-center justify-center rounded-full bg-brand-500 text-2xl font-bold text-white shadow-sm">
+                    <div className="hidden sm:flex h-16 w-16 items-center justify-center rounded-full bg-white/10 p-1.5 shadow-inner backdrop-blur-sm">
+                        <div className="flex h-full w-full items-center justify-center rounded-full bg-accent text-xl font-bold font-oswald text-white shadow-sm">
                             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                     </div>
                     <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+                        <h2 className="text-[22px] sm:text-[26px] font-bold font-oswald tracking-tight text-white mb-1.5">
                             Selamat datang kembali, {user?.name}! 👋
                         </h2>
-                        <p className="text-brand-100 max-w-2xl text-sm sm:text-base">
+                        <p className="text-line max-w-2xl text-[13px] sm:text-[14px] font-sans">
                             Berikut adalah ringkasan aktivitas dan performa sistem hari ini. 
                             Pantau terus progres pekerjaan untuk memastikan target tercapai.
                         </p>

@@ -5,6 +5,7 @@ import Card from '@/Components/Card';
 import StatsCard from '@/Components/StatsCard';
 import Pagination from '@/Components/Pagination';
 import { CheckCircleIcon, ClockIcon, CurrencyDollarIcon, CubeIcon } from '@heroicons/react/24/outline';
+import HRTabs from './HRTabs';
 
 export default function OutputRekap({ outputs, stats, filters }) {
     const handleFilterChange = (key, value) => {
@@ -12,10 +13,12 @@ export default function OutputRekap({ outputs, stats, filters }) {
     };
 
     return (
-        <AppLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Rekap Output Borongan</h2>}>
+        <AppLayout title="Rekap Output Borongan">
             <Head title="Rekap Output Borongan" />
-
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="mb-6">
+                <HRTabs />
+            </div>
+            <div className="space-y-6">
                 <Card>
                     <div className="flex flex-col sm:flex-row gap-4 items-end">
                         <div>

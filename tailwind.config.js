@@ -13,23 +13,35 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
-                heading: ['Inter', ...defaultTheme.fontFamily.sans],
+                sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+                oswald: ['Oswald', 'sans-serif'],
+                mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
             },
             colors: {
-                brand: {
-                    50: '#eef2ff',
-                    100: '#e0e7ff',
-                    200: '#c7d2fe',
-                    300: '#a5b4fc',
-                    400: '#818cf8',
-                    500: '#6366f1', // Indigo-500
-                    600: '#4f46e5',
-                    700: '#4338ca',
-                    800: '#3730a3',
-                    900: '#312e81',
-                    950: '#1e1b4b',
-                }
+                // Background & Surface
+                bg: '#F3EFE6',
+                panel: '#FBF9F4',
+                // Text
+                ink: {
+                    DEFAULT: '#211D1A',
+                    soft: '#6B655C',
+                },
+                // Borders
+                line: '#DCD3BF',
+                // Brand/UI structural
+                navy: '#29394A',
+                // Semantic / Status
+                accent: '#2F6F62', // Teal
+                gold: '#C9962B',
+                danger: '#A8402F',
+                purple: '#8A6A9E',
+            },
+            borderRadius: {
+                'panel': '4px',
+                'badge': '20px',
+            },
+            borderWidth: {
+                'accent': '1.5px',
             },
             boxShadow: {
                 'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',

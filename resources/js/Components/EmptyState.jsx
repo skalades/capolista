@@ -2,22 +2,22 @@ import { Link } from '@inertiajs/react';
 
 export default function EmptyState({ title, description, action, icon: Icon }) {
     return (
-        <div className="text-center py-16 px-4 sm:px-6 lg:px-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+        <div className="flex flex-col items-center justify-center text-center py-10 px-4">
             {Icon && (
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 mb-4">
-                    <Icon className="h-6 w-6 text-brand-600" aria-hidden="true" />
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-line/30 mb-3 text-ink-soft">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
                 </div>
             )}
-            <h3 className="mt-2 text-sm font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-[14px] font-semibold text-ink font-sans">{title}</h3>
             {description && (
-                <p className="mt-1 text-sm text-gray-500 max-w-sm mx-auto">{description}</p>
+                <p className="mt-1 text-[12.5px] text-ink-soft font-sans max-w-sm mx-auto leading-relaxed">{description}</p>
             )}
             {action && (
-                <div className="mt-6">
+                <div className="mt-5">
                     {action.href ? (
                         <Link
                             href={action.href}
-                            className="inline-flex items-center justify-center rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                            className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium text-white hover:bg-navy/90 transition-colors"
                         >
                             {action.label}
                         </Link>
@@ -25,7 +25,7 @@ export default function EmptyState({ title, description, action, icon: Icon }) {
                         <button
                             type="button"
                             onClick={action.onClick}
-                            className="inline-flex items-center justify-center rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                            className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium text-white hover:bg-navy/90 transition-colors"
                         >
                             {action.label}
                         </button>

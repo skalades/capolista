@@ -1,7 +1,7 @@
 export default function Table({ children, className = '' }) {
     return (
-        <div className={`overflow-x-auto rounded-lg border border-gray-100 shadow-sm ${className}`}>
-            <table className="min-w-full divide-y divide-gray-200">
+        <div className={`overflow-x-auto w-full ${className}`}>
+            <table className="min-w-full text-left border-collapse">
                 {children}
             </table>
         </div>
@@ -10,7 +10,7 @@ export default function Table({ children, className = '' }) {
 
 Table.Head = function TableHead({ children }) {
     return (
-        <thead className="bg-gray-50/75">
+        <thead className="border-b border-line">
             <tr>{children}</tr>
         </thead>
     );
@@ -18,7 +18,7 @@ Table.Head = function TableHead({ children }) {
 
 Table.HeadCell = function TableHeadCell({ children, className = '' }) {
     return (
-        <th className={`px-6 py-3.5 text-left text-sm font-semibold text-gray-900 ${className}`}>
+        <th className={`px-4 py-3 text-[11px] font-sans font-medium text-ink-soft lowercase tracking-wide font-normal ${className}`}>
             {children}
         </th>
     );
@@ -26,7 +26,7 @@ Table.HeadCell = function TableHeadCell({ children, className = '' }) {
 
 Table.Body = function TableBody({ children }) {
     return (
-        <tbody className="bg-white divide-y divide-gray-100">
+        <tbody className="divide-y divide-line bg-transparent">
             {children}
         </tbody>
     );
@@ -34,7 +34,7 @@ Table.Body = function TableBody({ children }) {
 
 Table.Row = function TableRow({ children, className = '' }) {
     return (
-        <tr className={`hover:bg-gray-50/50 transition-colors ${className}`}>
+        <tr className={`hover:bg-accent/5 transition-colors ${className}`}>
             {children}
         </tr>
     );
@@ -42,7 +42,7 @@ Table.Row = function TableRow({ children, className = '' }) {
 
 Table.Cell = function TableCell({ children, className = '' }) {
     return (
-        <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-600 ${className}`}>
+        <td className={`px-4 py-3 whitespace-nowrap text-[13px] font-sans text-ink ${className}`}>
             {children}
         </td>
     );

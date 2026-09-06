@@ -2,18 +2,21 @@ import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
 import Badge from '@/Components/Badge';
 import StatusTimeline from '@/Components/StatusTimeline';
+import EmptyState from '@/Components/EmptyState';
 import { formatRupiah } from '@/utils';
 import { useState } from 'react';
 import { useForm, router } from '@inertiajs/react';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import { DocumentTextIcon, ChartBarSquareIcon, ClockIcon } from '@heroicons/react/24/outline';
 
-const STATUS_COLORS = {
-    draft: 'gray', desain: 'blue', procurement: 'yellow',
-    cutting: 'lime', jahit: 'cyan', produksi: 'orange', printing: 'purple', pemasangan: 'pink',
-    packing: 'teal', dikirim: 'indigo', selesai: 'green'
+const STATUS_SEMANTICS = {
+    draft: 'neutral', desain: 'neutral', procurement: 'gold',
+    cutting: 'gold', jahit: 'gold', produksi: 'gold', printing: 'gold', pemasangan: 'gold',
+    packing: 'gold', dikirim: 'accent', selesai: 'accent'
 };
+
 const STATUS_LABELS = {
     draft: 'Draft', desain: 'Desain', procurement: 'Procurement',
     cutting: 'Cutting', jahit: 'Jahit', produksi: 'Produksi', printing: 'Printing', pemasangan: 'Pemasangan',
@@ -46,25 +49,25 @@ export default function OrderShow({ order = {} }) {
     };
 
     return (
-        <AppLayout title={`Detail Order: ${o.no_order}`}>
+        <AppLayout title={`Detail Order`}>
             <div className="flex flex-col gap-6">
                 
                 {/* Header Card */}
                 <Card>
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">{o.no_order}</h2>
-                            <p className="text-sm text-gray-500 mt-1">Dibuat pada: {o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}</p>
+                            <h2 className="text-[22px] font-bold font-mono text-ink tracking-tight">{o.no_order}</h2>
+                            <p className="text-[12px] text-ink-soft mt-1">Dibuat pada: {o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'}</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <Badge color={STATUS_COLORS[o.status] || 'gray'} className="text-sm px-3 py-1">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Badge status={STATUS_SEMANTICS[o.status] || 'neutral'} className="text-[12px] px-3 py-1 mr-2">
                                 {STATUS_LABELS[o.status] || o.status}
                             </Badge>
                             <a
                                 href={route('orders.spk', o.id)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-brand-600 shadow-sm ring-1 ring-inset ring-brand-300 hover:bg-brand-50"
+                                className="rounded bg-navy px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm hover:bg-navy/90 transition-colors"
                             >
                                 Cetak SPK
                             </a>
@@ -72,13 +75,13 @@ export default function OrderShow({ order = {} }) {
                                 href={route('orders.invoice', o.id)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-green-600 shadow-sm ring-1 ring-inset ring-green-300 hover:bg-green-50"
+                                className="rounded bg-accent px-3 py-1.5 text-[12px] font-semibold text-white shadow-sm hover:bg-accent/90 transition-colors"
                             >
                                 Cetak Invoice
                             </a>
                             <button
                                 onClick={() => setIsStatusModalOpen(true)}
-                                className="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                className="rounded bg-white border border-line px-3 py-1.5 text-[12px] font-semibold text-ink shadow-sm hover:bg-line/20 transition-colors"
                             >
                                 Ubah Status
                             </button>
@@ -92,20 +95,20 @@ export default function OrderShow({ order = {} }) {
                         <Card title="Informasi Pesanan">
                             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
                                 <div>
-                                    <dt className="text-sm font-medium text-gray-500">Customer</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{o.customer?.name}</dd>
+                                    <dt className="text-[12px] font-medium text-ink-soft uppercase tracking-wider font-sans">Customer</dt>
+                                    <dd className="mt-1.5 text-[14px] font-medium text-ink">{o.customer?.nama || '-'}</dd>
                                 </div>
                                 <div>
-                                    <dt className="text-sm font-medium text-gray-500">Jenis Produk</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{o.jenis_produk}</dd>
+                                    <dt className="text-[12px] font-medium text-ink-soft uppercase tracking-wider font-sans">Jenis Produk</dt>
+                                    <dd className="mt-1.5 text-[14px] font-medium text-ink">{o.jenis_produk}</dd>
                                 </div>
                                 <div>
-                                    <dt className="text-sm font-medium text-gray-500">Jumlah / Deadline</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{o.jumlah} pcs / {o.deadline ? new Date(o.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</dd>
+                                    <dt className="text-[12px] font-medium text-ink-soft uppercase tracking-wider font-sans">Jumlah / Deadline</dt>
+                                    <dd className="mt-1.5 text-[14px] font-medium text-ink">{o.jumlah} pcs / {o.deadline ? new Date(o.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</dd>
                                 </div>
                                 <div>
-                                    <dt className="text-sm font-medium text-gray-500">Keuangan</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">
+                                    <dt className="text-[12px] font-medium text-ink-soft uppercase tracking-wider font-sans">Keuangan</dt>
+                                    <dd className="mt-1.5 text-[14px] font-medium text-ink leading-relaxed">
                                         Total: {formatRupiah(o.total_harga)}<br/>
                                         DP: {formatRupiah(o.dp)}<br/>
                                         Sisa: {formatRupiah(o.total_harga - o.dp)}
@@ -115,36 +118,53 @@ export default function OrderShow({ order = {} }) {
                         </Card>
 
                         <Card title="Detail Ukuran">
-                            <div className="flex gap-4 flex-wrap">
-                                {o.items && o.items.map((item, idx) => (
-                                    <div key={idx} className="border border-gray-200 rounded px-4 py-2 text-center min-w-[4rem]">
-                                        <div className="font-bold text-gray-900">{item.ukuran || 'Total'}</div>
-                                        <div className="text-sm text-gray-500">{item.jumlah_pcs}</div>
+                            <div className="flex gap-3 flex-wrap mt-2">
+                                {o.items && o.items.length > 0 ? o.items.map((item, idx) => (
+                                    <div key={idx} className="border border-line rounded px-4 py-2 text-center min-w-[4rem] bg-panel">
+                                        <div className="font-bold text-ink text-[14px]">{item.ukuran || 'Total'}</div>
+                                        <div className="text-[12px] text-ink-soft mt-0.5">{item.jumlah_pcs} pcs</div>
                                     </div>
-                                ))}
-                                {(!o.items || o.items.length === 0) && (
-                                    <div className="text-sm text-gray-500">Tidak ada detail ukuran.</div>
+                                )) : (
+                                    <div className="w-full">
+                                        <EmptyState 
+                                            title="Belum ada ukuran" 
+                                            description="Tidak ada rincian ukuran untuk order ini." 
+                                            icon={ChartBarSquareIcon} 
+                                        />
+                                    </div>
                                 )}
                             </div>
                         </Card>
                         
                         <Card title="Progres Divisi">
-                            <div className="text-sm text-gray-500 py-4 text-center">
-                                Menunggu implementasi data progress divisi.
-                            </div>
+                            <EmptyState 
+                                title="Belum ada progres" 
+                                description="Menunggu implementasi data progress lintas divisi." 
+                                icon={ChartBarSquareIcon} 
+                            />
                         </Card>
                     </div>
 
                     {/* Right Column (Timeline & Files) */}
                     <div className="space-y-6">
                         <Card title="Riwayat Status">
-                            <StatusTimeline logs={o.orderLogs} />
+                            {o.orderLogs && o.orderLogs.length > 0 ? (
+                                <StatusTimeline logs={o.orderLogs} />
+                            ) : (
+                                <EmptyState 
+                                    title="Kosong" 
+                                    description="Belum ada riwayat pergerakan status." 
+                                    icon={ClockIcon} 
+                                />
+                            )}
                         </Card>
 
                         <Card title="File & Lampiran">
-                            <div className="text-sm text-gray-500 py-4 text-center">
-                                Belum ada file yang diunggah.
-                            </div>
+                            <EmptyState 
+                                title="Belum ada file" 
+                                description="Desain atau file pelengkap belum diunggah." 
+                                icon={DocumentTextIcon} 
+                            />
                         </Card>
                     </div>
                 </div>
@@ -152,15 +172,15 @@ export default function OrderShow({ order = {} }) {
 
             <Modal show={isStatusModalOpen} onClose={() => setIsStatusModalOpen(false)}>
                 <form onSubmit={submitStatus} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Ubah Status Order</h2>
+                    <h2 className="text-lg font-medium font-oswald text-ink mb-4">Ubah Status Order</h2>
                     
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium leading-6 text-gray-900">Status Baru</label>
+                            <label className="block text-sm font-medium leading-6 text-ink">Status Baru</label>
                             <select
                                 value={data.status}
                                 onChange={e => setData('status', e.target.value)}
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-ink ring-1 ring-inset ring-line focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                             >
                                 {Object.entries(STATUS_LABELS).map(([val, label]) => (
                                     <option key={val} value={val}>{label}</option>
@@ -169,12 +189,12 @@ export default function OrderShow({ order = {} }) {
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium leading-6 text-gray-900">Catatan (Opsional)</label>
+                            <label className="block text-sm font-medium leading-6 text-ink">Catatan (Opsional)</label>
                             <textarea
                                 value={data.catatan}
                                 onChange={e => setData('catatan', e.target.value)}
                                 rows={3}
-                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                className="mt-2 block w-full rounded-md border-0 py-1.5 text-ink ring-1 ring-inset ring-line focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 placeholder="Tambahkan catatan mengapa status diubah..."
                             />
                         </div>

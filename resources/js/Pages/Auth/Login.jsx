@@ -30,8 +30,8 @@ export default function Login({ status, canResetPassword }) {
             <Head title="Log in" />
 
             <div>
-                <h2 className="text-2xl font-bold leading-9 tracking-tight text-gray-900 mb-1">Masuk ke Akun</h2>
-                <p className="text-sm text-gray-500 mb-8">Silakan masukkan email dan password Anda</p>
+                <h2 className="text-[28px] font-oswald font-bold text-ink mb-1">Masuk ke Akun</h2>
+                <p className="text-[13.5px] text-ink-soft mb-8">Silakan masukkan email dan password Anda</p>
             </div>
 
             {status && (
@@ -65,7 +65,7 @@ export default function Login({ status, canResetPassword }) {
                             <div className="text-sm">
                                 <Link
                                     href={route('password.request')}
-                                    className="font-semibold text-brand-600 hover:text-brand-500"
+                                    className="text-[13px] font-semibold text-navy hover:text-navy/70 transition-colors"
                                 >
                                     Lupa password?
                                 </Link>
@@ -120,7 +120,7 @@ export default function Login({ status, canResetPassword }) {
                 <p className="text-sm text-gray-500 mb-4">Apakah Anda pelanggan?</p>
                 <Link
                     href={route('cek-pesanan')}
-                    className="inline-flex items-center justify-center gap-2 w-full px-4 py-2 border border-brand-200 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 hover:bg-brand-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors"
+                    className="inline-flex items-center justify-center w-full px-4 py-2.5 border border-line text-[13px] font-medium rounded-lg text-ink bg-panel hover:bg-line/20 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-line"
                 >
                     Lacak Pesanan Anda
                 </Link>

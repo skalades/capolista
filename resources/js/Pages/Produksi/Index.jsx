@@ -99,7 +99,7 @@ export default function Index({ ordersByStatus, bottlenecks, statsPerDivisi, esk
             <StatsBar statsPerDivisi={statsPerDivisi} />
 
             {/* Tab Navigation */}
-            <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-xl w-fit">
+            <div className="flex gap-1 mb-4 bg-line/20 p-1 rounded-xl w-fit">
                 {TABS.map((tab) => {
                     const badgeCount =
                         tab.key === 'eskalasi' ? totalEskalasi :
@@ -110,10 +110,10 @@ export default function Index({ ordersByStatus, bottlenecks, statsPerDivisi, esk
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`relative px-4 py-2 text-[13px] font-sans font-medium rounded-lg transition-all duration-200 ${
                                 activeTab === tab.key
-                                    ? 'bg-white text-brand-700 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
+                                    ? 'bg-panel text-ink shadow-sm'
+                                    : 'text-ink-soft hover:text-ink hover:bg-line/30'
                             }`}
                         >
                             {tab.label}
@@ -131,16 +131,16 @@ export default function Index({ ordersByStatus, bottlenecks, statsPerDivisi, esk
             {activeTab === 'kanban' && (
                 <div>
                     {/* Filter bar */}
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xs text-gray-500 font-medium">Filter:</span>
+                    <div className="flex items-center gap-2 mb-4">
+                        <span className="text-[12px] text-ink-soft font-sans font-medium">Filter:</span>
                         {FILTER_OPTIONS.map((opt) => (
                             <button
                                 key={opt.value}
                                 onClick={() => setFilter(opt.value)}
-                                className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${
+                                className={`px-3 py-1.5 text-[11.5px] font-sans rounded-full font-medium transition-colors border ${
                                     filter === opt.value
-                                        ? 'bg-brand-600 text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-navy text-white border-navy'
+                                        : 'bg-panel text-ink-soft border-line hover:bg-line/20'
                                 }`}
                             >
                                 {opt.label}
