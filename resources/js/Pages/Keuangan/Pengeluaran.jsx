@@ -3,6 +3,14 @@ import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
 import Modal from '@/Components/Modal';
 import CurrencyInput from '@/Components/CurrencyInput';
+import Card from '@/Components/Card';
+import Table from '@/Components/Table';
+import EmptyState from '@/Components/EmptyState';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import { DocumentChartBarIcon } from '@heroicons/react/24/outline';
 
 export default function Pengeluaran({ pengeluarans }) {
     const fmtRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
@@ -28,50 +36,63 @@ export default function Pengeluaran({ pengeluarans }) {
 
     return (
         <AppLayout title="Pengeluaran">
-            <Head title="Pengeluaran" />
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 className="text-[24px] font-oswald font-bold text-ink mb-1">Daftar Pengeluaran</h2>
+                        <p className="text-[13px] text-ink-soft">Riwayat pengeluaran operasional dan bahan baku.</p>
+                    </div>
+                    <PrimaryButton onClick={() => setShowModal(true)}>
+                        + Catat Pengeluaran
+                    </PrimaryButton>
+                </div>
 
-            <div className="flex justify-between mb-6">
-                <h2 className="text-xl font-bold">Daftar Pengeluaran</h2>
-                <button onClick={() => setShowModal(true)} className="bg-red-600 text-white px-4 py-2 rounded">
-                    + Catat Pengeluaran
-                </button>
-            </div>
-
-            <div className="bg-white rounded-lg shadow overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 border-b">
-                            <th className="p-4">Tanggal</th>
-                            <th className="p-4">Kategori</th>
-                            <th className="p-4">Deskripsi</th>
-                            <th className="p-4">Jumlah</th>
-                            <th className="p-4">Pencatat</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {pengeluarans.data.map(p => (
-                            <tr key={p.id} className="border-b">
-                                <td className="p-4">{p.tanggal}</td>
-                                <td className="p-4 uppercase">{p.kategori.replace('_', ' ')}</td>
-                                <td className="p-4">{p.deskripsi} {p.order_id ? `(Order #${p.order_id})` : ''}</td>
-                                <td className="p-4 font-medium text-red-600">{fmtRupiah(p.jumlah)}</td>
-                                <td className="p-4">{p.pencatat?.name}</td>
-                            </tr>
-                        ))}
-                        {pengeluarans.data.length === 0 && (
-                            <tr><td colSpan="5" className="p-4 text-center">Belum ada data pengeluaran.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                <Card className="!p-0 overflow-hidden">
+                    <Table>
+                        <Table.Head>
+                            <Table.HeadCell>Tanggal</Table.HeadCell>
+                            <Table.HeadCell>Kategori</Table.HeadCell>
+                            <Table.HeadCell>Deskripsi</Table.HeadCell>
+                            <Table.HeadCell>Jumlah</Table.HeadCell>
+                            <Table.HeadCell>Pencatat</Table.HeadCell>
+                        </Table.Head>
+                        <Table.Body>
+                            {pengeluarans.data.map(p => (
+                                <Table.Row key={p.id}>
+                                    <Table.Cell className="text-ink-soft">{p.tanggal}</Table.Cell>
+                                    <Table.Cell className="uppercase text-[11px] font-bold text-ink-soft">{p.kategori.replace('_', ' ')}</Table.Cell>
+                                    <Table.Cell className="text-ink">{p.deskripsi} {p.order_id ? <span className="text-ink-soft">(Order #{p.order_id})</span> : ''}</Table.Cell>
+                                    <Table.Cell className="font-mono text-danger font-bold text-[14px]">{fmtRupiah(p.jumlah)}</Table.Cell>
+                                    <Table.Cell className="text-ink-soft">{p.pencatat?.name}</Table.Cell>
+                                </Table.Row>
+                            ))}
+                            {pengeluarans.data.length === 0 && (
+                                <Table.Row>
+                                    <Table.Cell colSpan={5}>
+                                        <EmptyState 
+                                            title="Belum ada data pengeluaran"
+                                            description="Catat pengeluaran baru dengan menekan tombol di atas."
+                                            icon={DocumentChartBarIcon}
+                                        />
+                                    </Table.Cell>
+                                </Table.Row>
+                            )}
+                        </Table.Body>
+                    </Table>
+                </Card>
             </div>
 
             <Modal show={showModal} onClose={() => setShowModal(false)} maxWidth="lg">
-                <div className="p-6">
-                    <h3 className="text-lg font-bold mb-4">Catat Pengeluaran</h3>
+                <div className="p-6 bg-panel">
+                    <h3 className="text-[18px] font-oswald font-bold text-ink mb-6">Catat Pengeluaran</h3>
                     <form onSubmit={submit} className="space-y-4">
                         <div>
-                            <label className="block mb-1 text-sm font-medium">Kategori</label>
-                            <select className="w-full border-gray-300 rounded" value={data.kategori} onChange={e => setData('kategori', e.target.value)}>
+                            <InputLabel value="Kategori" />
+                            <select 
+                                className="mt-1 block w-full bg-bg border-line text-ink rounded focus:border-navy focus:ring-navy sm:text-[13px]" 
+                                value={data.kategori} 
+                                onChange={e => setData('kategori', e.target.value)}
+                            >
                                 <option value="operasional">Operasional</option>
                                 <option value="bahan_baku">Bahan Baku</option>
                                 <option value="lainnya">Lainnya</option>
@@ -79,14 +100,20 @@ export default function Pengeluaran({ pengeluarans }) {
                         </div>
                         
                         <div>
-                            <label className="block mb-1 text-sm font-medium">Deskripsi</label>
-                            <input type="text" className="w-full border-gray-300 rounded" value={data.deskripsi} onChange={e => setData('deskripsi', e.target.value)} required />
+                            <InputLabel value="Deskripsi" />
+                            <TextInput 
+                                type="text" 
+                                className="mt-1 block w-full" 
+                                value={data.deskripsi} 
+                                onChange={e => setData('deskripsi', e.target.value)} 
+                                required 
+                            />
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium">Jumlah (Rp)</label>
+                            <InputLabel value="Jumlah (Rp)" />
                             <CurrencyInput 
-                                className="w-full border-gray-300 rounded" 
+                                className="mt-1" 
                                 value={data.jumlah} 
                                 onChange={e => setData('jumlah', e.target.value)} 
                                 required 
@@ -94,18 +121,34 @@ export default function Pengeluaran({ pengeluarans }) {
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium">Order Terkait (Opsional)</label>
-                            <input type="number" className="w-full border-gray-300 rounded" placeholder="ID Order" value={data.order_id} onChange={e => setData('order_id', e.target.value)} />
+                            <InputLabel value="Order Terkait (Opsional)" />
+                            <TextInput 
+                                type="number" 
+                                className="mt-1 block w-full" 
+                                placeholder="ID Order" 
+                                value={data.order_id} 
+                                onChange={e => setData('order_id', e.target.value)} 
+                            />
                         </div>
 
                         <div>
-                            <label className="block mb-1 text-sm font-medium">Tanggal</label>
-                            <input type="date" className="w-full border-gray-300 rounded" value={data.tanggal} onChange={e => setData('tanggal', e.target.value)} required />
+                            <InputLabel value="Tanggal" />
+                            <TextInput 
+                                type="date" 
+                                className="mt-1 block w-full" 
+                                value={data.tanggal} 
+                                onChange={e => setData('tanggal', e.target.value)} 
+                                required 
+                            />
                         </div>
 
-                        <div className="flex justify-end gap-2 mt-6">
-                            <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded">Batal</button>
-                            <button type="submit" disabled={processing} className="px-4 py-2 text-white bg-red-600 rounded">Simpan</button>
+                        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-line">
+                            <SecondaryButton type="button" onClick={() => setShowModal(false)}>
+                                Batal
+                            </SecondaryButton>
+                            <PrimaryButton type="submit" disabled={processing}>
+                                Simpan Pengeluaran
+                            </PrimaryButton>
                         </div>
                     </form>
                 </div>

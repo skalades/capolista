@@ -1,9 +1,10 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Head, useForm } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
+import Card from '@/Components/Card';
 
 export default function Settings({ auth, settings }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -47,80 +48,73 @@ export default function Settings({ auth, settings }) {
     }, {});
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Pengaturan Sistem</h2>}
-        >
-            <Head title="Pengaturan Sistem" />
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <form onSubmit={submit} className="space-y-6">
-                        {Object.entries(groupedSettings).map(([group, groupSettings]) => (
-                            <div key={group} className="bg-white p-6 rounded-lg shadow-sm">
-                                <h3 className="text-lg font-medium text-gray-900 capitalize mb-4 border-b pb-2">
-                                    {group === 'company' ? 'Profil Perusahaan' : group}
-                                </h3>
-                                
-                                <div className="space-y-6">
-                                    {groupSettings.map((setting) => (
-                                        <div key={setting.key}>
-                                            <InputLabel htmlFor={setting.key} value={setting.label} />
-                                            {setting.description && (
-                                                <p className="text-sm text-gray-500 mb-2">{setting.description}</p>
-                                            )}
-                                            
-                                            {setting.type === 'text' || setting.type === 'number' ? (
-                                                <TextInput
+        <AppLayout title="Pengaturan Sistem">
+            <div className="max-w-4xl mx-auto space-y-6">
+                <form onSubmit={submit} className="space-y-6">
+                    {Object.entries(groupedSettings).map(([group, groupSettings]) => (
+                        <Card key={group}>
+                            <h3 className="text-[18px] font-oswald font-bold text-ink capitalize mb-6 border-b border-line pb-2">
+                                {group === 'company' ? 'Profil Perusahaan' : group}
+                            </h3>
+                            
+                            <div className="space-y-6">
+                                {groupSettings.map((setting) => (
+                                    <div key={setting.key}>
+                                        <InputLabel htmlFor={setting.key} value={setting.label} className="!mb-1 font-bold text-ink" />
+                                        {setting.description && (
+                                            <p className="text-[13px] text-ink-soft mb-3">{setting.description}</p>
+                                        )}
+                                        
+                                        {setting.type === 'text' || setting.type === 'number' ? (
+                                            <TextInput
+                                                id={setting.key}
+                                                type={setting.type}
+                                                className="mt-1 block w-full"
+                                                value={setting.value || ''}
+                                                onChange={(e) => {
+                                                    const newSettings = [...data.settings];
+                                                    newSettings[setting.originalIndex].value = e.target.value;
+                                                    setData('settings', newSettings);
+                                                }}
+                                            />
+                                        ) : setting.type === 'image' ? (
+                                            <div>
+                                                {typeof setting.value === 'string' && setting.value && (
+                                                    <div className="mb-3">
+                                                        <img 
+                                                            src={`/storage/${setting.value}`} 
+                                                            alt={setting.label} 
+                                                            className="h-20 object-contain rounded border border-line bg-panel p-2"
+                                                        />
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="file"
                                                     id={setting.key}
-                                                    type={setting.type}
-                                                    className="mt-1 block w-full"
-                                                    value={setting.value || ''}
-                                                    onChange={(e) => {
-                                                        const newSettings = [...data.settings];
-                                                        newSettings[setting.originalIndex].value = e.target.value;
-                                                        setData('settings', newSettings);
-                                                    }}
+                                                    accept="image/*"
+                                                    onChange={(e) => handleFileChange(setting.originalIndex, e)}
+                                                    className="mt-1 block w-full text-[13px] text-ink-soft
+                                                    file:mr-4 file:py-2 file:px-4
+                                                    file:rounded file:border-0
+                                                    file:text-[13px] file:font-semibold
+                                                    file:bg-navy/10 file:text-navy
+                                                    hover:file:bg-navy/20 cursor-pointer"
                                                 />
-                                            ) : setting.type === 'image' ? (
-                                                <div>
-                                                    {typeof setting.value === 'string' && setting.value && (
-                                                        <div className="mb-2">
-                                                            <img 
-                                                                src={`/storage/${setting.value}`} 
-                                                                alt={setting.label} 
-                                                                className="h-20 object-contain rounded border p-1"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <input
-                                                        type="file"
-                                                        id={setting.key}
-                                                        accept="image/*"
-                                                        onChange={(e) => handleFileChange(setting.originalIndex, e)}
-                                                        className="mt-1 block w-full text-sm text-gray-500
-                                                        file:mr-4 file:py-2 file:px-4
-                                                        file:rounded-md file:border-0
-                                                        file:text-sm file:font-semibold
-                                                        file:bg-indigo-50 file:text-indigo-700
-                                                        hover:file:bg-indigo-100"
-                                                    />
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    ))}
-                                </div>
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </Card>
+                    ))}
 
-                        <div className="flex items-center justify-end">
-                            <PrimaryButton className="ml-4" disabled={processing}>
-                                Simpan Pengaturan
-                            </PrimaryButton>
-                        </div>
-                    </form>
-                </div>
+                    <div className="flex items-center justify-end">
+                        <PrimaryButton disabled={processing} type="submit">
+                            Simpan Pengaturan
+                        </PrimaryButton>
+                    </div>
+                </form>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

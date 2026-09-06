@@ -8,7 +8,7 @@ import SidePanel from '@/Components/Kanban/SidePanel';
 import Badge from '@/Components/Badge';
 import StatusTimeline from '@/Components/StatusTimeline';
 
-const DESAIN_STATUS_COLORS = { menunggu: 'gray', dikerjakan: 'blue', revisi: 'yellow', disetujui: 'green' };
+const DESAIN_STATUS_COLORS = { menunggu: 'gold', dikerjakan: 'neutral', revisi: 'danger', disetujui: 'accent' };
 const DESAIN_STATUS_LABELS = { menunggu: 'Menunggu approval', dikerjakan: 'Draft', revisi: 'Revisi', disetujui: 'Disetujui' };
 
 export default function Index({ orders }) {
@@ -34,10 +34,7 @@ export default function Index({ orders }) {
   };
 
   orders?.forEach(order => {
-    // If it has no desain yet, we treat it as draft/dikerjakan or new.
-    // Wait, by PRD if it has no desain, status is empty, so let's put it in dikerjakan (Draft).
     const status = order.desain?.status || 'dikerjakan';
-    // If it is 'menunggu' (waiting), maybe it maps to Menunggu approval. Let's map it.
     if (groupedOrders[status]) {
         groupedOrders[status].push(order);
     } else {
@@ -60,10 +57,7 @@ export default function Index({ orders }) {
   const handleMockupSubmit = (e) => {
     e.preventDefault();
     postMockup(route('desain.upload-mockup', selectedOrder.id), {
-        onSuccess: () => {
-            // Update the selected order from the new props if possible, or close panel
-            closePanel();
-        }
+        onSuccess: () => closePanel()
     });
   };
 
@@ -85,74 +79,75 @@ export default function Index({ orders }) {
 
   return (
     <AppLayout title="Divisi Desain">
-      <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              Divisi Desain
-              <Badge color="yellow">{orders?.length || 0} order berjalan</Badge>
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">Mockup & approval — antrian desain aktif hari ini</p>
-      </div>
-
-      <div className="flex h-[calc(100vh-12rem)] relative">
-          <div className="flex-1 overflow-hidden">
-              <KanbanBoard>
-                  {/* Draft Column */}
-                  <KanbanColumn title="Draft" count={groupedOrders.dikerjakan.length} color="gray">
-                      {groupedOrders.dikerjakan.map(order => (
-                          <KanbanCard 
-                              key={order.id} 
-                              order={order}
-                              imagePlaceholder={true}
-                              badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
-                              badgeColor="gray"
-                              onClick={() => handleCardClick(order)}
-                          />
-                      ))}
-                  </KanbanColumn>
-                  
-                  {/* Revisi Column */}
-                  <KanbanColumn title="Revisi" count={groupedOrders.revisi.length} color="red">
-                      {groupedOrders.revisi.map(order => (
-                          <KanbanCard 
-                              key={order.id} 
-                              order={order}
-                              imagePlaceholder={true}
-                              badgeText={order.desain?.versi ? `Revisi ke-${order.desain.versi}` : null}
-                              badgeColor="yellow"
-                              onClick={() => handleCardClick(order)}
-                          />
-                      ))}
-                  </KanbanColumn>
-
-                  {/* Menunggu Approval Column */}
-                  <KanbanColumn title="Menunggu approval" count={groupedOrders.menunggu.length} color="yellow">
-                      {groupedOrders.menunggu.map(order => (
-                          <KanbanCard 
-                              key={order.id} 
-                              order={order}
-                              imagePlaceholder={true}
-                              badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
-                              badgeColor="yellow"
-                              onClick={() => handleCardClick(order)}
-                          />
-                      ))}
-                  </KanbanColumn>
-
-                  {/* Disetujui Column */}
-                  <KanbanColumn title="Disetujui" count={groupedOrders.disetujui.length} color="green">
-                      {groupedOrders.disetujui.map(order => (
-                          <KanbanCard 
-                              key={order.id} 
-                              order={order}
-                              imagePlaceholder={true}
-                              badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
-                              badgeColor="green"
-                              onClick={() => handleCardClick(order)}
-                          />
-                      ))}
-                  </KanbanColumn>
-              </KanbanBoard>
+      <div className="max-w-7xl mx-auto space-y-6">
+          <div className="mb-4">
+              <h1 className="text-[24px] font-oswald font-bold text-ink flex items-center gap-3">
+                  Divisi Desain
+                  <Badge status="gold">{orders?.length || 0} order berjalan</Badge>
+              </h1>
+              <p className="text-[13px] text-ink-soft mt-1">Mockup & approval — antrian desain aktif hari ini</p>
           </div>
+
+          <div className="flex h-[calc(100vh-12rem)] relative">
+              <div className="flex-1 overflow-hidden">
+                  <KanbanBoard>
+                      {/* Draft Column */}
+                      <KanbanColumn title="Draft" count={groupedOrders.dikerjakan.length} color="neutral">
+                          {groupedOrders.dikerjakan.map(order => (
+                              <KanbanCard 
+                                  key={order.id} 
+                                  order={order}
+                                  imagePlaceholder={true}
+                                  badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
+                                  badgeStatus="neutral"
+                                  onClick={() => handleCardClick(order)}
+                              />
+                          ))}
+                      </KanbanColumn>
+                      
+                      {/* Revisi Column */}
+                      <KanbanColumn title="Revisi" count={groupedOrders.revisi.length} color="danger">
+                          {groupedOrders.revisi.map(order => (
+                              <KanbanCard 
+                                  key={order.id} 
+                                  order={order}
+                                  imagePlaceholder={true}
+                                  badgeText={order.desain?.versi ? `Revisi ke-${order.desain.versi}` : null}
+                                  badgeStatus="danger"
+                                  onClick={() => handleCardClick(order)}
+                              />
+                          ))}
+                      </KanbanColumn>
+
+                      {/* Menunggu Approval Column */}
+                      <KanbanColumn title="Menunggu approval" count={groupedOrders.menunggu.length} color="gold">
+                          {groupedOrders.menunggu.map(order => (
+                              <KanbanCard 
+                                  key={order.id} 
+                                  order={order}
+                                  imagePlaceholder={true}
+                                  badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
+                                  badgeStatus="gold"
+                                  onClick={() => handleCardClick(order)}
+                              />
+                          ))}
+                      </KanbanColumn>
+
+                      {/* Disetujui Column */}
+                      <KanbanColumn title="Disetujui" count={groupedOrders.disetujui.length} color="accent">
+                          {groupedOrders.disetujui.map(order => (
+                              <KanbanCard 
+                                  key={order.id} 
+                                  order={order}
+                                  imagePlaceholder={true}
+                                  badgeText={order.desain?.versi ? `Versi ${order.desain.versi}` : null}
+                                  badgeStatus="accent"
+                                  onClick={() => handleCardClick(order)}
+                              />
+                          ))}
+                      </KanbanColumn>
+                  </KanbanBoard>
+              </div>
 
           {/* Side Panel Detail */}
           <SidePanel isOpen={!!selectedOrder} onClose={closePanel}>
@@ -254,6 +249,7 @@ export default function Index({ orders }) {
                   </div>
               )}
           </SidePanel>
+      </div>
       </div>
     </AppLayout>
   );

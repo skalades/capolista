@@ -8,57 +8,66 @@ import Pagination from '@/Components/Pagination';
 import EmptyState from '@/Components/EmptyState';
 import SearchFilter from '@/Components/SearchFilter';
 
-const PEMASANGAN_STATUS_COLORS = { menunggu: 'gray', proses: 'blue', selesai: 'green' };
+const PEMASANGAN_STATUS_COLORS = { menunggu: 'gold', proses: 'accent', selesai: 'neutral' };
 const PEMASANGAN_STATUS_LABELS = { menunggu: 'Menunggu', proses: 'Proses', selesai: 'Selesai' };
 
 export default function Index({ orders, filters }) {
   return (
     <AppLayout title={`Antrian Pemasangan (${orders?.total || 0})`}>
-      <Card className="mb-6">
-        <SearchFilter filters={filters} routeName="pemasangan.index" />
-      </Card>
+      <div className="max-w-7xl mx-auto space-y-6">
+          <div className="mb-6">
+              <h2 className="text-[24px] font-oswald font-bold text-ink">Divisi Pemasangan</h2>
+              <p className="text-[13px] text-ink-soft">Kelola antrean pemasangan aksesoris / finishing.</p>
+          </div>
 
-      <Card>
-        {orders?.data?.length > 0 ? (
-          <>
-            <Table>
-              <Table.Head>
-                  <Table.HeadCell>No. Order</Table.HeadCell>
-                  <Table.HeadCell>Customer</Table.HeadCell>
-                  <Table.HeadCell>Jenis Produk</Table.HeadCell>
-                  <Table.HeadCell>Jumlah</Table.HeadCell>
-                  <Table.HeadCell>Suhu Heat Press</Table.HeadCell>
-                  <Table.HeadCell>Status</Table.HeadCell>
-                  <Table.HeadCell>Aksi</Table.HeadCell>
-              </Table.Head>
-              <Table.Body>
-                {orders.data.map((order) => (
-                  <Table.Row key={order.id}>
-                    <Table.Cell className="font-medium">{order.no_order}</Table.Cell>
-                    <Table.Cell>{order.customer?.nama}</Table.Cell>
-                    <Table.Cell>{order.jenis_produk}</Table.Cell>
-                    <Table.Cell>{order.jumlah}</Table.Cell>
-                    <Table.Cell>{order.pemasangan?.suhu_heat_press || '-'}</Table.Cell>
-                    <Table.Cell>
-                      <Badge color={PEMASANGAN_STATUS_COLORS[order.pemasangan?.status || 'menunggu']}>
-                        {PEMASANGAN_STATUS_LABELS[order.pemasangan?.status || 'menunggu']}
-                      </Badge>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Link href={route('pemasangan.show', order.id)} className="text-brand-600 hover:text-brand-900 font-medium mr-3">
-                        Detail
-                      </Link>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-            <Pagination links={orders.links} className="mt-4" />
-          </>
-        ) : (
-          <EmptyState title="Tidak ada antrian pemasangan" description="Belum ada order yang masuk ke tahap pemasangan." />
-        )}
-      </Card>
+          <Card className="mb-6 !p-4">
+            <SearchFilter filters={filters} routeName="pemasangan.index" />
+          </Card>
+
+          <Card className="!p-0 overflow-hidden">
+            {orders?.data?.length > 0 ? (
+              <>
+                <Table>
+                  <Table.Head>
+                      <Table.HeadCell>No. Order</Table.HeadCell>
+                      <Table.HeadCell>Customer</Table.HeadCell>
+                      <Table.HeadCell>Jenis Produk</Table.HeadCell>
+                      <Table.HeadCell>Jumlah</Table.HeadCell>
+                      <Table.HeadCell>Suhu Heat Press</Table.HeadCell>
+                      <Table.HeadCell>Status</Table.HeadCell>
+                      <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body>
+                    {orders.data.map((order) => (
+                      <Table.Row key={order.id}>
+                        <Table.Cell className="font-medium font-mono text-[12px]">{order.no_order}</Table.Cell>
+                        <Table.Cell className="font-bold text-ink">{order.customer?.nama}</Table.Cell>
+                        <Table.Cell>{order.jenis_produk}</Table.Cell>
+                        <Table.Cell className="font-bold text-ink">{order.jumlah} pcs</Table.Cell>
+                        <Table.Cell>{order.pemasangan?.suhu_heat_press || '-'}</Table.Cell>
+                        <Table.Cell>
+                          <Badge status={PEMASANGAN_STATUS_COLORS[order.pemasangan?.status || 'menunggu']}>
+                            {PEMASANGAN_STATUS_LABELS[order.pemasangan?.status || 'menunggu']}
+                          </Badge>
+                        </Table.Cell>
+                        <Table.Cell className="text-right">
+                          <Link href={route('pemasangan.show', order.id)} className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-line/20 hover:border-navy transition-colors">
+                            Detail
+                          </Link>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+                <div className="p-4 border-t border-line bg-panel">
+                    <Pagination links={orders.links} />
+                </div>
+              </>
+            ) : (
+              <EmptyState title="Tidak ada antrian pemasangan" description="Belum ada order yang masuk ke tahap pemasangan." />
+            )}
+          </Card>
+      </div>
     </AppLayout>
   );
 }

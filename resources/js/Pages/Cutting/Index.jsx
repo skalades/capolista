@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import KanbanBoard from '@/Components/Kanban/KanbanBoard';
 import KanbanColumn from '@/Components/Kanban/KanbanColumn';
 import KanbanCard from '@/Components/Kanban/KanbanCard';
-import SidePanel from '@/Components/Kanban/SidePanel';
-import Badge from '@/Components/Badge';
 import { ScissorsIcon, ClockIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import StatsCard from '@/Components/StatsCard';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Index({ orders, stats }) {
-    const [selectedOrder, setSelectedOrder] = useState(null);
-
     // Grouping orders by cutting status
     const groupedOrders = {
         menunggu: [],
@@ -28,10 +25,6 @@ export default function Index({ orders, stats }) {
     });
 
     const handleCardClick = (order) => {
-        // Option 1: fetch complete data if needed, or just redirect to show view for now
-        // since we didn't fully integrate Cutting Show into SidePanel yet.
-        // Let's redirect to Show view to keep it simple, OR we can build the SidePanel.
-        // The instructions said to incorporate Show.jsx functionality into SidePanel.
         router.visit(route('cutting.show', order.id));
     };
 
@@ -43,52 +36,77 @@ export default function Index({ orders, stats }) {
     };
 
     return (
-        <AppLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Divisi Cutting</h2>}>
-            <Head title="Cutting" />
+        <AppLayout title="Divisi Cutting">
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="mb-6">
+                    <h2 className="text-[24px] font-oswald font-bold text-ink">Divisi Cutting</h2>
+                    <p className="text-[13px] text-ink-soft">Pantau dan kelola antrean potong kain berdasarkan SPK.</p>
+                </div>
 
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <StatsCard title="Menunggu Dikerjakan" value={stats.menunggu} icon={ClockIcon} color="orange" />
-                    <StatsCard title="Sedang Dikerjakan" value={stats.dikerjakan} icon={ScissorsIcon} color="blue" />
-                    <StatsCard title="Selesai Hari Ini" value={stats.selesai_hari_ini} icon={CheckCircleIcon} color="green" />
+                    <StatsCard 
+                        title="Menunggu Dikerjakan" 
+                        value={stats.menunggu} 
+                        status="gold" 
+                        caption="Antrian order baru"
+                    />
+                    <StatsCard 
+                        title="Sedang Dikerjakan" 
+                        value={stats.dikerjakan} 
+                        status="accent"
+                        caption="Proses potong kain"
+                    />
+                    <StatsCard 
+                        title="Selesai Hari Ini" 
+                        value={stats.selesai_hari_ini} 
+                        status="neutral" 
+                        caption="Order selesai dan oper ke Jahit"
+                    />
                 </div>
 
                 <div className="flex h-[calc(100vh-20rem)] relative">
                     <div className="flex-1 overflow-hidden">
                         <KanbanBoard>
                             {/* Menunggu Column */}
-                            <KanbanColumn title="Menunggu" count={groupedOrders.menunggu.length} color="orange">
+                            <KanbanColumn title="Menunggu" count={groupedOrders.menunggu.length} color="gold">
                                 {groupedOrders.menunggu.map(order => (
-                                    <div key={order.id} className="relative">
-                                        <KanbanCard 
-                                            order={order}
-                                            imagePlaceholder={false}
-                                            badgeText="Menunggu"
-                                            badgeColor="yellow"
-                                            onClick={() => handleCardClick(order)}
-                                        />
-                                        <button 
-                                            onClick={(e) => startCutting(order.id, e)}
-                                            className="absolute bottom-3 right-3 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded"
-                                        >
-                                            Mulai
-                                        </button>
+                                    <div key={order.id} className="relative group cursor-pointer border border-line bg-panel p-3 rounded hover:border-navy mb-3 transition-colors" onClick={() => handleCardClick(order)}>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="font-bold text-[13px] text-ink font-mono">{order.no_order}</div>
+                                            <span className="text-[10px] bg-gold/10 text-gold font-bold px-2 py-0.5 rounded border border-gold/20">
+                                                Menunggu
+                                            </span>
+                                        </div>
+                                        <div className="text-[12px] text-ink-soft mb-4">{order.customer?.nama} • {order.jumlah} pcs</div>
+                                        
+                                        <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <PrimaryButton 
+                                                size="sm"
+                                                onClick={(e) => startCutting(order.id, e)}
+                                            >
+                                                Mulai Potong
+                                            </PrimaryButton>
+                                        </div>
                                     </div>
                                 ))}
                             </KanbanColumn>
                             
                             {/* Dikerjakan Column */}
-                            <KanbanColumn title="Sedang Dikerjakan" count={groupedOrders.dikerjakan.length} color="blue">
+                            <KanbanColumn title="Sedang Dikerjakan" count={groupedOrders.dikerjakan.length} color="accent">
                                 {groupedOrders.dikerjakan.map(order => (
-                                    <KanbanCard 
-                                        key={order.id} 
-                                        order={order}
-                                        imagePlaceholder={false}
-                                        badgeText="Dikerjakan"
-                                        badgeColor="gray"
-                                        onClick={() => handleCardClick(order)}
-                                    />
+                                    <div key={order.id} className="cursor-pointer border border-line bg-panel p-3 rounded hover:border-navy mb-3 transition-colors" onClick={() => handleCardClick(order)}>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="font-bold text-[13px] text-ink font-mono">{order.no_order}</div>
+                                            <span className="text-[10px] bg-accent/10 text-accent font-bold px-2 py-0.5 rounded border border-accent/20">
+                                                Dikerjakan
+                                            </span>
+                                        </div>
+                                        <div className="text-[12px] text-ink-soft mb-2">{order.customer?.nama} • {order.jumlah} pcs</div>
+                                        <div className="text-[11px] text-ink-soft border-t border-line pt-2 mt-2">
+                                            Klik untuk update hasil & QC
+                                        </div>
+                                    </div>
                                 ))}
                             </KanbanColumn>
                         </KanbanBoard>

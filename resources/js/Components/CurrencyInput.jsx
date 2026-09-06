@@ -48,7 +48,7 @@ export default forwardRef(function CurrencyInput(
             {...props}
             type="text"
             className={
-                'block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm sm:leading-6 transition-shadow duration-200 ' +
+                'block w-full bg-panel border-line text-ink rounded-md focus:border-navy focus:ring-navy sm:text-[13px] ' +
                 className
             }
             value={displayValue}

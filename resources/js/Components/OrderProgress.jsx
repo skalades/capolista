@@ -7,6 +7,8 @@ export default function OrderProgress({ currentStatus, statusLabels }) {
         'draft',
         'desain',
         'procurement',
+        'cutting',
+        'jahit',
         'produksi',
         'printing',
         'pemasangan',
@@ -22,9 +24,9 @@ export default function OrderProgress({ currentStatus, statusLabels }) {
             <h4 className="sr-only">Status Progress</h4>
             <div className="relative">
                 {/* Background Line */}
-                <div className="absolute top-3 sm:top-4 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 z-0">
+                <div className="absolute top-3 sm:top-4 left-0 w-full h-1 bg-line -translate-y-1/2 z-0">
                     <div
-                        className="h-full bg-brand-500 transition-all duration-1000 ease-out"
+                        className="h-full bg-navy transition-all duration-1000 ease-out"
                         style={{ width: `${currentIndex === -1 ? 0 : Math.max(0, (currentIndex / (statuses.length - 1)) * 100)}%` }}
                     />
                 </div>
@@ -41,10 +43,10 @@ export default function OrderProgress({ currentStatus, statusLabels }) {
                                     className={`
                                         w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-medium z-10 transition-colors duration-500
                                         ${isCompleted 
-                                            ? 'bg-brand-600 text-white shadow-md shadow-brand-200' 
-                                            : 'bg-white border-2 border-gray-300 text-gray-400'
+                                            ? 'bg-navy text-white shadow-md shadow-navy/20' 
+                                            : 'bg-panel border-2 border-line text-ink-soft'
                                         }
-                                        ${isCurrent ? 'ring-4 ring-brand-100' : ''}
+                                        ${isCurrent ? 'ring-4 ring-navy/20' : ''}
                                     `}
                                 >
                                     {isCompleted && status !== 'selesai' && !isCurrent ? (
@@ -55,12 +57,12 @@ export default function OrderProgress({ currentStatus, statusLabels }) {
                                 </div>
                                 <span 
                                     className={`
-                                        absolute text-[10px] sm:text-[11px] font-medium text-center w-16 sm:w-20 leading-tight
-                                        ${isCurrent ? 'text-brand-700 font-bold' : isCompleted ? 'text-gray-800' : 'text-gray-400'}
+                                        absolute text-[10px] sm:text-[10px] font-medium text-center w-14 sm:w-16 leading-tight
+                                        ${isCurrent ? 'text-navy font-bold' : isCompleted ? 'text-ink' : 'text-ink-soft'}
                                         ${isEven ? 'top-8 sm:top-10' : 'bottom-8 sm:bottom-10'}
                                     `}
                                 >
-                                    {statusLabels[status] || status}
+                                    {statusLabels && statusLabels[status] ? statusLabels[status] : (status.charAt(0).toUpperCase() + status.slice(1))}
                                 </span>
                             </div>
                         );

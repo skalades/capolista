@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import Card from '@/Components/Card';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import Badge from '@/Components/Badge';
 
 export default function Show({ order }) {
     const defaultSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
     
-    // Parse order items to expected sizes, fallback to default sizes
     let expectedSizes = {};
     if (order.items && order.items.length > 0) {
         order.items.forEach(item => {
@@ -17,7 +19,6 @@ export default function Show({ order }) {
     }
     const sizeKeys = Object.keys(expectedSizes).length > 0 ? Object.keys(expectedSizes) : defaultSizes;
 
-    // Initialize form with existing data or defaults
     const initialPcs = {};
     sizeKeys.forEach(size => {
         initialPcs[size] = order.cutting?.pcs_per_ukuran?.[size] || 0;
@@ -55,37 +56,48 @@ export default function Show({ order }) {
         }
     };
 
-    // calculate totals
     const expectedTotal = order.jumlah;
     const currentTotal = Object.values(data.pcs_per_ukuran).reduce((a, b) => a + (parseInt(b) || 0), 0);
 
     return (
-        <AppLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Detail Cutting: {order.no_order}</h2>}>
-            <Head title={`Cutting - ${order.no_order}`} />
-
-            <div className="py-8 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <AppLayout title={`Detail Cutting: ${order.no_order}`}>
+            <div className="max-w-7xl mx-auto space-y-6">
                 
+                <div className="flex justify-between items-end mb-6">
+                    <div>
+                        <Link href={route('cutting.index')} className="text-ink-soft hover:text-navy text-[12px] mb-2 inline-block">
+                            &larr; Kembali ke Antrean
+                        </Link>
+                        <h2 className="text-[24px] font-oswald font-bold text-ink flex items-center gap-3">
+                            {order.no_order}
+                            <Badge status="accent">Cutting</Badge>
+                        </h2>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Order Info */}
+                    {/* Left Col: Order Info */}
                     <div className="md:col-span-1 space-y-6">
                         <Card title="Informasi Pesanan">
-                            <dl className="space-y-3 text-sm">
+                            <dl className="space-y-4">
                                 <div>
-                                    <dt className="text-gray-500 font-medium">Customer</dt>
-                                    <dd className="font-semibold">{order.customer?.nama}</dd>
+                                    <dt className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-1">Customer</dt>
+                                    <dd className="text-[14px] font-bold text-ink">{order.customer?.nama}</dd>
                                 </div>
                                 <div>
-                                    <dt className="text-gray-500 font-medium">Produk & Jumlah</dt>
-                                    <dd>{order.jenis_produk} ({order.jumlah} pcs)</dd>
+                                    <dt className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-1">Produk & Jumlah</dt>
+                                    <dd className="text-[13px] text-ink">{order.jenis_produk} <span className="font-bold">({order.jumlah} pcs)</span></dd>
                                 </div>
                                 <div>
-                                    <dt className="text-gray-500 font-medium">Deadline</dt>
-                                    <dd className="text-red-600 font-bold">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</dd>
+                                    <dt className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-1">Deadline</dt>
+                                    <dd className="text-[13px] text-danger font-bold">
+                                        {order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                                    </dd>
                                 </div>
                                 {order.catatan_produksi && (
                                     <div>
-                                        <dt className="text-gray-500 font-medium">Catatan Produksi</dt>
-                                        <dd className="bg-yellow-50 p-2 rounded text-yellow-800 text-xs mt-1">
+                                        <dt className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-1">Catatan Produksi</dt>
+                                        <dd className="bg-gold/10 p-3 border border-gold/30 rounded text-[12px] text-gold mt-1 leading-relaxed">
                                             {order.catatan_produksi}
                                         </dd>
                                     </div>
@@ -93,99 +105,94 @@ export default function Show({ order }) {
                             </dl>
                         </Card>
 
-                        {/* Breakdown Req */}
                         <Card title="Target Ukuran (SPK)">
-                            <ul className="divide-y divide-gray-200 text-sm">
+                            <ul className="divide-y divide-line text-[13px]">
                                 {Object.entries(expectedSizes).map(([size, qty]) => (
-                                    <li key={size} className="py-2 flex justify-between">
-                                        <span className="font-bold">{size}</span>
-                                        <span>{qty} pcs</span>
+                                    <li key={size} className="py-2.5 flex justify-between">
+                                        <span className="font-bold text-ink">{size}</span>
+                                        <span className="text-ink-soft">{qty} pcs</span>
                                     </li>
                                 ))}
                             </ul>
                         </Card>
                     </div>
 
-                    {/* Update Form */}
-                    <div className="md:col-span-2">
+                    {/* Right Col: Input & QC */}
+                    <div className="md:col-span-2 space-y-6">
                         <Card title="Input Hasil Potong & QC">
-                            <form onSubmit={handleUpdate} className="space-y-6 mt-4">
+                            <form onSubmit={handleUpdate} className="mt-2 space-y-8">
                                 
                                 <div>
-                                    <h4 className="font-medium text-gray-700 mb-3 border-b pb-2">Output Potongan per Ukuran</h4>
+                                    <h4 className="text-[12px] font-bold text-ink-soft uppercase tracking-wider mb-4 border-b border-line pb-2">Output Potongan per Ukuran</h4>
                                     <div className="grid grid-cols-3 gap-4">
                                         {sizeKeys.map(size => (
                                             <div key={size}>
-                                                <label className="block text-xs text-gray-500 font-bold mb-1">{size}</label>
-                                                <input
+                                                <label className="block text-[13px] font-bold text-ink mb-1">{size}</label>
+                                                <TextInput
                                                     type="number"
                                                     min="0"
                                                     value={data.pcs_per_ukuran[size] || ''}
                                                     onChange={e => handlePcsChange(size, e.target.value)}
-                                                    className="w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
+                                                    className="w-full text-center"
                                                 />
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="mt-4 p-3 bg-gray-50 rounded-md flex justify-between items-center">
-                                        <span className="font-bold text-gray-700">Total Potongan:</span>
-                                        <span className={`font-bold text-lg ${currentTotal < expectedTotal ? 'text-red-600' : 'text-green-600'}`}>
+                                    <div className="mt-6 p-4 bg-line/20 rounded-lg flex justify-between items-center border border-line">
+                                        <span className="font-bold text-[13px] text-ink">Total Potongan:</span>
+                                        <span className={`font-mono font-bold text-[18px] ${currentTotal < expectedTotal ? 'text-danger' : 'text-accent'}`}>
                                             {currentTotal} / {expectedTotal} pcs
                                         </span>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <h4 className="font-medium text-gray-700 mb-3 border-b pb-2">Checklist QC</h4>
+                                    <h4 className="text-[12px] font-bold text-ink-soft uppercase tracking-wider mb-4 border-b border-line pb-2">Checklist QC</h4>
                                     <div className="space-y-3">
-                                        <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_akurasi_ukuran} onChange={e => setData('qc_akurasi_ukuran', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
-                                            <span className="ml-2 text-sm text-gray-600">Akurasi pola/ukuran sesuai SPK</span>
+                                        <label className="flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={data.qc_akurasi_ukuran} onChange={e => setData('qc_akurasi_ukuran', e.target.checked)} className="rounded border-line text-navy focus:ring-navy form-checkbox" />
+                                            <span className="ml-3 text-[13px] text-ink">Akurasi pola/ukuran sesuai SPK</span>
                                         </label>
-                                        <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_arah_kain} onChange={e => setData('qc_arah_kain', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
-                                            <span className="ml-2 text-sm text-gray-600">Arah serat kain / motif benar</span>
+                                        <label className="flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={data.qc_arah_kain} onChange={e => setData('qc_arah_kain', e.target.checked)} className="rounded border-line text-navy focus:ring-navy form-checkbox" />
+                                            <span className="ml-3 text-[13px] text-ink">Arah serat kain / motif benar</span>
                                         </label>
-                                        <label className="flex items-center">
-                                            <input type="checkbox" checked={data.qc_tidak_cacat} onChange={e => setData('qc_tidak_cacat', e.target.checked)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500" />
-                                            <span className="ml-2 text-sm text-gray-600">Tidak ada cacat kain (bolong, noda)</span>
+                                        <label className="flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={data.qc_tidak_cacat} onChange={e => setData('qc_tidak_cacat', e.target.checked)} className="rounded border-line text-navy focus:ring-navy form-checkbox" />
+                                            <span className="ml-3 text-[13px] text-ink">Tidak ada cacat kain (bolong, noda)</span>
                                         </label>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700">Catatan QC</label>
+                                    <label className="block text-[12px] font-bold text-ink-soft uppercase tracking-wider mb-2">Catatan QC (Opsional)</label>
                                     <textarea
                                         value={data.catatan_qc}
                                         onChange={e => setData('catatan_qc', e.target.value)}
-                                        rows={2}
-                                        className="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm"
+                                        rows={3}
+                                        className="mt-1 block w-full bg-panel border-line focus:border-navy focus:ring-navy rounded text-[13px]"
                                     />
                                 </div>
 
-                                <div className="flex justify-end pt-4 border-t border-gray-200">
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500"
-                                    >
+                                <div className="flex justify-end pt-4 border-t border-line">
+                                    <PrimaryButton type="submit" disabled={processing}>
                                         Simpan Progress
-                                    </button>
+                                    </PrimaryButton>
                                 </div>
                             </form>
                         </Card>
 
-                        <div className="mt-6 flex justify-between bg-white p-6 rounded-lg border border-gray-200 shadow-sm items-center">
+                        <div className="flex justify-between bg-panel p-6 rounded border border-line items-center">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Selesai Cutting</h3>
-                                <p className="text-sm text-gray-500">Tandai selesai dan oper ke divisi Jahit.</p>
+                                <h3 className="text-[18px] font-oswald font-bold text-ink">Selesai Cutting</h3>
+                                <p className="text-[13px] text-ink-soft">Tandai selesai dan oper ke divisi Jahit.</p>
                             </div>
-                            <button
+                            <PrimaryButton
                                 onClick={handleComplete}
-                                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                                className="bg-accent hover:bg-accent/90 border-transparent text-white"
                             >
                                 Selesai & Lanjut Jahit
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </div>
                 </div>

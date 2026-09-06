@@ -18,7 +18,7 @@ Table.Head = function TableHead({ children }) {
 
 Table.HeadCell = function TableHeadCell({ children, className = '' }) {
     return (
-        <th className={`px-4 py-3 text-[11px] font-sans font-medium text-ink-soft lowercase tracking-wide font-normal ${className}`}>
+        <th className={`px-4 py-3 text-[11px] font-sans font-bold text-ink uppercase tracking-wider ${className}`}>
             {children}
         </th>
     );
@@ -34,7 +34,7 @@ Table.Body = function TableBody({ children }) {
 
 Table.Row = function TableRow({ children, className = '' }) {
     return (
-        <tr className={`hover:bg-accent/5 transition-colors ${className}`}>
+        <tr className={`hover:bg-line/20 transition-colors ${className}`}>
             {children}
         </tr>
     );
