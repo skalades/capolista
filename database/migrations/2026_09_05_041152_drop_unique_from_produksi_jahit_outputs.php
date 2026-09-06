@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('produksi_jahit_outputs', function (Blueprint $table) {
+            $table->dropForeign(['operator_id']);
             $table->dropUnique('unique_output_harian');
+            $table->foreign('operator_id')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 
