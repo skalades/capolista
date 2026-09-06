@@ -205,84 +205,11 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $superadminUser->assignRole('superadmin');
 
-        // DEFAULT OWNER USER
-        $ownerUser = User::firstOrCreate(
-            ['email' => 'owner@capolista.com'],
-            [
-                'name'        => 'Owner Capolista',
-                'password'    => Hash::make('capolista@2024'),
-                'level_akses' => User::LEVEL_OWNER,
-                'divisi'      => null,
-                'is_active'   => true,
-            ]
-        );
-        $ownerUser->assignRole('owner');
-
-        // DEFAULT ADMIN USER
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@capolista.com'],
-            [
-                'name'        => 'Admin Operasional',
-                'password'    => Hash::make('capolista@2024'),
-                'level_akses' => User::LEVEL_ADMIN,
-                'divisi'      => null,
-                'is_active'   => true,
-            ]
-        );
-        $adminUser->assignRole('admin');
-
-        // SEEDER KEPALA DIVISI & STAF UNTUK SETIAP DIVISI
         $outputUsers = [
             ['superadmin@capolista.com', 'superadmin', 'capolista@2024', '-'],
-            ['owner@capolista.com',      'owner',      'capolista@2024', '-'],
-            ['admin@capolista.com',      'admin',      'capolista@2024', '-'],
         ];
 
-        foreach (User::DIVISI_LIST as $key => $label) {
-            // Kepala Divisi
-            $kepala = User::firstOrCreate(
-                ['email' => "kepala.{$key}@capolista.com"],
-                [
-                    'name'        => "Kepala Divisi {$label}",
-                    'password'    => Hash::make('capolista@2024'),
-                    'level_akses' => User::LEVEL_KEPALA_DIVISI,
-                    'divisi'      => $key,
-                    'is_active'   => true,
-                ]
-            );
-            $kepala->assignRole('kepala divisi');
-            $outputUsers[] = [$kepala->email, 'kepala divisi', 'capolista@2024', $key];
-
-            // Staf
-            $staf = User::firstOrCreate(
-                ['email' => "staf.{$key}@capolista.com"],
-                [
-                    'name'        => "Staf {$label}",
-                    'password'    => Hash::make('capolista@2024'),
-                    'level_akses' => User::LEVEL_STAF,
-                    'divisi'      => $key,
-                    'is_active'   => true,
-                ]
-            );
-            $staf->assignRole('staf');
-            $outputUsers[] = [$staf->email, 'staf', 'capolista@2024', $key];
-        }
-
-        // DEFAULT CUSTOMER (Opsional login)
-        $customerUser = User::firstOrCreate(
-            ['email' => 'customer@capolista.com'],
-            [
-                'name'        => 'Customer Testing',
-                'password'    => Hash::make('capolista@2024'),
-                'level_akses' => User::LEVEL_CUSTOMER,
-                'divisi'      => null,
-                'is_active'   => true,
-            ]
-        );
-        $customerUser->assignRole('customer');
-        $outputUsers[] = [$customerUser->email, 'customer', 'capolista@2024', '-'];
-
-        $this->command->info('✅ Roles, permissions, dan default users berhasil dibuat!');
+        $this->command->info('? Roles, permissions, dan akun Superadmin berhasil dibuat!');
         $this->command->table(
             ['Email', 'Role', 'Password', 'Divisi'],
             $outputUsers
