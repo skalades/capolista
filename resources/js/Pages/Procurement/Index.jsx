@@ -6,28 +6,26 @@ import Alert from '@/Components/Alert';
 
 export default function Index({ auth, stats }) {
     return (
-        <AppLayout title="Dashboard Procurement">
-            <div className="max-w-7xl mx-auto space-y-6">
-                
-                <div className="flex flex-col sm:flex-row justify-between items-end gap-4 mb-6">
-                    <div>
-                        <h2 className="text-[24px] font-oswald font-bold text-ink">Dashboard Procurement</h2>
-                        <div className="flex gap-2 mt-4">
-                            <Link 
-                                href={route('procurement.supplier.index')} 
-                                className="inline-flex items-center justify-center rounded bg-navy px-4 py-2 text-[13px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90"
-                            >
-                                Kelola Supplier
-                            </Link>
-                            <Link 
-                                href={route('procurement.po.index')} 
-                                className="inline-flex items-center justify-center rounded bg-panel border border-line px-4 py-2 text-[13px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20"
-                            >
-                                Daftar Purchase Order
-                            </Link>
-                        </div>
-                    </div>
+        <AppLayout 
+            title="Dashboard Procurement"
+            headerActions={
+                <div className="flex gap-2">
+                    <Link 
+                        href={route('procurement.supplier.index')} 
+                        className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90"
+                    >
+                        Kelola Supplier
+                    </Link>
+                    <Link 
+                        href={route('procurement.po.index')} 
+                        className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12.5px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20"
+                    >
+                        Purchase Order
+                    </Link>
                 </div>
+            }
+        >
+            <div className="max-w-7xl mx-auto space-y-6">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StatsCard 

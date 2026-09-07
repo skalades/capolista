@@ -36,12 +36,17 @@ export default function Index({ orders, stats }) {
     };
 
     return (
-        <AppLayout title="Divisi Cutting">
-            <div className="max-w-7xl mx-auto space-y-6">
-                <div className="mb-6">
-                    <h2 className="text-[24px] font-oswald font-bold text-ink">Divisi Cutting</h2>
-                    <p className="text-[13px] text-ink-soft">Pantau dan kelola antrean potong kain berdasarkan SPK.</p>
+        <AppLayout 
+            title={
+                <div className="flex flex-col justify-center mt-1">
+                    <div className="flex items-center gap-3 leading-none">
+                        <span>Divisi Cutting</span>
+                    </div>
+                    <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Pantau dan kelola antrean potong kain berdasarkan SPK.</span>
                 </div>
+            }
+        >
+            <div className="max-w-7xl mx-auto space-y-6">
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

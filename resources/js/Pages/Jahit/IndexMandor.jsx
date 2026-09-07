@@ -55,22 +55,21 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
     };
 
     return (
-        <AppLayout>
+        <AppLayout 
+            title={
+                <div className="flex flex-col justify-center mt-1">
+                    <div className="flex items-center gap-3 leading-none">
+                        <span>Divisi Jahit</span>
+                        <Badge status="gold">{stats.order_berjalan} order berjalan</Badge>
+                    </div>
+                    <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Penjahitan & QC jahitan — {operatorList.length} penjahit aktif hari ini</span>
+                </div>
+            }
+        >
             <Head title="Divisi Jahit" />
             
             <div className="max-w-7xl mx-auto space-y-6">
                 
-                {/* Header */}
-                <div className="mb-6">
-                    <div className="flex items-center space-x-3 mb-1">
-                        <h2 className="text-[24px] font-oswald font-bold text-ink">Divisi Jahit</h2>
-                        <Badge status="gold">
-                            {stats.order_berjalan} order berjalan
-                        </Badge>
-                    </div>
-                    <p className="text-[13px] text-ink-soft font-sans">Penjahitan & QC jahitan — {operatorList.length} penjahit aktif hari ini</p>
-                </div>
-
                 {/* 4 Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <StatsCard 

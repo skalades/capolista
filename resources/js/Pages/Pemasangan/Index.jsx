@@ -13,12 +13,18 @@ const PEMASANGAN_STATUS_LABELS = { menunggu: 'Menunggu', proses: 'Proses', seles
 
 export default function Index({ orders, filters }) {
   return (
-    <AppLayout title={`Antrian Pemasangan (${orders?.total || 0})`}>
+    <AppLayout 
+      title={
+        <div className="flex flex-col justify-center mt-1">
+            <div className="flex items-center gap-3 leading-none">
+                <span>Divisi Pemasangan</span>
+                <Badge status="gold">{orders?.total || 0} antrian</Badge>
+            </div>
+            <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Kelola antrean pemasangan aksesoris / finishing.</span>
+        </div>
+      }
+    >
       <div className="max-w-7xl mx-auto space-y-6">
-          <div className="mb-6">
-              <h2 className="text-[24px] font-oswald font-bold text-ink">Divisi Pemasangan</h2>
-              <p className="text-[13px] text-ink-soft">Kelola antrean pemasangan aksesoris / finishing.</p>
-          </div>
 
           <Card className="mb-6 !p-4">
             <SearchFilter filters={filters} routeName="pemasangan.index" />

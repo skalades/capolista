@@ -78,16 +78,18 @@ export default function Index({ orders }) {
   };
 
   return (
-    <AppLayout title="Divisi Desain">
+    <AppLayout 
+      title={
+        <div className="flex flex-col justify-center mt-1">
+            <div className="flex items-center gap-3 leading-none">
+                <span>Divisi Desain</span>
+                <Badge status="gold">{orders?.length || 0} order berjalan</Badge>
+            </div>
+            <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Mockup & approval — antrian desain aktif hari ini</span>
+        </div>
+      }
+    >
       <div className="max-w-7xl mx-auto space-y-6">
-          <div className="mb-4">
-              <h1 className="text-[24px] font-oswald font-bold text-ink flex items-center gap-3">
-                  Divisi Desain
-                  <Badge status="gold">{orders?.length || 0} order berjalan</Badge>
-              </h1>
-              <p className="text-[13px] text-ink-soft mt-1">Mockup & approval — antrian desain aktif hari ini</p>
-          </div>
-
           <div className="flex h-[calc(100vh-12rem)] relative">
               <div className="flex-1 overflow-hidden">
                   <KanbanBoard>

@@ -65,7 +65,7 @@ export default function UserCreate() {
                                     type="text"
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                                 {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
                             </div>
@@ -76,7 +76,7 @@ export default function UserCreate() {
                                     type="email"
                                     value={data.email}
                                     onChange={e => setData('email', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                                 {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
                             </div>
@@ -87,7 +87,7 @@ export default function UserCreate() {
                                     type="password"
                                     value={data.password}
                                     onChange={e => setData('password', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -97,7 +97,7 @@ export default function UserCreate() {
                                     type="password"
                                     value={data.password_confirmation}
                                     onChange={e => setData('password_confirmation', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -106,7 +106,7 @@ export default function UserCreate() {
                                 <select
                                     value={data.role}
                                     onChange={e => handleRoleChange(e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 >
                                     <option value="">Pilih Role</option>
                                     {roles.map(r => <option key={r} value={r}>{r.replace('_', ' ').toUpperCase()}</option>)}
@@ -119,7 +119,7 @@ export default function UserCreate() {
                                     type="number"
                                     value={data.level_akses}
                                     onChange={e => setData('level_akses', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6 bg-gray-50"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6 bg-gray-50"
                                 />
                             </div>
 
@@ -129,7 +129,7 @@ export default function UserCreate() {
                                     <select
                                         value={data.divisi}
                                         onChange={e => setData('divisi', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                     >
                                         <option value="">Pilih Divisi</option>
                                         {divisis.map(d => <option key={d} value={d.toLowerCase()}>{d}</option>)}
@@ -145,7 +145,7 @@ export default function UserCreate() {
                                         type="checkbox"
                                         checked={data.is_active}
                                         onChange={e => setData('is_active', e.target.checked)}
-                                        className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-600"
+                                        className="h-4 w-4 rounded border-gray-300 text-navy focus:ring-navy"
                                     />
                                     <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
                                         Aktif
@@ -166,7 +166,7 @@ export default function UserCreate() {
                                     type="text"
                                     value={data.nik}
                                     onChange={e => setData('nik', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -176,7 +176,7 @@ export default function UserCreate() {
                                     type="text"
                                     value={data.jabatan}
                                     onChange={e => setData('jabatan', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -186,7 +186,7 @@ export default function UserCreate() {
                                     type="date"
                                     value={data.tanggal_masuk}
                                     onChange={e => setData('tanggal_masuk', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -195,7 +195,7 @@ export default function UserCreate() {
                                 <select
                                     value={data.tipe_gaji}
                                     onChange={e => setData('tipe_gaji', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 >
                                     <option value="">Pilih Tipe Gaji</option>
                                     {tipeGajis.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
@@ -208,7 +208,7 @@ export default function UserCreate() {
                                     type="number"
                                     value={data.tarif_default}
                                     onChange={e => setData('tarif_default', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -218,7 +218,7 @@ export default function UserCreate() {
                                     type="number"
                                     value={data.tarif_lembur}
                                     onChange={e => setData('tarif_lembur', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
                             
@@ -228,7 +228,7 @@ export default function UserCreate() {
                                     type="text"
                                     value={data.no_hp}
                                     onChange={e => setData('no_hp', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
 
@@ -238,7 +238,7 @@ export default function UserCreate() {
                                     type="text"
                                     value={data.mesin_pos}
                                     onChange={e => setData('mesin_pos', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                     placeholder="Contoh: Mesin Jahit 1"
                                 />
                             </div>
@@ -249,7 +249,7 @@ export default function UserCreate() {
                                     value={data.alamat}
                                     onChange={e => setData('alamat', e.target.value)}
                                     rows={3}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
                             </div>
                         </div>
@@ -262,7 +262,7 @@ export default function UserCreate() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50"
+                            className="rounded-md bg-navy px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy disabled:opacity-50"
                         >
                             Simpan Pengguna
                         </button>
