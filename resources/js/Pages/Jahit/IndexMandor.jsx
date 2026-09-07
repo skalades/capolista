@@ -125,8 +125,15 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         <div className="w-2/4 px-4">
                                             <ProgressBar target={op.target} selesai={op.pcs_selesai} reject={op.pcs_reject} />
                                         </div>
-                                        <div className="w-1/4 text-right font-medium text-[13px] text-ink">
-                                            {op.pcs_selesai}/{op.target}
+                                        <div className="w-1/4 flex flex-col items-end justify-center">
+                                            <div className="font-medium text-[13px] text-ink">
+                                                {op.pcs_selesai} <span className="text-ink-soft font-normal">/ {op.target} pcs</span>
+                                            </div>
+                                            {op.pcs_reject > 0 && (
+                                                <div className="text-[10px] font-bold text-danger bg-danger/10 px-1.5 py-0.5 rounded mt-1 border border-danger/20" title={`${op.pcs_reject} barang perlu perbaikan`}>
+                                                    {op.pcs_reject} Reject
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}

@@ -15,10 +15,14 @@ import {
 
 export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, upahBulanIni, tanggal }) {
     const { auth } = usePage().props;
+    const activeAssigns = myAssigns.filter(a => {
+        const totalApproved = Object.values(a.total_rincian_selesai || {}).reduce((sum, v) => sum + (parseInt(v) || 0), 0);
+        return totalApproved < (a.order?.jumlah || Infinity);
+    });
     const [activeTab, setActiveTab] = useState('tugas');
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        assign_id: myAssigns.length === 1 ? myAssigns[0].id : '',
+        assign_id: activeAssigns.length === 1 ? activeAssigns[0].id : '',
         tanggal: tanggal,
         pcs_klaim: '',
         rincian_ukuran: {},
@@ -65,10 +69,10 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                         <div className="space-y-6 animation-fade-in">
                             <div className="bg-gradient-to-r from-teal-600 to-teal-800 rounded-xl p-5 text-white shadow-md">
                                 <h3 className="text-sm opacity-90 mb-1">Halo, Selamat Bekerja!</h3>
-                                <p className="font-bold text-xl">Anda memiliki {myAssigns.length} tugas aktif</p>
+                                <p className="font-bold text-xl">Anda memiliki {activeAssigns.length} tugas aktif</p>
                             </div>
 
-                            {myAssigns.length === 0 ? (
+                            {activeAssigns.length === 0 ? (
                                 <div className="bg-white p-8 rounded-xl border border-gray-200 text-center shadow-sm">
                                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                                         <CheckCircleIcon className="w-8 h-8 text-gray-400" />
@@ -97,7 +101,7 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                                                 required
                                             >
                                                 <option value="">-- Pilih Order --</option>
-                                                {myAssigns.map(a => (
+                                                {activeAssigns.map(a => (
                                                     <option key={a.id} value={a.id}>
                                                         {a.order?.no_order} - {a.order?.customer?.nama} (Upah: Rp{a.tarif_per_pcs})
                                                     </option>
@@ -236,13 +240,19 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                                             <div>
                                                 <div className="font-bold text-gray-800">{out.order?.no_order}</div>
                                                 <div className="text-xs text-gray-500 mb-1">{out.pcs_klaim} pcs diklaim</div>
-                                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${
+                                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full inline-block mt-1 ${
                                                     out.status === 'approved' ? 'bg-green-100 text-green-700' :
                                                     out.status === 'rejected' ? 'bg-red-100 text-red-700' :
                                                     'bg-yellow-100 text-yellow-700'
                                                 }`}>
                                                     {out.status === 'menunggu_approval' ? 'MENUNGGU ACC' : out.status.toUpperCase()}
                                                 </span>
+                                                {out.status === 'rejected' && out.catatan_mandor && (
+                                                    <div className="text-[11px] text-red-600 mt-2 bg-red-50 p-2 rounded border border-red-100 leading-snug">
+                                                        <span className="font-semibold block mb-0.5">Alasan Reject:</span> 
+                                                        {out.catatan_mandor}
+                                                    </div>
+                                                )}
                                             </div>
                                             {out.status === 'approved' && (
                                                 <div className="text-right">
