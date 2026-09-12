@@ -61,6 +61,21 @@ export default function OrderCreate({ customers = [] }) {
         setData('items', newItems);
     };
 
+    // Auto-fill customer details when a known customer is selected
+    useEffect(() => {
+        if (data.nama_kustomer && customers) {
+            const customer = customers.find(c => c.nama.toLowerCase() === data.nama_kustomer.toLowerCase());
+            if (customer) {
+                if (customer.kontak && !data.nomor_kontak) {
+                    setData('nomor_kontak', customer.kontak);
+                }
+                if (customer.alamat && !data.alamat_pengiriman) {
+                    setData('alamat_pengiriman', customer.alamat);
+                }
+            }
+        }
+    }, [data.nama_kustomer]);
+
     const handleJenisProdukChange = (index, value) => {
         const newItems = [...data.items];
         newItems[index].jenis_produk = value;
@@ -144,11 +159,17 @@ export default function OrderCreate({ customers = [] }) {
                                 </label>
                                 <input
                                     type="text"
+                                    list="customers-list"
                                     value={data.nama_kustomer}
                                     onChange={e => setData('nama_kustomer', e.target.value)}
                                     placeholder="Mis. Universitas Brawijaya"
                                     className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
                                 />
+                                <datalist id="customers-list">
+                                    {customers.map(c => (
+                                        <option key={c.id} value={c.nama} />
+                                    ))}
+                                </datalist>
                                 {errors.nama_kustomer && <p className="mt-1 text-[11px] text-danger">{errors.nama_kustomer}</p>}
                             </div>
                             <div>

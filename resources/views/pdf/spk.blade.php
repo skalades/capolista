@@ -76,6 +76,12 @@
                     <td class="value">{{ $order->customer->nama ?? '-' }}</td>
                 </tr>
                 <tr>
+                    <td class="label">Tgl Order:</td>
+                    <td class="value">{{ \Carbon\Carbon::parse($order->tanggal_order)->format('d/m/Y') }}</td>
+                    <td class="label">Alamat:</td>
+                    <td class="value">{{ $order->customer->alamat ?? '-' }}</td>
+                </tr>
+                <tr>
                     <td class="label">Deadline:</td>
                     <td class="value text-red">{{ \Carbon\Carbon::parse($order->deadline)->format('d/m/Y') }}</td>
                     <td class="label">Status Order:</td>

@@ -40,7 +40,7 @@ class OrderController extends Controller
     public function create()
     {
         return Inertia::render('Orders/Create', [
-            'customers' => Customer::orderBy('nama')->get(['id', 'nama', 'kontak']),
+            'customers' => Customer::orderBy('nama')->get(['id', 'nama', 'kontak', 'alamat']),
         ]);
     }
 
@@ -67,11 +67,28 @@ class OrderController extends Controller
         $customerId = $validated['customer_id'] ?? null;
 
         if (!$customerId && !empty($validated['nama_kustomer'])) {
-            $customer = Customer::create([
-                'nama'   => $validated['nama_kustomer'],
-                'kontak' => $validated['nomor_kontak'] ?? '',
-                'alamat' => $validated['alamat_pengiriman'] ?? '',
-            ]);
+            $customer = Customer::where('nama', $validated['nama_kustomer'])->first();
+            
+            if ($customer) {
+                $needsUpdate = false;
+                if (empty($customer->kontak) && !empty($validated['nomor_kontak'])) {
+                    $customer->kontak = $validated['nomor_kontak'];
+                    $needsUpdate = true;
+                }
+                if (empty($customer->alamat) && !empty($validated['alamat_pengiriman'])) {
+                    $customer->alamat = $validated['alamat_pengiriman'];
+                    $needsUpdate = true;
+                }
+                if ($needsUpdate) {
+                    $customer->save();
+                }
+            } else {
+                $customer = Customer::create([
+                    'nama'   => $validated['nama_kustomer'],
+                    'kontak' => $validated['nomor_kontak'] ?? '',
+                    'alamat' => $validated['alamat_pengiriman'] ?? '',
+                ]);
+            }
             $customerId = $customer->id;
         }
 
@@ -165,7 +182,7 @@ class OrderController extends Controller
     {
         return Inertia::render('Orders/Edit', [
             'order'     => $order->load(['customer', 'items']),
-            'customers' => Customer::orderBy('nama')->get(['id', 'nama', 'kontak']),
+            'customers' => Customer::orderBy('nama')->get(['id', 'nama', 'kontak', 'alamat']),
         ]);
     }
 

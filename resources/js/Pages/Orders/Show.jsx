@@ -148,6 +148,9 @@ export default function OrderShow({ order = {} }) {
                                     <div>
                                         <h3 className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-3">Detail Spesifikasi</h3>
                                         <div className="grid grid-cols-[80px_1fr] gap-y-2 text-[13px]">
+                                            <div className="text-ink-soft">Tgl Order</div>
+                                            <div className="font-medium text-ink">{o.tanggal_order ? new Date(o.tanggal_order).toLocaleDateString('id-ID') : '-'}</div>
+
                                             <div className="text-ink-soft">Deadline</div>
                                             <div className="font-medium text-danger">{o.deadline ? new Date(o.deadline).toLocaleDateString('id-ID') : '-'}</div>
                                             
