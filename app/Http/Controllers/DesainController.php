@@ -90,15 +90,15 @@ class DesainController extends Controller
             'disetujui_at'   => now(),
         ]);
 
-        // Pindah order ke produksi
+        // Pindah order ke procurement
         $order = $desain->order;
-        $order->update(['status' => Order::STATUS_PRODUKSI]);
+        $order->update(['status' => Order::STATUS_PROCUREMENT]);
 
         OrderLog::create([
             'order_id'    => $order->id,
             'user_id'     => auth()->id(),
             'status_lama' => Order::STATUS_DESAIN,
-            'status_baru' => Order::STATUS_PRODUKSI,
+            'status_baru' => Order::STATUS_PROCUREMENT,
             'catatan'     => 'Desain disetujui',
         ]);
 

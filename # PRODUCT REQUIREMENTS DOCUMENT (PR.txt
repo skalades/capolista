@@ -11,9 +11,9 @@
 
 ## 1. RINGKASAN EKSEKUTIF
 
-Capolista Apparel adalah usaha konveksi yang memproduksi pakaian secara mandiri (kaus, baju, celana) dengan model produksi **Cut, Make & Trim (CMT)** — mulai dari pemotongan kain hingga finishing produk jadi. Sistem manajemen internal yang dibutuhkan harus mampu mengelola alur kerja produksi secara terstruktur, mulai dari order masuk, desain & pola, pemotongan kain (cutting), penjahitan, printing/sablon, pemasangan/finishing, hingga quality control, packing, dan pengiriman ke customer.
+Capolista Apparel adalah usaha konveksi yang memproduksi pakaian secara mandiri (kaus, baju, celana) dengan model produksi **Cut, Make & Trim (CMT)** — mulai dari pemotongan kain hingga finishing produk jadi. Sistem manajemen internal yang dibutuhkan harus mampu mengelola alur kerja produksi secara terstruktur, mulai dari order masuk, desain & pola, pengadaan bahan (procurement), printing/sablon, pemasangan/finishing, pemotongan kain (cutting), penjahitan, hingga quality control, packing, dan pengiriman ke customer.
 
-Sistem ini dirancang dengan pendekatan **multi-level akses berdasarkan divisi**, sehingga setiap divisi hanya melihat dan mengerjakan tugas sesuai tanggung jawabnya. Selain itu, sistem juga mengakomodasi **manajemen operator produksi (penjahit & pemotong)** dengan sistem penggajian campur: **borongan (per pcs), harian, dan bulanan** — termasuk tarif borongan yang fleksibel per operator per order/proyek berdasarkan tingkat kesulitan pekerjaan.
+Sistem ini dirancang dengan pendekatan **multi-level akses berdasarkan divisi**, sehingga setiap pengguna hanya melihat dan mengerjakan tugas sesuai tanggung jawabnya. Selain itu, sistem juga mengakomodasi **manajemen operator produksi (penjahit & pemotong)** dengan sistem penggajian campur: **borongan (per pcs), harian, dan bulanan** — termasuk tarif borongan yang fleksibel per operator per order/proyek berdasarkan tingkat kesulitan pekerjaan.
 
 ---
 
@@ -29,7 +29,7 @@ Sistem ini dirancang dengan pendekatan **multi-level akses berdasarkan divisi**,
 - Tidak ada sistem approval output harian operator — angka pcs yang diklaim operator tidak terverifikasi secara sistematis.
 
 ### 2.2 Masalah yang Ingin Diselesaikan
-1. Tidak ada standar alur kerja digital antar divisi (Desain → Cutting → Jahit → Printing → Pemasangan → QC → Packing).
+1. Tidak ada standar alur kerja digital antar divisi (Draft → Desain → Procurement → Printing → Pemasangan → Cutting → Jahit → Packing → Dikirim).
 2. Tidak ada sistem approval/hand-off yang jelas antar divisi.
 3. Owner/manajemen tidak punya dashboard untuk melihat status seluruh order secara real-time.
 4. Data pelanggan, order, dan riwayat produksi tidak terpusat.
@@ -72,52 +72,51 @@ Sistem menggunakan **Role-Based Access Control (RBAC)** dengan level akses berti
 ### 4.1 Daftar Divisi dalam Sistem
 
 1. **Divisi Penjualan/Pemasaran** — input order baru, data customer, follow-up pembayaran
-2. **Divisi Produksi** — koordinator/supervisor keseluruhan proses produksi CMT
+2. **Divisi Produksi** — koordinator/supervisor keseluruhan proses produksi
 3. **Divisi Desain & Pola** — pembuatan desain, pattern making (pola potong), approval mockup
-4. **Divisi Cutting/Pemotongan** — pemotongan kain sesuai pola & ukuran per order
-5. **Divisi Jahit** — penjahitan garmen (kaus, baju, celana) oleh operator penjahit
-6. **Divisi Printing/Produksi Cetak** — sablon/DTF/DTG, quality control cetakan
-7. **Divisi Pemasangan/Finishing** — heat press, curing, pasang aksesori/label, QC akhir
-8. **Divisi Pembelian/Procurement** — pengadaan bahan baku, manajemen supplier, purchase order (PO)
+4. **Divisi Pembelian/Procurement** — pengadaan bahan baku, manajemen supplier, purchase order (PO)
+5. **Divisi Printing/Produksi Cetak** — sablon/DTF/DTG/Sublimasi, quality control cetakan
+6. **Divisi Pemasangan/Finishing** — heat press, curing, pasang aksesori/label, QC akhir
+7. **Divisi Cutting/Pemotongan** — pemotongan kain/bahan yang sudah diprint sesuai pola & ukuran per order
+8. **Divisi Jahit** — penjahitan garmen (kaus, baju, celana) oleh operator penjahit
 9. **Divisi Gudang & Logistik** — stok bahan baku, stok opname, packing, pengiriman
 10. **Divisi Keuangan & Akuntansi** — pencatatan pembayaran, invoice, biaya produksi, laporan laba rugi
 11. **Divisi HR/Personalia** — data karyawan, absensi, penggajian (borongan/harian/bulanan)
 
-> **Catatan:** Divisi Produksi bersifat koordinatif — bertugas memantau progres Cutting → Jahit → Printing → Pemasangan secara keseluruhan, menyelesaikan bottleneck antar sub-divisi, dan melapor ke Admin/Owner.
+> **Catatan:** Divisi Produksi bersifat koordinatif — bertugas memantau progres Procurement → Printing → Pemasangan → Cutting → Jahit secara keseluruhan, menyelesaikan bottleneck antar sub-divisi, dan melapor ke Admin/Owner.
 
 ---
 
 ## 5. ALUR KERJA SISTEM (BUSINESS PROCESS FLOW)
 
 ```
-[Customer Order]
+[Customer Order] (Status: Draft)
       ↓
 [Divisi Pemasaran] → Input data order (jenis produk, jumlah, ukuran, deadline, DP)
       ↓
 [Divisi Desain & Pola] → Buat desain + pola potong → Approval Customer/Owner
-      ↓ (approved)
-[Divisi Pembelian/Procurement] → Cek ketersediaan bahan baku → PO ke supplier bila stok kurang
+      ↓ (approved, status: Procurement)
+[Divisi Pembelian/Procurement] → Pengadaan/penyiapan bahan → Lempar ke Printing
       ↓
-[Divisi Produksi] → Koordinasi & jadwalkan pengerjaan ke Cutting, Jahit, Printing, Pemasangan
+[Divisi Produksi] → Koordinasi & pantau order di Procurement, Printing, Pemasangan, Cutting, Jahit
       ↓
-[Divisi Cutting] → Potong kain sesuai pola & ukuran → Update status "Selesai Cutting"
+[Divisi Printing] → Proses cetak (sublim/DTF/kain lembaran) → Update status "Selesai Cetak" (Pemasangan)
       ↓
-[Divisi Jahit] → Jahit potongan kain menjadi produk jadi → QC Jahit → Update status "Selesai Jahit"
+[Divisi Pemasangan/Finishing] → Press cetakan ke bahan → QC awal → Update status "Selesai Pemasangan" (Cutting)
       ↓
-[Divisi Printing] → Proses cetak (sablon/DTF/DTG) → Update status "Selesai Cetak" (jika ada motif cetak)
+[Divisi Cutting] → Potong bahan yang sudah diprint/press sesuai pola → Update status "Selesai Cutting" (Jahit)
       ↓
-[Divisi Pemasangan/Finishing] → Heat press/curing/aksesori → QC akhir → Update status "Selesai Finishing"
+[Divisi Jahit] → Jahit potongan kain menjadi produk jadi → QC Jahit → Update status "Selesai Jahit" (Packing)
       ↓
-[Divisi Gudang] → Packing → Update status "Siap Kirim"
+[Divisi Gudang] → Packing → Update status "Siap Kirim" (Dikirim)
       ↓
 [Pengiriman ke Customer] → Update status "Selesai/Delivered"
       ↓
 [Divisi Keuangan & Akuntansi] → Update pelunasan pembayaran → Order Closed
 ```
 
-> **Catatan 1:** Alur Pembelian/Procurement hanya aktif jika bahan baku kurang dari stok minimum. Jika stok mencukupi, proses langsung lanjut dari Desain ke Cutting.
-
-> **Catatan 2:** Divisi Printing bersifat kondisional — aktif hanya jika produk memerlukan cetak/sablon. Produk tanpa motif cetak langsung lanjut dari Jahit ke Pemasangan/Finishing.
+> **Catatan 1:** Alur di atas adalah alur utama sistem.
+> **Catatan 2:** Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya dan ke Admin/Owner.
 
 Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya dan ke Admin/Owner.
 
@@ -148,7 +147,7 @@ Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya da
 - Pencarian & filter order (berdasarkan status, customer, tanggal, divisi)
 
 ### 6.4 Modul Divisi Produksi (Koordinator)
-- Dashboard progres seluruh order yang sedang berjalan di Cutting, Jahit, Printing, dan Pemasangan
+- Dashboard progres seluruh order yang sedang berjalan di Procurement, Printing, Pemasangan, Cutting, dan Jahit
 - Penjadwalan & alokasi target harian/mingguan per sub-divisi
 - Deteksi bottleneck (order yang tertahan lama di satu tahap)
 - Laporan kapasitas produksi vs jumlah order masuk
@@ -158,17 +157,29 @@ Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya da
 - Daftar tugas desain yang masuk dari order
 - Upload mockup desain & pola potong (pattern), revisi, dan versioning
 - Status: Menunggu → Dikerjakan → Revisi → Disetujui
-- Approval dari Admin/Customer sebelum lanjut ke Cutting
+- Approval dari Admin/Customer sebelum lanjut ke Procurement/Printing
 - Catatan instruksi pola untuk divisi cutting (warna kain, arah serat, dll)
 
-### 6.6 Modul Divisi Cutting/Pemotongan
-- Daftar order yang sudah di-approve desain & polanya
+### 6.6 Modul Divisi Printing
+- Daftar order dari Procurement yang akan dicetak (sublim/DTF/kain lembaran)
+- Input jenis metode cetak (sablon manual/DTF/DTG/Sublimasi), jumlah warna, estimasi waktu
+- Checklist QC hasil cetak (ketajaman warna, posisi cetakan, foto sebagai bukti)
+- Update status ke "Selesai Cetak" → notifikasi ke Pemasangan
+
+### 6.7 Modul Divisi Pemasangan/Finishing
+- Daftar order siap pemasangan (selesai Printing)
+- Input parameter proses (suhu heat press, waktu curing, dll)
+- Checklist QC awal (kerekatan, kerapian)
+- Update status ke "Selesai Pemasangan" → notifikasi ke Cutting
+
+### 6.8 Modul Divisi Cutting/Pemotongan
+- Daftar order yang sudah selesai di-press (dari Pemasangan)
 - Breakdown ukuran per order (jumlah pcs per ukuran S/M/L/XL/XXL)
 - Input output harian operator cutting (pcs per ukuran yang selesai dipotong)
 - Checklist QC cutting (akurasi ukuran, arah kain, tidak ada cacat)
 - Update status ke "Selesai Cutting" → notifikasi ke Divisi Jahit
 
-### 6.7 Modul Divisi Jahit
+### 6.9 Modul Divisi Jahit
 - Daftar order siap jahit (sudah selesai cutting)
 - Assign order ke operator penjahit oleh Kepala Divisi/Mandor, termasuk penetapan tarif borongan per operator per order
 - Sistem self-report output harian:
@@ -181,19 +192,7 @@ Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya da
 - Support multi-order dalam satu hari untuk satu operator
 - Support multi-jenis produk dalam satu hari untuk satu operator
 - Checklist QC jahit (kerapian jahitan, ukuran sesuai pola, tidak ada loncat jahit)
-- Update status ke "Selesai Jahit" → notifikasi ke Divisi Printing/Pemasangan
-
-### 6.8 Modul Divisi Printing
-- Daftar order yang sudah selesai dijahit dan membutuhkan proses cetak
-- Input jenis metode cetak (sablon manual/DTF/DTG), jumlah warna, estimasi waktu
-- Checklist QC hasil cetak (ketajaman warna, posisi cetakan, foto sebagai bukti)
-- Update status ke "Selesai Cetak"
-
-### 6.9 Modul Divisi Pemasangan/Finishing
-- Daftar order siap finishing
-- Input parameter proses (suhu heat press, waktu curing, jenis aksesori/label yang dipasang)
-- Checklist QC akhir (kerekatan, kerapian, kebersihan produk)
-- Update status ke "Selesai Finishing"
+- Update status ke "Selesai Jahit" → notifikasi ke Divisi Gudang/Packing
 
 ### 6.10 Modul Divisi Pembelian/Procurement
 - Daftar kebutuhan bahan baku otomatis (berdasarkan order yang masuk & sisa stok)
@@ -331,18 +330,18 @@ Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya da
 |---|---|---|---|
 | US-01 | Staf Pemasaran | menginput order baru dengan detail lengkap (jenis produk, ukuran, jumlah, deadline) | data order tercatat rapi dan bisa langsung diteruskan ke Desain |
 | US-02 | Kepala Divisi Desain | melihat daftar tugas desain & pola yang masuk | bisa membagi tugas ke staf desain dan menyiapkan pola cutting |
-| US-03 | Staf Desain | upload mockup & pola potong dan menandai status "siap approval" | Admin/Customer bisa segera mengecek dan menyetujui sebelum kain dipotong |
-| US-04 | Staf Cutting | melihat order yang sudah di-approve pola & desainnya beserta breakdown ukuran | langsung bisa mulai proses pemotongan kain |
+| US-03 | Staf Desain | upload mockup & pola potong dan menandai status "siap approval" | Admin/Customer bisa segera mengecek dan menyetujui sebelum masuk tahap procurement/produksi |
+| US-04 | Staf Cutting | melihat order yang sudah selesai di-press/cetak beserta breakdown ukuran | langsung bisa mulai proses pemotongan kain sesuai area print |
 | US-05 | Mandor Jahit | assign operator penjahit ke order tertentu dengan tarif borongan yang sesuai kesulitan | setiap operator tahu tugasnya dan tarif upahnya sejak awal |
 | US-06 | Operator Jahit | menginput jumlah pcs yang saya selesaikan hari ini untuk tiap order | upah borongan saya dihitung secara akurat dan transparan |
 | US-07 | Mandor Jahit | me-review dan approve/reject output harian operator | data output yang masuk ke sistem sudah terverifikasi kebenarannya |
-| US-08 | Staf Printing | melihat order yang sudah selesai dijahit dan perlu di-cetak | langsung bisa mulai proses sablon/DTF tanpa menunggu info manual |
-| US-09 | Kepala Divisi Pemasangan | approve hasil kerja stafnya sebelum lanjut ke gudang | kualitas terjaga sebelum sampai ke customer |
+| US-08 | Staf Printing | melihat order dari procurement yang perlu dicetak | langsung bisa mulai proses cetak kain (sublim) tanpa menunggu info manual |
+| US-09 | Kepala Divisi Pemasangan | approve hasil kerja stafnya sebelum lanjut ke cutting | kualitas terjaga sebelum kain dipotong |
 | US-10 | Owner | melihat dashboard status semua order secara real-time | bisa mengambil keputusan cepat tanpa menanyakan satu per satu ke divisi |
 | US-11 | Admin | melakukan input absensi manual untuk karyawan harian | upah harian dihitung otomatis berdasarkan kehadiran yang saya catat |
 | US-12 | Staf Gudang | mendapat notifikasi otomatis saat order siap packing | proses packing & pengiriman tidak tertunda |
 | US-13 | Staf Keuangan | melihat status pembayaran tiap order dan data total penggajian bulan ini | bisa follow-up pelunasan dan rekap biaya tenaga kerja dengan akurat |
-| US-14 | Kepala Divisi Produksi | melihat progres semua order di Cutting, Jahit, Printing, dan Pemasangan dalam satu layar | bisa mendeteksi bottleneck dan order berisiko telat lebih awal |
+| US-14 | Kepala Divisi Produksi | melihat progres semua order di Procurement, Printing, Pemasangan, Cutting, dan Jahit dalam satu layar | bisa mendeteksi bottleneck dan order berisiko telat lebih awal |
 | US-15 | Staf Procurement | mendapat daftar kebutuhan bahan baku otomatis dari sistem | tidak perlu mengecek manual stok yang menipis |
 | US-16 | Staf Gudang | melakukan stok opname dan mencatat selisih stok fisik vs sistem | data stok selalu akurat dan penyebab selisih terdokumentasi |
 | US-17 | Owner | melihat laporan laba rugi sederhana per periode | bisa mengevaluasi kesehatan bisnis secara berkala |
@@ -447,7 +446,7 @@ Setiap perpindahan status **memicu notifikasi otomatis** ke divisi berikutnya da
 
 | Fase | Fokus | Estimasi |
 |---|---|---|
-| **Fase 1 (MVP)** | Manajemen order, role & RBAC dasar, alur produksi CMT (Desain → Cutting → Jahit → Printing → Pemasangan → Gudang), notifikasi status | 5-7 minggu |
+| **Fase 1 (MVP)** | Manajemen order, role & RBAC dasar, alur produksi CMT (Draft → Desain → Procurement → Printing → Pemasangan → Cutting → Jahit → Packing → Dikirim), notifikasi status | 5-7 minggu |
 | **Fase 2** | Modul HR & Penggajian (absensi manual, tarif borongan fleksibel, self-report output + approval mandor, slip gaji), Modul Keuangan & Akuntansi, Pembelian/Procurement, Stok Opname | 5-6 minggu |
 | **Fase 3** | Laporan & Analitik lengkap (performa operator, produktivitas, keuangan), Portal customer (read-only status order) | 3-4 minggu |
 | **Fase 4** | Integrasi marketplace (opsional), fitur lanjutan HR (absensi mobile self-service, BPJS tracker) | Sesuai kebutuhan |

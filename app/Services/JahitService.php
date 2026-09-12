@@ -156,9 +156,7 @@ class JahitService
             throw new Exception('Order tidak dalam status Jahit.');
         }
 
-        $nextStatus = $data['next_divisi'] === 'printing'
-            ? Order::STATUS_PRINTING
-            : Order::STATUS_PEMASANGAN;
+        $nextStatus = Order::STATUS_PACKING;
 
         DB::transaction(function () use ($order, $nextStatus, $data, $userId) {
             $order->update(['status' => $nextStatus]);
@@ -171,16 +169,12 @@ class JahitService
                 'catatan'     => $data['catatan'] ?? 'Selesai jahit.',
             ]);
 
-            if ($nextStatus === Order::STATUS_PRINTING && !$order->printing) {
-                Printing::create(['order_id' => $order->id, 'status' => 'menunggu']);
-            }
-
-            if ($nextStatus === Order::STATUS_PEMASANGAN && !$order->pemasangan) {
-                Pemasangan::create(['order_id' => $order->id, 'status' => 'menunggu']);
+            if (!$order->packing) {
+                \App\Models\Packing::create(['order_id' => $order->id]);
             }
         });
 
-        return ucfirst($data['next_divisi']);
+        return 'Packing';
     }
 
     /**

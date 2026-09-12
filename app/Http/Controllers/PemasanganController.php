@@ -80,16 +80,16 @@ class PemasanganController extends Controller
 
         if ($request->status_qc === 'lulus') {
             $order = $pemasangan->order;
-            $order->update(['status' => Order::STATUS_PACKING]);
+            $order->update(['status' => Order::STATUS_CUTTING]);
 
-            Packing::firstOrCreate(['order_id' => $order->id]);
+            \App\Models\ProduksiCutting::firstOrCreate(['order_id' => $order->id]);
 
             OrderLog::create([
                 'order_id'    => $order->id,
                 'user_id'     => auth()->id(),
                 'status_lama' => Order::STATUS_PEMASANGAN,
-                'status_baru' => Order::STATUS_PACKING,
-                'catatan'     => 'QC Pemasangan lulus. Lanjut ke Packing.',
+                'status_baru' => Order::STATUS_CUTTING,
+                'catatan'     => 'QC Pemasangan lulus. Lanjut ke Cutting.',
             ]);
         }
 

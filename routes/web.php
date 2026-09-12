@@ -106,8 +106,11 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::middleware(['level:0,2,3,4', 'divisi:cutting'])->group(function () {
         Route::get('/cutting', [CuttingController::class, 'index'])->name('cutting.index');
         Route::get('/cutting/{order}', [CuttingController::class, 'show'])->name('cutting.show');
-        Route::post('/cutting/{order}/mulai', [CuttingController::class, 'mulai'])->name('cutting.mulai');
-        Route::patch('/cutting/{order}/update', [CuttingController::class, 'update'])->name('cutting.update');
+        Route::post('/cutting/{order}/assign', [CuttingController::class, 'assign'])->name('cutting.assign');
+        Route::post('/cutting/output', [CuttingController::class, 'storeOutput'])->name('cutting.output.store');
+        Route::post('/cutting/output/{output}/approve', [CuttingController::class, 'approveOutput'])->name('cutting.output.approve');
+        Route::post('/cutting/output/{output}/reject', [CuttingController::class, 'rejectOutput'])->name('cutting.output.reject');
+        Route::post('/cutting/{order}/qc-reject', [CuttingController::class, 'qcReject'])->name('cutting.qc-reject');
         Route::post('/cutting/{order}/complete', [CuttingController::class, 'complete'])->name('cutting.complete');
     });
 

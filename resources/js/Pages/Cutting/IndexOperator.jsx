@@ -31,7 +31,7 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('jahit.output.store'), {
+        post(route('cutting.output.store'), {
             onSuccess: () => {
                 reset('pcs_klaim', 'catatan_operator');
                 alert('Berhasil mengirim progres harian!');
@@ -64,7 +64,7 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
     ];
 
     return (
-        <MobileStaffLayout title="Staf Jahit - Dashboard" activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs}>
+        <MobileStaffLayout title="Staf Cutting - Dashboard" activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs}>
             {/* TAB: TUGAS & INPUT */}
             {activeTab === 'tugas' && (
                 <div className="space-y-6 animation-fade-in">
@@ -79,7 +79,7 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                                 <CheckCircleIcon className="w-8 h-8 text-gray-400" />
                             </div>
                             <h4 className="font-bold text-gray-800 mb-1">Belum ada tugas</h4>
-                            <p className="text-sm text-gray-500">Saat ini Anda tidak memiliki tugas jahitan yang aktif dari Mandor.</p>
+                            <p className="text-sm text-gray-500">Saat ini Anda tidak memiliki tugas cuttingan yang aktif dari Mandor.</p>
                         </div>
                     ) : (
                         <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
@@ -133,7 +133,7 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                                             
                                             {ord.items && ord.items.length > 0 && (
                                                 <div className="mt-3 border-t pt-3">
-                                                    <div className="text-xs font-semibold text-gray-800 mb-2">Input Ukuran yang Dijahit:</div>
+                                                    <div className="text-xs font-semibold text-gray-800 mb-2">Input Ukuran yang Dicutting:</div>
                                                     <div className="grid grid-cols-2 gap-2">
                                                         {ord.items.map(item => {
                                                             const alreadyDone = selAssign.total_rincian_selesai?.[item.ukuran] || 0;

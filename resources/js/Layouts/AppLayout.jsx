@@ -2,24 +2,33 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import {
-    HomeIcon,
-    ClipboardDocumentListIcon,
-    PaintBrushIcon,
-    PrinterIcon,
-    WrenchScrewdriverIcon,
-    Cog6ToothIcon,
-    ArchiveBoxIcon,
-    UsersIcon,
-    ArrowRightOnRectangleIcon,
-    BellIcon,
-    Bars3Icon,
-    XMarkIcon,
-    ShoppingCartIcon,
-    UserGroupIcon,
-    ChartBarIcon,
-    ShieldCheckIcon,
-    ExclamationTriangleIcon,
-} from '@heroicons/react/24/outline';
+    LayoutDashboard,
+    Package,
+    FileEdit,
+    PenTool,
+    ShoppingCart,
+    Printer,
+    Hammer,
+    Scissors,
+    Shirt,
+    Box,
+    Truck,
+    Warehouse,
+    Wallet,
+    Factory,
+    Users,
+    ClipboardCheck,
+    ClipboardList,
+    Banknote,
+    BarChart2,
+    UserCog,
+    Settings,
+    LogOut,
+    Menu,
+    X,
+    Bell,
+    AlertTriangle
+} from 'lucide-react';
 
 // Panggil route() dengan aman — kembalikan '#' jika route belum terdaftar
 function safeRoute(name) {
@@ -38,25 +47,48 @@ function isActive(name) {
     }
 }
 
-const MENU_ITEMS = [
-    { name: 'Dashboard',         routeName: 'dashboard',          icon: HomeIcon,                   levels: [0, 1, 2, 3, 4] },
-    { name: 'Kelola Order',      routeName: 'orders.index',       icon: ClipboardDocumentListIcon,  levels: [0, 1, 2] },
-    { name: 'Order Saya',        routeName: 'orders.index',       icon: ClipboardDocumentListIcon,  levels: [3, 4] },
-    // Divisi - diurutkan sesuai alur produksi
-    { name: 'Produksi',          routeName: 'produksi.index',     icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['produksi'] },
-    { name: 'Desain',            routeName: 'desain.index',       icon: PaintBrushIcon,             levels: [0, 1, 2, 3, 4], divisi: ['desain'] },
-    { name: 'Cutting',           routeName: 'cutting.index',      icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['cutting'] },
-    { name: 'Jahit',             routeName: 'jahit.index',        icon: Cog6ToothIcon,              levels: [0, 1, 2, 3, 4], divisi: ['jahit'] },
-    { name: 'Printing',          routeName: 'printing.index',     icon: PrinterIcon,                levels: [0, 1, 2, 3, 4], divisi: ['printing'] },
-    { name: 'Pemasangan',        routeName: 'pemasangan.index',   icon: WrenchScrewdriverIcon,      levels: [0, 1, 2, 3, 4], divisi: ['pemasangan'] },
-    { name: 'Pembelian',         routeName: 'procurement.index',  icon: ShoppingCartIcon,           levels: [0, 1, 2, 3, 4], divisi: ['pembelian'] },
-    { name: 'Gudang & Stok',     routeName: 'gudang.index',       icon: ArchiveBoxIcon,             levels: [0, 1, 2, 3, 4], divisi: ['gudang'] },
-    { name: 'Keuangan',          routeName: 'keuangan.index',     icon: ClipboardDocumentListIcon,  levels: [0, 1, 2, 3, 4], divisi: ['keuangan'] },
-    { name: 'HR & Gaji',         routeName: 'hr.penggajian.index',icon: UserGroupIcon,              levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
-    // Sistem
-    { name: 'Laporan',           routeName: 'laporan.index',      icon: ChartBarIcon,               levels: [0, 1, 2] },
-    { name: 'Pengguna',          routeName: 'users.index',        icon: UsersIcon,                  levels: [0, 2] },
-    { name: 'Superadmin',        routeName: 'superadmin.index',   icon: ShieldCheckIcon,            levels: [0] },
+const MENU_SECTIONS = [
+    {
+        title: 'RINGKASAN',
+        items: [
+            { name: 'Dashboard', routeName: 'dashboard', icon: LayoutDashboard, levels: [0, 1, 2, 3, 4] },
+            { name: 'Manajemen Order', routeName: 'orders.index', icon: Package, levels: [0, 1, 2, 3, 4] },
+        ],
+    },
+    {
+        title: 'DIVISI & ALUR',
+        items: [
+            { name: 'Draft Order', routeName: 'orders.create', icon: FileEdit, levels: [0, 1, 2, 3, 4] },
+            { name: 'Desain & Pola', routeName: 'desain.index', icon: PenTool, levels: [0, 1, 2, 3, 4], divisi: ['desain'] },
+            { name: 'Procurement', routeName: 'procurement.index', icon: ShoppingCart, levels: [0, 1, 2, 3, 4], divisi: ['pembelian'] },
+            { name: 'Printing', routeName: 'printing.index', icon: Printer, levels: [0, 1, 2, 3, 4], divisi: ['printing'] },
+            { name: 'Pemasangan', routeName: 'pemasangan.index', icon: Hammer, levels: [0, 1, 2, 3, 4], divisi: ['pemasangan'] },
+            { name: 'Cutting', routeName: 'cutting.index', icon: Scissors, levels: [0, 1, 2, 3, 4], divisi: ['cutting'] },
+            { name: 'Jahit', routeName: 'jahit.index', icon: Shirt, levels: [0, 1, 2, 3, 4], divisi: ['jahit'] },
+            { name: 'Packing', routeName: 'gudang.packing.index', icon: Box, levels: [0, 1, 2, 3, 4], divisi: ['gudang'] },
+            { name: 'Dikirim', routeName: '#', icon: Truck, levels: [0, 1, 2, 3, 4] },
+            { name: 'Gudang & Stok', routeName: 'gudang.index', icon: Warehouse, levels: [0, 1, 2, 3, 4], divisi: ['gudang'] },
+            { name: 'Keuangan', routeName: 'keuangan.index', icon: Wallet, levels: [0, 1, 2, 3, 4], divisi: ['keuangan'] },
+            { name: 'Produksi (Koordinator)', routeName: 'produksi.index', icon: Factory, levels: [0, 1, 2, 3, 4], divisi: ['produksi'] },
+        ],
+    },
+    {
+        title: 'HR & SUMBER DAYA',
+        items: [
+            { name: 'Data Karyawan', routeName: 'users.index', icon: Users, levels: [0, 1, 2] },
+            { name: 'Absensi', routeName: 'hr.absensi.index', icon: ClipboardCheck, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
+            { name: 'Approval Borongan', routeName: 'hr.output.rekap', icon: ClipboardList, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
+            { name: 'Penggajian', routeName: 'hr.penggajian.index', icon: Banknote, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
+        ],
+    },
+    {
+        title: 'SISTEM',
+        items: [
+            { name: 'Laporan & Analitik', routeName: 'laporan.index', icon: BarChart2, levels: [0, 1, 2] },
+            { name: 'Pengguna & Akses', routeName: 'superadmin.roles', icon: UserCog, levels: [0] },
+            { name: 'Pengaturan Sistem', routeName: 'superadmin.settings', icon: Settings, levels: [0] },
+        ],
+    },
 ];
 
 export default function AppLayout({ children, title = '', headerActions }) {
@@ -108,12 +140,6 @@ export default function AppLayout({ children, title = '', headerActions }) {
         return 'text-gold';
     };
 
-    const visibleMenu = MENU_ITEMS.filter(item => {
-        if (!item.levels.includes(levelAkses)) return false;
-        if ((levelAkses === 3 || levelAkses === 4) && item.divisi && !item.divisi.includes(user.divisi)) return false;
-        return true;
-    });
-
     return (
         <div className="min-h-screen bg-bg flex font-sans">
             {/* Mobile Sidebar Overlay */}
@@ -127,35 +153,54 @@ export default function AppLayout({ children, title = '', headerActions }) {
             {/* Sidebar */}
             <aside className={`fixed inset-y-0 left-0 z-50 w-[230px] bg-navy flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 {/* Logo */}
-                <div className="h-16 flex items-center justify-between px-6 shrink-0">
+                <div className="h-16 flex items-center justify-between px-6 shrink-0 border-b border-line/10">
                     <h1 className="text-xl font-bold font-oswald tracking-widest text-white mt-1">CAPOLISTA</h1>
                     <button 
                         className="lg:hidden text-line hover:text-white"
                         onClick={() => setIsSidebarOpen(false)}
                     >
-                        <XMarkIcon className="h-6 w-6" />
+                        <X className="h-5 w-5" />
                     </button>
                 </div>
 
                 {/* Nav Menu */}
-                <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto scrollbar-hide">
-                    {visibleMenu.map((item) => {
-                        const href   = safeRoute(item.routeName);
-                        const active = isActive(item.routeName);
+                <nav className="flex-1 py-4 overflow-y-auto scrollbar-hide">
+                    {MENU_SECTIONS.map((section, idx) => {
+                        const visibleItems = section.items.filter(item => {
+                            if (!item.levels.includes(levelAkses)) return false;
+                            if ((levelAkses === 3 || levelAkses === 4) && item.divisi && !item.divisi.includes(user.divisi)) return false;
+                            return true;
+                        });
+
+                        if (visibleItems.length === 0) return null;
+
                         return (
-                            <Link
-                                key={item.name}
-                                href={href}
-                                onClick={() => setIsSidebarOpen(false)}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 ${
-                                    active
-                                        ? 'bg-white/10 text-white'
-                                        : 'text-line hover:bg-white/5 hover:text-white'
-                                }`}
-                            >
-                                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-white' : 'text-line'}`} />
-                                <span className="font-medium text-[13px]">{item.name}</span>
-                            </Link>
+                            <div key={idx} className="mb-6 px-3">
+                                <h3 className="px-3 mb-2 text-[11px] font-bold text-line tracking-wider uppercase">
+                                    {section.title}
+                                </h3>
+                                <div className="space-y-1">
+                                    {visibleItems.map((item) => {
+                                        const href   = safeRoute(item.routeName);
+                                        const active = isActive(item.routeName);
+                                        return (
+                                            <Link
+                                                key={item.name}
+                                                href={href}
+                                                onClick={() => setIsSidebarOpen(false)}
+                                                className={`flex items-center gap-3 px-3 py-2.5 rounded transition-all duration-200 ${
+                                                    active
+                                                        ? 'bg-white/10 text-white'
+                                                        : 'text-line hover:bg-white/5 hover:text-white'
+                                                }`}
+                                            >
+                                                <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-white' : 'text-line'}`} strokeWidth={active ? 2.5 : 2} />
+                                                <span className={`text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}>{item.name}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         );
                     })}
                 </nav>
@@ -179,7 +224,7 @@ export default function AppLayout({ children, title = '', headerActions }) {
                         as="button"
                         className="w-full flex items-center justify-center gap-2 px-3 py-2 text-[12px] font-medium text-line rounded hover:bg-white/10 hover:text-white transition-colors border border-line/20"
                     >
-                        <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                        <LogOut className="h-4 w-4" />
                         <span>Logout</span>
                     </Link>
                 </div>
@@ -194,7 +239,7 @@ export default function AppLayout({ children, title = '', headerActions }) {
                             className="lg:hidden p-2 -ml-2 text-ink-soft hover:text-accent rounded hover:bg-line/20 transition-colors"
                             onClick={() => setIsSidebarOpen(true)}
                         >
-                            <Bars3Icon className="h-6 w-6" />
+                            <Menu className="h-6 w-6" />
                         </button>
                         <h2 className="text-[22px] font-semibold font-oswald text-ink hidden sm:block">{title}</h2>
                     </div>
@@ -212,7 +257,7 @@ export default function AppLayout({ children, title = '', headerActions }) {
                                 className="p-2 text-ink-soft hover:text-accent rounded-full hover:bg-line/20 transition-colors relative"
                                 title="Notifikasi Deadline"
                             >
-                                <BellIcon className={`h-[22px] w-[22px] ${notifData.count > 0 ? 'text-gold' : ''}`} />
+                                <Bell className={`h-[22px] w-[22px] ${notifData.count > 0 ? 'text-gold' : ''}`} />
                                 {notifData.count > 0 && (
                                     <span className="absolute top-1 right-1 min-w-[16px] h-[16px] rounded-full bg-danger text-white text-[9px] font-bold flex items-center justify-center px-0.5">
                                         {notifData.count > 9 ? '9+' : notifData.count}
@@ -225,7 +270,7 @@ export default function AppLayout({ children, title = '', headerActions }) {
                                 <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 panel z-50 overflow-hidden shadow-card">
                                     <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-gold/10">
                                         <div className="flex items-center gap-2">
-                                            <ExclamationTriangleIcon className="h-4 w-4 text-gold" />
+                                            <AlertTriangle className="h-4 w-4 text-gold" />
                                             <p className="text-[13px] font-semibold text-ink">
                                                 Deadline dalam 3 Hari
                                             </p>
@@ -240,7 +285,7 @@ export default function AppLayout({ children, title = '', headerActions }) {
                                     <div className="max-h-80 overflow-y-auto divide-y divide-line">
                                         {notifData.orders.length === 0 ? (
                                             <div className="flex flex-col items-center justify-center py-8 text-ink-soft">
-                                                <BellIcon className="h-8 w-8 mb-2 opacity-30" />
+                                                <Bell className="h-8 w-8 mb-2 opacity-30" />
                                                 <p className="text-[12px]">Tidak ada deadline mendekat</p>
                                             </div>
                                         ) : (

@@ -15,8 +15,11 @@ class DashboardController extends Controller
         $user = $request->user();
         $level = $user->level_akses;
 
-        if ($level === \App\Models\User::LEVEL_STAF && $user->divisi === 'jahit') {
-            return redirect()->route('jahit.index');
+        if ($level === \App\Models\User::LEVEL_STAF) {
+            $produksiDivisions = ['jahit', 'cutting', 'printing', 'pemasangan'];
+            if (in_array($user->divisi, $produksiDivisions)) {
+                return redirect()->route($user->divisi . '.index');
+            }
         }
         
         $stats = [

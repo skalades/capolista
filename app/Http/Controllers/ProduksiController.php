@@ -41,6 +41,7 @@ class ProduksiController extends Controller
     {
         $statusList = [
             Order::STATUS_DESAIN,
+            Order::STATUS_PROCUREMENT,
             Order::STATUS_PRODUKSI,
             Order::STATUS_CUTTING,
             Order::STATUS_JAHIT,
@@ -82,6 +83,7 @@ class ProduksiController extends Controller
         // Kelompokkan per status untuk kanban
         $ordersByStatus = [
             'desain'     => $orders->where('status', Order::STATUS_DESAIN)->values(),
+            'procurement'=> $orders->where('status', Order::STATUS_PROCUREMENT)->values(),
             'produksi'   => $orders->where('status', Order::STATUS_PRODUKSI)->values(),
             'cutting'    => $orders->where('status', Order::STATUS_CUTTING)->values(),
             'jahit'      => $orders->where('status', Order::STATUS_JAHIT)->values(),

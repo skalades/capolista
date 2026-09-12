@@ -14,7 +14,7 @@ import DangerButton from '@/Components/DangerButton';
 import EmptyState from '@/Components/EmptyState';
 import { UserGroupIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 
-export default function IndexMandor({ ordersJahit, operatorList, stats, progresPenjahit, catatanReject, menungguApproval }) {
+export default function IndexMandor({ ordersCutting, operatorList, stats, progresPemotong, catatanReject, menungguApproval }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     // QC Modal State
@@ -40,7 +40,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
 
     const handleSelectOperator = (operator) => {
         if (operator.order_id) {
-            const order = ordersJahit.find(o => o.id === operator.order_id);
+            const order = ordersCutting.find(o => o.id === operator.order_id);
             if (order) setSelectedOrder(order);
         }
     };
@@ -48,7 +48,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
     const handleKirimPacking = (e) => {
         e.preventDefault();
         if (confirm('Selesaikan order dan kirim ke divisi Packing?')) {
-            router.post(route('jahit.complete', selectedOrder.id), { next_divisi: 'packing' }, {
+            router.post(route('cutting.complete', selectedOrder.id), { next_divisi: 'packing' }, {
                 onSuccess: () => setSelectedOrder(null)
             });
         }
@@ -59,14 +59,14 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
             title={
                 <div className="flex flex-col justify-center mt-1">
                     <div className="flex items-center gap-3 leading-none">
-                        <span>Divisi Jahit</span>
+                        <span>Divisi Cutting</span>
                         <Badge status="gold">{stats.order_berjalan} order berjalan</Badge>
                     </div>
-                    <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Penjahitan & QC jahitan — {operatorList.length} penjahit aktif hari ini</span>
+                    <span className="text-[12px] text-ink-soft mt-1 font-sans font-normal normal-case tracking-normal leading-none">Pemotongan & QC cuttingan — {operatorList.length} pemotong aktif hari ini</span>
                 </div>
             }
         >
-            <Head title="Divisi Jahit" />
+            <Head title="Divisi Cutting" />
             
             <div className="max-w-7xl mx-auto space-y-6">
                 
@@ -87,11 +87,11 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                     <StatsCard 
                         title="Reject hari ini" 
                         value={stats.reject_hari_ini + " pcs"}
-                        caption="Perlu dijahit ulang"
+                        caption="Perlu dicutting ulang"
                         status="danger"
                     />
                     <StatsCard 
-                        title="Rata-rata pcs/penjahit" 
+                        title="Rata-rata pcs/pemotong" 
                         value={stats.rata_rata_pcs}
                         caption={`Target harian ${stats.target_harian_per_orang} pcs`}
                         status="accent"
@@ -104,15 +104,15 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                     {/* Left Column (Progres & Reject) */}
                     <div className="w-full lg:w-3/5 space-y-6">
                         
-                        {/* Progres per penjahit */}
+                        {/* Progres per pemotong */}
                         <Card>
                             <div className="flex justify-between items-end mb-6">
-                                <h3 className="font-oswald text-[18px] font-bold text-ink">Progres per penjahit</h3>
+                                <h3 className="font-oswald text-[18px] font-bold text-ink">Progres per pemotong</h3>
                                 <span className="text-[11px] text-ink-soft">Diperbarui baru saja</span>
                             </div>
                             
                             <div className="space-y-3">
-                                {progresPenjahit.map(op => (
+                                {progresPemotong.map(op => (
                                     <div 
                                         key={op.id} 
                                         className="flex items-center cursor-pointer hover:bg-line/20 p-3 -mx-3 rounded-lg transition-colors border border-transparent hover:border-line"
@@ -137,10 +137,10 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         </div>
                                     </div>
                                 ))}
-                                {progresPenjahit.length === 0 && (
+                                {progresPemotong.length === 0 && (
                                     <EmptyState 
-                                        title="Belum ada penjahit"
-                                        description="Belum ada penjahit aktif hari ini."
+                                        title="Belum ada pemotong"
+                                        description="Belum ada pemotong aktif hari ini."
                                         icon={UserGroupIcon}
                                     />
                                 )}
@@ -152,13 +152,13 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                             <div className="p-6 pb-2">
                                 <div className="flex justify-between items-end mb-2">
                                     <h3 className="font-oswald text-[18px] font-bold text-ink">Menunggu Approval QC</h3>
-                                    <span className="text-[11px] text-ink-soft">Persetujuan hasil jahitan harian</span>
+                                    <span className="text-[11px] text-ink-soft">Persetujuan hasil cuttingan harian</span>
                                 </div>
                             </div>
                             
                             <Table>
                                 <Table.Head>
-                                    <Table.HeadCell>Penjahit</Table.HeadCell>
+                                    <Table.HeadCell>Pemotong</Table.HeadCell>
                                     <Table.HeadCell>Order</Table.HeadCell>
                                     <Table.HeadCell className="text-center">Diklaim</Table.HeadCell>
                                     <Table.HeadCell>Rincian Ukuran</Table.HeadCell>
@@ -193,7 +193,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                                     onClick={() => {
                                                         const alasan = prompt('Alasan reject:');
                                                         if (alasan) {
-                                                            router.post(route('jahit.output.reject', item.id), {
+                                                            router.post(route('cutting.output.reject', item.id), {
                                                                 catatan_mandor: alasan
                                                             });
                                                         }
@@ -208,8 +208,8 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         <Table.Row>
                                             <Table.Cell colSpan={5}>
                                                 <EmptyState 
-                                                    title="Tidak ada hasil jahitan"
-                                                    description="Tidak ada hasil jahitan yang menunggu persetujuan."
+                                                    title="Tidak ada hasil cuttingan"
+                                                    description="Tidak ada hasil cuttingan yang menunggu persetujuan."
                                                     icon={ClipboardDocumentCheckIcon}
                                                 />
                                             </Table.Cell>
@@ -224,7 +224,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                             <div className="p-6 pb-2">
                                 <div className="flex justify-between items-end mb-2">
                                     <h3 className="font-oswald text-[18px] font-bold text-ink">Catatan reject</h3>
-                                    <span className="text-[11px] text-ink-soft">Perlu dijahit ulang sebelum lanjut QC</span>
+                                    <span className="text-[11px] text-ink-soft">Perlu dicutting ulang sebelum lanjut QC</span>
                                 </div>
                             </div>
                             
@@ -233,7 +233,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                     <Table.HeadCell>No. order</Table.HeadCell>
                                     <Table.HeadCell className="text-center">Jumlah</Table.HeadCell>
                                     <Table.HeadCell>Penyebab</Table.HeadCell>
-                                    <Table.HeadCell>Penjahit</Table.HeadCell>
+                                    <Table.HeadCell>Pemotong</Table.HeadCell>
                                     <Table.HeadCell></Table.HeadCell>
                                 </Table.Head>
                                 <Table.Body>
@@ -244,10 +244,10 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                                 <Badge status="danger">{r.jumlah} pcs</Badge>
                                             </Table.Cell>
                                             <Table.Cell className="text-ink">{r.penyebab}</Table.Cell>
-                                            <Table.Cell className="text-ink">{r.penjahit}</Table.Cell>
+                                            <Table.Cell className="text-ink">{r.pemotong}</Table.Cell>
                                             <Table.Cell className="text-right">
                                                 <SecondaryButton size="sm">
-                                                    Jahit ulang
+                                                    Cutting ulang
                                                 </SecondaryButton>
                                             </Table.Cell>
                                         </Table.Row>
@@ -271,7 +271,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                             </div>
                             
                             <div className="space-y-3">
-                                {ordersJahit.filter(o => !o.jahit_assigns?.some(a => a.is_active)).map(order => (
+                                {ordersCutting.filter(o => !o.cutting_assigns?.some(a => a.is_active)).map(order => (
                                     <div 
                                         key={order.id} 
                                         className="flex justify-between items-center bg-bg p-3 border border-line rounded cursor-pointer hover:border-navy transition-colors"
@@ -286,8 +286,8 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         </div>
                                     </div>
                                 ))}
-                                {ordersJahit.filter(o => !o.jahit_assigns?.some(a => a.is_active)).length === 0 && (
-                                    <div className="text-center text-[12px] text-ink-soft py-4">Semua order sudah memiliki penjahit.</div>
+                                {ordersCutting.filter(o => !o.cutting_assigns?.some(a => a.is_active)).length === 0 && (
+                                    <div className="text-center text-[12px] text-ink-soft py-4">Semua order sudah memiliki pemotong.</div>
                                 )}
                             </div>
                         </Card>
@@ -304,15 +304,15 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                     {selectedOrder.jenis_produk} • {selectedOrder.jumlah} pcs • deadline {new Date(selectedOrder.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                                 </div>
 
-                                {(!selectedOrder.jahit_assigns || !selectedOrder.jahit_assigns.some(a => a.is_active)) ? (
+                                {(!selectedOrder.cutting_assigns || !selectedOrder.cutting_assigns.some(a => a.is_active)) ? (
                                     <div className="bg-bg p-5 rounded border border-line">
-                                        <h4 className="font-bold text-[14px] text-ink mb-2">Assign Penjahit</h4>
-                                        <p className="text-[12px] text-ink-soft mb-4 leading-relaxed">Pilih penjahit yang akan mengerjakan order ini dan tentukan upah jahit per pcs.</p>
+                                        <h4 className="font-bold text-[14px] text-ink mb-2">Assign Pemotong</h4>
+                                        <p className="text-[12px] text-ink-soft mb-4 leading-relaxed">Pilih pemotong yang akan mengerjakan order ini dan tentukan upah cutting per pcs.</p>
                                         
                                         <form onSubmit={(e) => {
                                             e.preventDefault();
                                             const formData = new FormData(e.target);
-                                            router.post(route('jahit.assign', selectedOrder.id), {
+                                            router.post(route('cutting.assign', selectedOrder.id), {
                                                 operator_id: formData.get('operator_id'),
                                                 tarif_per_pcs: formData.get('tarif_per_pcs'),
                                                 jenis_produk: selectedOrder.jenis_produk || 'Baju'
@@ -322,7 +322,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                             });
                                         }}>
                                             <div className="mb-4">
-                                                <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Pilih Penjahit</label>
+                                                <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Pilih Pemotong</label>
                                                 <select 
                                                     name="operator_id"
                                                     required
@@ -337,13 +337,13 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                                                 if (tarifEl) tarifEl.value = 0;
                                                                 if (divTarif) divTarif.style.display = 'none';
                                                             } else {
-                                                                if (tarifEl) tarifEl.value = op.tarif_default || 15000;
+                                                                if (tarifEl) tarifEl.value = op.tarif_default || 5000;
                                                                 if (divTarif) divTarif.style.display = 'block';
                                                             }
                                                         }
                                                     }}
                                                 >
-                                                    <option value="">-- Pilih Penjahit --</option>
+                                                    <option value="">-- Pilih Pemotong --</option>
                                                     {operatorList.map(op => (
                                                         <option key={op.id} value={op.id}>
                                                             {op.name} {op.tipe_gaji ? `(${op.tipe_gaji})` : ''}
@@ -353,13 +353,13 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                             </div>
                                             
                                             <div className="mb-6" id="div_tarif_per_pcs">
-                                                <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Tarif Jahit per Pcs (Rp)</label>
+                                                <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Tarif Cutting per Pcs (Rp)</label>
                                                 <input 
                                                     type="number"
                                                     id="tarif_per_pcs"
                                                     name="tarif_per_pcs"
                                                     required
-                                                    defaultValue="15000"
+                                                    defaultValue="5000"
                                                     min="0"
                                                     className="w-full border-line bg-panel text-ink rounded-md focus:border-navy focus:ring-navy text-[13px]"
                                                 />
@@ -376,7 +376,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                             <div className="flex items-end mb-2">
                                                 <span className="text-4xl font-oswald font-bold text-ink leading-none">
                                                     {(() => {
-                                                        const activeAssign = selectedOrder.jahit_assigns?.find(a => a.is_active);
+                                                        const activeAssign = selectedOrder.cutting_assigns?.find(a => a.is_active);
                                                         return activeAssign?.total_pcs_approved || 0;
                                                     })()}
                                                 </span>
@@ -384,7 +384,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                             </div>
                                             <ProgressBar 
                                                 target={selectedOrder.jumlah} 
-                                                selesai={selectedOrder.jahit_assigns?.find(a => a.is_active)?.total_pcs_approved || 0} 
+                                                selesai={selectedOrder.cutting_assigns?.find(a => a.is_active)?.total_pcs_approved || 0} 
                                                 reject={0} 
                                             />
                                         </div>
@@ -392,7 +392,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         {selectedOrder.items && selectedOrder.items.length > 0 && (
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-8">
                                                 {selectedOrder.items.map(item => {
-                                                    const activeAssign = selectedOrder.jahit_assigns?.find(a => a.is_active);
+                                                    const activeAssign = selectedOrder.cutting_assigns?.find(a => a.is_active);
                                                     const finished = activeAssign?.total_rincian_selesai?.[item.ukuran] || 0;
                                                     return (
                                                         <div key={item.id} className="bg-bg text-center p-3 rounded border border-line">
@@ -408,11 +408,11 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                         <div className="space-y-4 mb-8">
                                             <label className="flex items-center space-x-3 text-[13px] text-ink cursor-pointer border-b border-line pb-3">
                                                 <input type="checkbox" className="form-checkbox h-4 w-4 text-accent border-line rounded focus:ring-accent" defaultChecked />
-                                                <span className="line-through text-ink-soft">Kerapian jahitan</span>
+                                                <span className="line-through text-ink-soft">Kerapian cuttingan</span>
                                             </label>
                                             <label className="flex items-center space-x-3 text-[13px] text-ink cursor-pointer border-b border-line pb-3">
                                                 <input type="checkbox" className="form-checkbox h-4 w-4 text-accent border-line rounded focus:ring-accent" defaultChecked />
-                                                <span className="line-through text-ink-soft">Kekuatan jahitan (tarik uji)</span>
+                                                <span className="line-through text-ink-soft">Kekuatan cuttingan (tarik uji)</span>
                                             </label>
                                             <label className="flex items-center space-x-3 text-[13px] text-ink cursor-pointer border-b border-line pb-3">
                                                 <input type="checkbox" className="form-checkbox h-4 w-4 text-accent border-line rounded focus:ring-accent" />
@@ -451,8 +451,8 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                                 </div>
                                                 <div className="relative pl-4 border-l-2 border-accent">
                                                     <div className="absolute w-2 h-2 bg-accent rounded-full -left-[5px] top-1.5"></div>
-                                                    <div className="text-[11px] font-bold text-accent mb-0.5">Jahit - Ibu Suminah</div>
-                                                    <div className="text-[13px] text-ink leading-relaxed">Dibagi ke 2 penjahit, target selesai 1 Sep sore.</div>
+                                                    <div className="text-[11px] font-bold text-accent mb-0.5">Cutting - Ibu Suminah</div>
+                                                    <div className="text-[13px] text-ink leading-relaxed">Dibagi ke 2 pemotong, target selesai 1 Sep sore.</div>
                                                     <div className="text-[10px] text-ink-soft mt-0.5">30 Agu, 15.45</div>
                                                 </div>
                                             </div>
@@ -466,8 +466,8 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                                     <div className="w-16 h-16 bg-line/40 rounded-full flex items-center justify-center mb-4 text-ink-soft">
                                         <CheckCircleIcon className="w-8 h-8" />
                                     </div>
-                                    <h3 className="font-oswald text-[18px] font-bold text-ink mb-1">Pilih Penjahit</h3>
-                                    <p className="text-[13px] text-ink-soft max-w-[250px] leading-relaxed mx-auto">Klik salah satu penjahit di sebelah kiri untuk melihat detail order yang sedang dikerjakannya.</p>
+                                    <h3 className="font-oswald text-[18px] font-bold text-ink mb-1">Pilih Pemotong</h3>
+                                    <p className="text-[13px] text-ink-soft max-w-[250px] leading-relaxed mx-auto">Klik salah satu pemotong di sebelah kiri untuk melihat detail order yang sedang dikerjakannya.</p>
                                 </div>
                             </Card>
                         )}
@@ -482,10 +482,10 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                         e.preventDefault();
                         const total = Object.values(qcSizes).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
                         if (total > qcItem.pcs_klaim) {
-                            alert('Jumlah approved tidak boleh melebihi klaim penjahit!');
+                            alert('Jumlah approved tidak boleh melebihi klaim pemotong!');
                             return;
                         }
-                        router.post(route('jahit.output.approve', qcItem.id), {
+                        router.post(route('cutting.output.approve', qcItem.id), {
                             pcs_approved: total,
                             rincian_ukuran: qcSizes,
                             catatan_mandor: 'Lolos QC'
@@ -495,7 +495,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                     }} className="p-6">
                         <h2 className="text-[18px] font-oswald font-bold text-ink mb-2">Approval QC: {qcItem.order?.no_order}</h2>
                         <p className="text-[13px] text-ink-soft mb-4 leading-relaxed">
-                            Penjahit <strong>{qcItem.operator?.name}</strong> mengklaim <strong>{qcItem.pcs_klaim} pcs</strong> selesai. 
+                            Pemotong <strong>{qcItem.operator?.name}</strong> mengklaim <strong>{qcItem.pcs_klaim} pcs</strong> selesai. 
                             Silakan masukkan jumlah yang <strong>Lolos QC</strong> untuk masing-masing ukuran.
                         </p>
 
@@ -541,7 +541,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                 <form onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
-                    router.post(route('jahit.qc-reject', selectedOrder.id), {
+                    router.post(route('cutting.qc-reject', selectedOrder.id), {
                         operator_id: formData.get('operator_id'),
                         jumlah: formData.get('jumlah'),
                         alasan: formData.get('alasan')
@@ -550,13 +550,13 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
                     });
                 }} className="p-6">
                     <h2 className="text-[18px] font-oswald font-bold text-ink mb-4">Tandai Reject (Final QC)</h2>
-                    <p className="text-[13px] text-ink-soft mb-4 leading-relaxed">Masukan barang yang tidak lolos QC akhir untuk diperbaiki kembali oleh penjahit terkait.</p>
+                    <p className="text-[13px] text-ink-soft mb-4 leading-relaxed">Masukan barang yang tidak lolos QC akhir untuk diperbaiki kembali oleh pemotong terkait.</p>
 
                     <div className="mb-4">
-                        <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Penjahit yang mengerjakan</label>
+                        <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Pemotong yang mengerjakan</label>
                         <select name="operator_id" required className="w-full border-line bg-panel text-ink rounded focus:border-navy focus:ring-navy text-[13px]">
-                            <option value="">-- Pilih Penjahit --</option>
-                            {selectedOrder?.jahit_assigns?.map(a => (
+                            <option value="">-- Pilih Pemotong --</option>
+                            {selectedOrder?.cutting_assigns?.map(a => (
                                 <option key={a.operator?.id} value={a.operator?.id}>{a.operator?.name}</option>
                             ))}
                         </select>
@@ -569,7 +569,7 @@ export default function IndexMandor({ ordersJahit, operatorList, stats, progresP
 
                     <div className="mb-6">
                         <label className="block text-[11.5px] font-medium text-ink-soft uppercase tracking-wider mb-1">Alasan / Penyebab</label>
-                        <textarea name="alasan" required rows="2" className="w-full border-line bg-panel text-ink rounded focus:border-navy focus:ring-navy text-[13px]" placeholder="Misal: Jahitan kerah miring"></textarea>
+                        <textarea name="alasan" required rows="2" className="w-full border-line bg-panel text-ink rounded focus:border-navy focus:ring-navy text-[13px]" placeholder="Misal: Cuttingan kerah miring"></textarea>
                     </div>
 
                     <div className="flex justify-end gap-2">

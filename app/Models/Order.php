@@ -30,28 +30,28 @@ class Order extends Model
         self::STATUS_DRAFT => 'Draft',
         self::STATUS_DESAIN => 'Desain',
         self::STATUS_PROCUREMENT => 'Procurement',
-        self::STATUS_CUTTING => 'Cutting',
-        self::STATUS_JAHIT => 'Jahit',
-        self::STATUS_PRODUKSI => 'Produksi',
         self::STATUS_PRINTING => 'Printing',
         self::STATUS_PEMASANGAN => 'Pemasangan',
+        self::STATUS_CUTTING => 'Cutting',
+        self::STATUS_JAHIT => 'Jahit',
         self::STATUS_PACKING => 'Packing',
         self::STATUS_DIKIRIM => 'Dikirim',
         self::STATUS_SELESAI => 'Selesai',
+        self::STATUS_PRODUKSI => 'Produksi',
     ];
 
     public const STATUS_COLORS = [
         self::STATUS_DRAFT => 'gray',
         self::STATUS_DESAIN => 'blue',
         self::STATUS_PROCUREMENT => 'yellow',
-        self::STATUS_CUTTING => 'lime',
-        self::STATUS_JAHIT => 'cyan',
-        self::STATUS_PRODUKSI => 'orange',
         self::STATUS_PRINTING => 'purple',
         self::STATUS_PEMASANGAN => 'pink',
+        self::STATUS_CUTTING => 'lime',
+        self::STATUS_JAHIT => 'cyan',
         self::STATUS_PACKING => 'teal',
         self::STATUS_DIKIRIM => 'indigo',
         self::STATUS_SELESAI => 'green',
+        self::STATUS_PRODUKSI => 'orange',
     ];
 
     protected $fillable = [
@@ -119,6 +119,16 @@ class Order extends Model
     public function cutting(): HasOne
     {
         return $this->hasOne(ProduksiCutting::class);
+    }
+
+    public function cuttingAssigns(): HasMany
+    {
+        return $this->hasMany(ProduksiCuttingAssign::class);
+    }
+
+    public function cuttingOutputs(): HasMany
+    {
+        return $this->hasMany(ProduksiCuttingOutput::class);
     }
 
     public function jahitAssigns(): HasMany

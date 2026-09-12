@@ -15,7 +15,7 @@ export default function Show({ order, operatorList }) {
     });
 
     const { data: completeData, setData: setCompleteData, post: postComplete, processing: completeProcessing } = useForm({
-        next_divisi: 'pemasangan',
+        next_divisi: 'packing',
         catatan: ''
     });
 
@@ -57,18 +57,6 @@ export default function Show({ order, operatorList }) {
                     <Card title="Selesaikan Order">
                         <form onSubmit={handleComplete} className="space-y-4">
                             <div>
-                                <InputLabel htmlFor="next_divisi" value="Lanjutkan Ke Divisi" />
-                                <select 
-                                    id="next_divisi"
-                                    className="border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm w-full mt-1 block"
-                                    value={completeData.next_divisi}
-                                    onChange={e => setCompleteData('next_divisi', e.target.value)}
-                                >
-                                    <option value="pemasangan">Pemasangan / Finishing</option>
-                                    <option value="printing">Printing / Sablon</option>
-                                </select>
-                            </div>
-                            <div>
                                 <InputLabel htmlFor="catatan_complete" value="Catatan (Opsional)" />
                                 <TextInput
                                     id="catatan_complete"
@@ -76,6 +64,7 @@ export default function Show({ order, operatorList }) {
                                     className="mt-1 block w-full"
                                     value={completeData.catatan}
                                     onChange={e => setCompleteData('catatan', e.target.value)}
+                                    placeholder="Contoh: Jahitan sudah rapi, barang siap packing."
                                 />
                             </div>
                             <PrimaryButton disabled={completeProcessing}>Selesai Jahit</PrimaryButton>

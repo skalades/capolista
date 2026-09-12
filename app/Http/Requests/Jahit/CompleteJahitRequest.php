@@ -14,7 +14,6 @@ class CompleteJahitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'next_divisi' => 'required|in:printing,pemasangan',
             'catatan'     => 'nullable|string|max:500',
         ];
     }

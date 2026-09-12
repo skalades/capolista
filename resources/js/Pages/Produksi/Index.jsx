@@ -19,11 +19,12 @@ const TABS = [
 
 const KANBAN_COLUMNS = [
     { key: 'desain',     title: 'Desain',                      color: 'blue',   link: 'desain.show' },
-    { key: 'produksi',   title: 'Menunggu Jadwal (Produksi)',   color: 'gray',   link: 'orders.show' },
+    { key: 'procurement',title: 'Procurement',                 color: 'yellow', link: 'orders.show' },
+    { key: 'printing',   title: 'Printing',                     color: 'purple', link: 'printing.show' },
+    { key: 'pemasangan', title: 'Pemasangan',                   color: 'pink',   link: 'pemasangan.show' },
     { key: 'cutting',    title: 'Cutting',                      color: 'green',  link: 'cutting.show' },
     { key: 'jahit',      title: 'Jahit',                        color: 'indigo', link: 'jahit.show' },
-    { key: 'printing',   title: 'Printing',                     color: 'yellow', link: 'printing.show' },
-    { key: 'pemasangan', title: 'Pemasangan',                   color: 'red',    link: 'pemasangan.show' },
+    { key: 'produksi',   title: 'Menunggu Jadwal (Lainnya)',    color: 'gray',   link: 'orders.show' },
 ];
 
 // Filter options untuk kanban
@@ -182,10 +183,28 @@ export default function Index({ ordersByStatus, bottlenecks, statsPerDivisi, esk
                                                             <ClockIcon className="w-5 h-5" />
                                                         </div>
                                                     )}
-                                                    {/* Tombol mulai cutting untuk order di kolom produksi */}
+                                                    {/* Tombol mulai proses untuk order di kolom procurement dan produksi */}
+                                                    {col.key === 'procurement' && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (confirm('Lanjutkan order ini ke Divisi Printing?')) {
+                                                                    router.post(route('orders.update-status', order.id), { status: 'printing', catatan: 'Diteruskan ke printing' });
+                                                                }
+                                                            }}
+                                                            className="absolute bottom-3 right-3 text-xs bg-brand-50 text-brand-700 hover:bg-brand-100 px-3 py-1.5 rounded font-medium transition-colors border border-brand-200 shadow-sm"
+                                                        >
+                                                            Kirim ke Printing
+                                                        </button>
+                                                    )}
                                                     {col.key === 'produksi' && (
                                                         <button
-                                                            onClick={(e) => forwardToCutting(order.id, e)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (confirm('Jadwalkan order ini untuk mulai dikerjakan di Divisi Cutting?')) {
+                                                                    router.post(route('orders.update-status', order.id), { status: 'cutting', catatan: 'Dijadwalkan untuk cutting' });
+                                                                }
+                                                            }}
                                                             className="absolute bottom-3 right-3 text-xs bg-brand-50 text-brand-700 hover:bg-brand-100 px-3 py-1.5 rounded font-medium transition-colors border border-brand-200 shadow-sm"
                                                         >
                                                             Mulai Cutting

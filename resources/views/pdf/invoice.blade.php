@@ -4,143 +4,198 @@
     <meta charset="utf-8">
     <title>INVOICE - {{ $order->no_order }}</title>
     <style>
-        body { font-family: sans-serif; font-size: 14px; }
-        .header { display: table; width: 100%; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .header-left { display: table-cell; width: 50%; vertical-align: top; }
-        .header-right { display: table-cell; width: 50%; text-align: right; vertical-align: top; }
-        .header h1 { margin: 0; font-size: 28px; color: #333; }
-        .company-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .info-box { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; }
-        .info-table { width: 100%; }
-        .info-table td { padding: 3px; }
-        .details-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .details-table th, .details-table td { border: 1px solid #ddd; padding: 8px; }
-        .details-table th { background-color: #f2f2f2; text-align: center; }
-        .totals-table { width: 40%; float: right; margin-top: 20px; border-collapse: collapse; }
-        .totals-table td { padding: 5px; }
-        .totals-table .amount { text-align: right; font-weight: bold; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333; margin: 0; padding: 0; }
+        .top-bar { height: 10px; background-color: #29394A; width: 100%; position: absolute; top: -45px; left: -45px; right: -45px; } /* Assuming dompdf margin */
+        .container { padding-top: 20px; }
+        
+        .header { width: 100%; margin-bottom: 20px; }
+        .header td { vertical-align: middle; }
+        .header-logo { width: 80px; }
+        .header-logo img { width: 60px; }
+        .header-company { color: #29394A; }
+        .header-company h1 { margin: 0; font-size: 24px; font-weight: bold; }
+        .header-company p { margin: 3px 0 0 0; color: #777; font-size: 11px; }
+        .header-title { text-align: right; font-size: 28px; color: #B0B0B0; font-weight: bold; letter-spacing: 8px; }
+        
+        .divider { border-bottom: 1px solid #E5E7EB; margin-bottom: 25px; }
+        
+        .meta-table { width: 100%; margin-bottom: 30px; }
+        .meta-table td { vertical-align: top; }
+        .meta-left { width: 45%; }
+        .meta-box { background-color: #F8F9FA; padding: 15px; border-radius: 8px; }
+        .meta-box table { width: 100%; }
+        .meta-box td { padding: 4px 0; font-size: 12px; }
+        .meta-box td:first-child { color: #666; font-weight: bold; width: 40%; }
+        .badge-lunas { display: inline-block; background-color: #10B981; color: white; padding: 5px 15px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-top: 10px; text-align: center; }
+        .badge-belum { display: inline-block; background-color: #F59E0B; color: white; padding: 5px 15px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-top: 10px; text-align: center; }
+        
+        .meta-right { width: 50%; padding-left: 20px; }
+        .meta-right p { margin: 2px 0; font-size: 13px; }
+        .meta-right .label { color: #666; font-weight: bold; font-size: 12px; margin-bottom: 8px; }
+        
+        .items-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 25px; }
+        .items-table th { background-color: #29394A; color: white; padding: 10px; text-align: left; font-size: 12px; }
+        .items-table th:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
+        .items-table th:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; text-align: right; }
+        .items-table td { padding: 12px 10px; border-bottom: 1px solid #E5E7EB; font-size: 13px; }
+        .items-table td:last-child { text-align: right; }
+        
+        .summary-wrapper { width: 100%; }
+        .summary-table { width: 45%; float: right; background-color: #F8F9FA; border-radius: 8px; padding: 15px; border-collapse: separate; }
+        .summary-table td { padding: 6px 15px; font-size: 13px; }
+        .summary-table td:first-child { color: #555; font-weight: bold; }
+        .summary-table td:last-child { text-align: right; font-weight: bold; }
+        .summary-divider td { border-bottom: 1px solid #E5E7EB; padding-bottom: 10px; }
+        .summary-table tr:last-child td { padding-top: 10px; }
+        .text-green { color: #10B981; }
+        .text-red { color: #EF4444; }
+        
         .clearfix { clear: both; }
-        .footer { margin-top: 50px; font-size: 12px; color: #555; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
-        .signature-box { width: 30%; float: right; text-align: center; margin-top: 30px; }
-        .signature-line { border-bottom: 1px solid #000; margin-top: 60px; width: 100%; }
+        
+        .bottom-section { width: 100%; margin-top: 50px; }
+        .bottom-left { width: 45%; float: left; }
+        .payment-info { background-color: #F0F8FF; padding: 15px; border-radius: 8px; }
+        .payment-info h4 { color: #0284C7; margin: 0 0 5px 0; font-size: 13px; }
+        .payment-info p { color: #0369A1; margin: 0; font-size: 12px; }
+        
+        .bottom-right { width: 40%; float: right; text-align: center; }
+        .signature-text { margin-bottom: 60px; font-size: 13px; }
+        .signature-line { border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 5px; }
+        .signature-name { color: #777; font-size: 12px; }
+        
+        .footer { text-align: center; color: #9CA3AF; font-style: italic; font-size: 11px; margin-top: 60px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            @if(\App\Helpers\SettingsHelper::get('company.logo'))
-                <img src="{{ public_path('storage/' . \App\Helpers\SettingsHelper::get('company.logo')) }}" alt="Logo" style="max-height: 50px; margin-bottom: 10px;">
-            @endif
-            <div class="company-name">{{ \App\Helpers\SettingsHelper::get('company.name', 'CAPOLISTA') }}</div>
-            <p style="margin:0;">{!! nl2br(e(\App\Helpers\SettingsHelper::get('company.address', 'Alamat Perusahaan'))) !!}</p>
-        </div>
-        <div class="header-right">
-            <h1>INVOICE</h1>
-            <p>No: <strong>{{ $order->no_order }}</strong><br>Tanggal: {{ date('d M Y') }}</p>
-        </div>
-    </div>
+    @php
+        $isLunas = $order->sisa_bayar <= 0;
+    @endphp
 
-    <div class="info-box">
-        <table class="info-table">
+    <div class="top-bar"></div>
+    
+    <div class="container">
+        <table class="header">
             <tr>
-                <td style="width:100px;"><strong>Kepada:</strong></td>
-                <td>{{ $order->customer->nama ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td><strong>Kontak:</strong></td>
-                <td>{{ $order->customer->kontak ?? '-' }}</td>
-            </tr>
-            <tr>
-                <td><strong>Alamat:</strong></td>
-                <td>{{ $order->customer->alamat ?? '-' }}</td>
+                @if(\App\Helpers\SettingsHelper::get('company.logo'))
+                <td class="header-logo">
+                    <img src="{{ public_path('storage/' . \App\Helpers\SettingsHelper::get('company.logo')) }}" alt="Logo">
+                </td>
+                @endif
+                <td class="header-company">
+                    <h1>{{ \App\Helpers\SettingsHelper::get('company.name', 'CAPOLISTA APPAREL') }}</h1>
+                    <p>{{ \App\Helpers\SettingsHelper::get('company.address', 'Jl. Contoh No. 123, Kota') }}</p>
+                </td>
+                <td class="header-title">
+                    INVOICE
+                </td>
             </tr>
         </table>
-    </div>
-
-    <table class="details-table">
-        <thead>
+        
+        <div class="divider"></div>
+        
+        <table class="meta-table">
             <tr>
-                <th>No</th>
-                <th>Deskripsi Produk</th>
-                <th>Jumlah</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="text-align: center;">1</td>
-                <td>
-                    <strong>{{ $order->jenis_produk }}</strong><br>
-                    <small>
-                    @if($order->ukuran_detail)
-                        @foreach($order->ukuran_detail as $k => $v)
-                            {{ ucfirst($k) }}: {{ $v }} | 
-                        @endforeach
-                    @endif
-                    </small>
+                <td class="meta-left">
+                    <div class="meta-box">
+                        <table>
+                            <tr>
+                                <td>Nomor Order:</td>
+                                <td>{{ $order->no_order }}</td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Order:</td>
+                                <td>{{ \Carbon\Carbon::parse($order->tanggal_order)->format('d/m/Y') }}</td>
+                            </tr>
+                        </table>
+                        @if($isLunas)
+                            <div class="badge-lunas">LUNAS</div>
+                        @else
+                            <div class="badge-belum">BELUM LUNAS</div>
+                        @endif
+                    </div>
                 </td>
-                <td style="text-align: center;">{{ $order->jumlah }}</td>
-                <td style="text-align: right;">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                <td style="width: 5%;"></td>
+                <td class="meta-right">
+                    <div class="label">Kepada Yth:</div>
+                    <p style="font-weight: bold; font-size: 14px;">{{ $order->customer->nama ?? '-' }}</p>
+                    <p>{{ $order->customer->alamat ?? '-' }}</p>
+                    <p style="margin-top: 10px;">{{ $order->customer->kontak ?? '-' }}</p>
+                </td>
             </tr>
-        </tbody>
-    </table>
-
-    <table class="totals-table">
-        <tr>
-            <td>Total</td>
-            <td class="amount">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td>Uang Muka (DP)</td>
-            <td class="amount">Rp {{ number_format($order->dp, 0, ',', '.') }}</td>
-        </tr>
-        <tr>
-            <td style="border-top: 2px solid #000;"><strong>Sisa Tagihan</strong></td>
-            <td class="amount" style="border-top: 2px solid #000;"><strong>Rp {{ number_format($order->sisa_bayar, 0, ',', '.') }}</strong></td>
-        </tr>
-    </table>
-    
-    <div class="clearfix"></div>
-
-    @if($order->pembayarans && $order->pembayarans->count() > 0)
-    <div style="margin-top: 20px;">
-        <h4 style="margin-bottom: 5px;">Riwayat Pembayaran</h4>
-        <table class="details-table" style="width: 60%; margin-top: 0;">
+        </table>
+        
+        <table class="items-table">
             <thead>
                 <tr>
-                    <th style="padding: 4px;">Tanggal</th>
-                    <th style="padding: 4px;">Tipe</th>
-                    <th style="padding: 4px;">Metode</th>
-                    <th style="padding: 4px; text-align: right;">Jumlah</th>
+                    <th>Item Produksi</th>
+                    <th>Ukuran</th>
+                    <th>Jumlah</th>
+                    <th>Harga Satuan</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($order->pembayarans as $pembayaran)
-                <tr>
-                    <td style="padding: 4px; text-align: center;">{{ \Carbon\Carbon::parse($pembayaran->tanggal)->format('d M Y') }}</td>
-                    <td style="padding: 4px; text-align: center;">{{ ucfirst($pembayaran->tipe) }}</td>
-                    <td style="padding: 4px; text-align: center;">{{ ucfirst($pembayaran->metode) }}</td>
-                    <td style="padding: 4px; text-align: right;">Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}</td>
-                </tr>
-                @endforeach
+                @if($order->items && $order->items->count() > 0)
+                    @foreach($order->items as $item)
+                        <tr>
+                            <td>{{ $item->jenis_produk ?: $order->jenis_produk }}</td>
+                            <td>{{ $item->ukuran ?: 'All' }}</td>
+                            <td>{{ $item->jumlah_pcs }} pcs</td>
+                            <td>{{ $item->harga_satuan ? 'Rp ' . number_format($item->harga_satuan, 0, ',', '.') : '-' }}</td>
+                            <td>{{ $item->harga_satuan ? 'Rp ' . number_format($item->harga_satuan * $item->jumlah_pcs, 0, ',', '.') : '-' }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td>{{ $order->jenis_produk }}</td>
+                        <td>All</td>
+                        <td>{{ $order->jumlah }} pcs</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
-    </div>
-    @endif
-
-    <div class="clearfix"></div>
-
-    <div class="signature-box">
-        Hormat Kami,<br>
-        <div class="signature-line"></div>
-        ( Capolista Finance )
-    </div>
-
-    <div class="clearfix"></div>
-
-    <div class="footer">
-        Pembayaran dapat ditransfer ke Rekening {{ \App\Helpers\SettingsHelper::get('company.bank_account', 'BCA: 123456789 a.n. Capolista') }}<br>
-        Terima kasih atas kepercayaan Anda.
+        
+        <div class="summary-wrapper">
+            <table class="summary-table">
+                <tr class="summary-divider">
+                    <td>Total Harga:</td>
+                    <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                </tr>
+                <tr class="summary-divider">
+                    <td>Sudah Dibayar (DP):</td>
+                    <td class="text-green">Rp {{ number_format($order->dp, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td>Sisa Bayar:</td>
+                    <td class="text-red">Rp {{ number_format($order->sisa_bayar, 0, ',', '.') }}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="clearfix"></div>
+        
+        <div class="bottom-section">
+            <div class="bottom-left">
+                <div class="payment-info">
+                    <h4>Informasi Pembayaran</h4>
+                    <p>{{ \App\Helpers\SettingsHelper::get('company.bank_account', 'Belum ada informasi rekening.') }}</p>
+                </div>
+            </div>
+            
+            <div class="bottom-right">
+                <div class="signature-text">Hormat Kami,</div>
+                <div class="signature-line"></div>
+                <div class="signature-name">( Capolista Apparel )</div>
+            </div>
+        </div>
+        
+        <div class="clearfix"></div>
+        
+        <div class="footer">
+            Terima kasih atas pesanan Anda.
+        </div>
     </div>
 </body>
 </html>

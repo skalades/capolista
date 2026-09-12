@@ -1,39 +1,97 @@
 import AppLayout from '@/Layouts/AppLayout';
-import Card from '@/Components/Card';
-import { useForm, Link } from '@inertiajs/react';
-import { useState } from 'react';
-import { PlusIcon } from '@heroicons/react/20/solid';
-import Modal from '@/Components/Modal';
-import TextInput from '@/Components/TextInput';
-import InputLabel from '@/Components/InputLabel';
-import InputError from '@/Components/InputError';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
+import { Head, useForm, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { ArrowLeftIcon, ArrowUpTrayIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+
 export default function OrderCreate({ customers = [] }) {
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
-        jenis_produk: '',
-        jumlah: '',
-        ukuran_detail: { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 },
+        nama_kustomer: '',
+        nomor_kontak: '',
+        alamat_pengiriman: '',
+        items: [
+            { jenis_produk: '', ukuran_detail: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 }, jumlah: 0, harga_satuan: '' }
+        ],
+        jumlah: 0,
         tanggal_order: new Date().toISOString().split('T')[0],
         deadline: '',
+        harga_satuan: '', // Keep for backward compat or just ignore
         total_harga: '',
         dp: '',
         catatan_desain: '',
         catatan: '',
     });
 
-    const handleUkuranChange = (size, value) => {
-        setData('ukuran_detail', {
-            ...data.ukuran_detail,
-            [size]: parseInt(value) || 0
+    const [isUploadDisabled, setIsUploadDisabled] = useState(true);
+
+    // Auto-calculate Total Jumlah & Total Harga based on Sizes and Harga Satuan per item
+    useEffect(() => {
+        let totalAll = 0;
+        let totalHarga = 0;
+        let changed = false;
+        
+        const newItems = data.items.map((item, index) => {
+            const itemTotal = Object.values(item.ukuran_detail).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+            if (item.jumlah !== itemTotal) changed = true;
+            totalAll += itemTotal;
+            
+            const harga = parseInt((item.harga_satuan || '').toString().replace(/\D/g, '')) || 0;
+            totalHarga += (itemTotal * harga);
+            
+            return { ...item, jumlah: itemTotal };
         });
+
+        if (changed || totalAll !== data.jumlah || (totalHarga > 0 && totalHarga.toString() !== data.total_harga)) {
+            setData(d => ({ 
+                ...d, 
+                items: newItems, 
+                jumlah: totalAll,
+                total_harga: totalHarga > 0 ? totalHarga.toString() : d.total_harga
+            }));
+        }
+    }, [data.items]);
+
+    const handleUkuranChange = (index, size, value) => {
+        const parsed = parseInt(value);
+        const newItems = [...data.items];
+        newItems[index].ukuran_detail = {
+            ...newItems[index].ukuran_detail,
+            [size]: isNaN(parsed) ? '' : parsed
+        };
+        setData('items', newItems);
+    };
+
+    const handleJenisProdukChange = (index, value) => {
+        const newItems = [...data.items];
+        newItems[index].jenis_produk = value;
+        setData('items', newItems);
+    };
+
+    const handleItemHargaChange = (index, value) => {
+        const newItems = [...data.items];
+        const numericValue = value.replace(/\D/g, '');
+        newItems[index].harga_satuan = numericValue;
+        setData('items', newItems);
+    };
+
+    const addItem = () => {
+        setData('items', [
+            ...data.items, 
+            { jenis_produk: '', ukuran_detail: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 }, jumlah: 0, harga_satuan: '' }
+        ]);
+    };
+
+    const removeItem = (index) => {
+        if (data.items.length > 1) {
+            const newItems = data.items.filter((_, i) => i !== index);
+            setData('items', newItems);
+        }
     };
 
     const formatRupiahInput = (value) => {
-        if (!value) return '';
+        if (!value && value !== 0) return '';
         const number = parseInt(value.toString().replace(/\D/g, ''), 10);
-        return isNaN(number) ? '' : number.toLocaleString('id-ID');
+        return isNaN(number) ? '' : 'Rp ' + number.toLocaleString('id-ID');
     };
 
     const handleNumberChange = (field, value) => {
@@ -41,248 +99,285 @@ export default function OrderCreate({ customers = [] }) {
         setData(field, numericValue);
     };
 
-
     const submit = (e) => {
         e.preventDefault();
         post(route('orders.store'));
     };
 
-    const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
-    
-    const customerForm = useForm({
-        nama: '',
-        kontak: '',
-        email: '',
-        alamat: '',
-        catatan: '',
-    });
-
-    const submitCustomer = (e) => {
-        e.preventDefault();
-        customerForm.post(route('customers.store'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                setIsCustomerModalOpen(false);
-                customerForm.reset();
-            },
-        });
-    };
-
     return (
         <AppLayout title="Buat Order Baru">
-            <Card>
-                <form onSubmit={submit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Kolom Kiri */}
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Customer</label>
-                                <div className="mt-2 flex gap-2">
-                                    <select
-                                        value={data.customer_id}
-                                        onChange={e => setData('customer_id', e.target.value)}
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
-                                    >
-                                        <option value="">Pilih Customer</option>
-                                        {customers.map(c => (
-                                            <option key={c.id} value={c.id}>{c.nama}</option>
-                                        ))}
-                                    </select>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setIsCustomerModalOpen(true)}
-                                        className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-navy shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                        <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                                        Baru
-                                    </button>
-                                </div>
-                                {errors.customer_id && <p className="mt-2 text-sm text-red-600">{errors.customer_id}</p>}
-                            </div>
+            <Head title="Buat Order Baru" />
 
+            <div className="max-w-5xl mx-auto space-y-6 pb-20">
+                {/* TOP BAR */}
+                <div className="flex justify-between items-center mb-6">
+                    <Link 
+                        href={route('orders.index')} 
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#F3EFE6] border border-line rounded-full text-[13px] font-bold text-ink hover:bg-line/30 transition-colors"
+                    >
+                        <ArrowLeftIcon className="w-4 h-4" />
+                        Kembali
+                    </Link>
+
+                    <button
+                        onClick={submit}
+                        disabled={processing}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-navy border border-transparent rounded-full text-[13px] font-bold text-white shadow-sm hover:bg-navy/90 transition-colors disabled:opacity-50"
+                    >
+                        <DocumentTextIcon className="w-4 h-4" />
+                        Simpan Order
+                    </button>
+                </div>
+
+                <form onSubmit={submit} className="space-y-6">
+                    
+                    {/* DATA KUSTOMER */}
+                    <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
+                        <h2 className="font-oswald text-[18px] font-bold text-ink mb-4 pb-2 border-b border-line uppercase tracking-wide">
+                            Data Kustomer
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Jenis Produk</label>
+                                <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                    Nama Kustomer / Instansi
+                                </label>
                                 <input
                                     type="text"
-                                    value={data.jenis_produk}
-                                    onChange={e => setData('jenis_produk', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                    value={data.nama_kustomer}
+                                    onChange={e => setData('nama_kustomer', e.target.value)}
+                                    placeholder="Mis. Universitas Brawijaya"
+                                    className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
                                 />
-                                {errors.jenis_produk && <p className="mt-2 text-sm text-red-600">{errors.jenis_produk}</p>}
+                                {errors.nama_kustomer && <p className="mt-1 text-[11px] text-danger">{errors.nama_kustomer}</p>}
                             </div>
-
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Total Jumlah</label>
+                                <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                    Nomor Kontak (WA)
+                                </label>
                                 <input
-                                    type="number"
-                                    value={data.jumlah}
-                                    onChange={e => setData('jumlah', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                    type="text"
+                                    value={data.nomor_kontak}
+                                    onChange={e => setData('nomor_kontak', e.target.value)}
+                                    placeholder="08123456789"
+                                    className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
                                 />
-                                {errors.jumlah && <p className="mt-2 text-sm text-red-600">{errors.jumlah}</p>}
-                            </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">Detail Ukuran</label>
-                                <div className="grid grid-cols-3 gap-3">
-                                    {Object.keys(data.ukuran_detail).map(size => (
-                                        <div key={size} className="flex items-center gap-2">
-                                            <span className="w-10 text-sm font-medium text-gray-700">{size}</span>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={data.ukuran_detail[size] || ''}
-                                                onChange={e => handleUkuranChange(size, e.target.value)}
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
+                                {errors.nomor_kontak && <p className="mt-1 text-[11px] text-danger">{errors.nomor_kontak}</p>}
                             </div>
                         </div>
 
-                        {/* Kolom Kanan */}
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">Tanggal Order</label>
-                                    <input
-                                        type="date"
-                                        value={data.tanggal_order}
-                                        onChange={e => setData('tanggal_order', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">Deadline</label>
-                                    <input
-                                        type="date"
-                                        value={data.deadline}
-                                        onChange={e => setData('deadline', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
-                                    />
-                                </div>
-                            </div>
+                        <div>
+                            <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                Alamat Pengiriman
+                            </label>
+                            <textarea
+                                rows={3}
+                                value={data.alamat_pengiriman}
+                                onChange={e => setData('alamat_pengiriman', e.target.value)}
+                                placeholder="Alamat lengkap kustomer..."
+                                className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2 resize-none"
+                            />
+                        </div>
+                    </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                    {/* DETAIL PRODUK & UKURAN */}
+                    <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
+                        <div className="flex justify-between items-center mb-4 pb-2 border-b border-line">
+                            <h2 className="font-oswald text-[18px] font-bold text-ink uppercase tracking-wide">
+                                Detail Produk & Ukuran
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={addItem}
+                                className="text-[12px] font-bold text-navy hover:text-navy/80 bg-navy/10 px-3 py-1.5 rounded-full transition-colors"
+                            >
+                                + Tambah Produk
+                            </button>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                Batas Waktu (Deadline)
+                            </label>
+                            <input
+                                type="date"
+                                value={data.deadline}
+                                onChange={e => setData('deadline', e.target.value)}
+                                className="block w-full md:w-1/2 border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
+                            />
+                            {errors.deadline && <p className="mt-1 text-[11px] text-danger">{errors.deadline}</p>}
+                        </div>
+
+                        <div className="space-y-6">
+                            {data.items.map((item, index) => (
+                                <div key={index} className="p-4 bg-white border border-line rounded-md relative group">
+                                    {data.items.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeItem(index)}
+                                            className="absolute top-4 right-4 text-[11px] font-bold text-danger hover:text-danger/80 bg-danger/10 px-2 py-1 rounded transition-colors"
+                                        >
+                                            Hapus
+                                        </button>
+                                    )}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                        <div>
+                                            <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                                Jenis Produk #{index + 1}
+                                            </label>
+                                            <select
+                                                value={item.jenis_produk}
+                                                onChange={e => handleJenisProdukChange(index, e.target.value)}
+                                                className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
+                                            >
+                                                <option value="">Pilih Jenis Produk...</option>
+                                                <option value="Kaos Oblong">Kaos Oblong</option>
+                                                <option value="Kemeja PDH">Kemeja PDH</option>
+                                                <option value="Jaket">Jaket</option>
+                                                <option value="Jersey">Jersey</option>
+                                                <option value="Celana">Celana</option>
+                                                <option value="Lainnya">Lainnya...</option>
+                                            </select>
+                                            {errors[`items.${index}.jenis_produk`] && <p className="mt-1 text-[11px] text-danger">{errors[`items.${index}.jenis_produk`]}</p>}
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                                Harga Satuan (Rp)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={formatRupiahInput(item.harga_satuan)}
+                                                onChange={e => handleItemHargaChange(index, e.target.value)}
+                                                placeholder="Contoh: 100.000"
+                                                className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-2">
+                                            Rincian Ukuran (Pcs)
+                                        </label>
+                                        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                                            {Object.keys(item.ukuran_detail).map(size => (
+                                                <div key={size} className="flex items-center gap-3">
+                                                    <span className="font-bold text-[14px] text-ink w-4">{size}</span>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        value={item.ukuran_detail[size] || ''}
+                                                        onChange={e => handleUkuranChange(index, size, e.target.value)}
+                                                        placeholder="0"
+                                                        className="block w-24 border-line bg-white rounded-md text-[13px] text-center font-semibold text-ink focus:ring-navy focus:border-navy py-1.5"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-4 pt-3 border-t border-line border-dashed flex justify-between items-center text-[12px]">
+                            <span className="text-ink-soft">Total Seluruh Item (Otomatis):</span>
+                            <span className="font-bold text-ink text-[14px] bg-bg px-3 py-1 rounded border border-line">{data.jumlah || 0} Pcs</span>
+                        </div>
+                    </div>
+
+                    {/* TWO COLUMNS: PEMBAYARAN & DESAIN */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        {/* PEMBAYARAN */}
+                        <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
+                            <h2 className="font-oswald text-[18px] font-bold text-ink mb-4 pb-2 border-b border-line uppercase tracking-wide">
+                                Pembayaran
+                            </h2>
+
+                            <div className="space-y-5">
+
                                 <div>
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">Total Harga (Rp)</label>
+                                    <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                        Total Harga (Rp)
+                                    </label>
                                     <input
                                         type="text"
                                         value={formatRupiahInput(data.total_harga)}
                                         onChange={e => handleNumberChange('total_harga', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                        placeholder="Rp 0"
+                                        className="block w-full border-line bg-gray-50 rounded-md text-[13px] font-semibold text-ink focus:ring-navy focus:border-navy py-2"
                                     />
-                                    {errors.total_harga && <p className="mt-2 text-sm text-red-600">{errors.total_harga}</p>}
+                                    <p className="mt-1 text-[10px] text-ink-soft">Dihitung otomatis dari Jumlah Pcs x Harga Satuan (Bisa diubah manual)</p>
+                                    {errors.total_harga && <p className="mt-1 text-[11px] text-danger">{errors.total_harga}</p>}
                                 </div>
+
                                 <div>
-                                    <label className="block text-sm font-medium leading-6 text-gray-900">DP (Rp)</label>
+                                    <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                        Uang Muka / DP (Rp)
+                                    </label>
                                     <input
                                         type="text"
                                         value={formatRupiahInput(data.dp)}
                                         onChange={e => handleNumberChange('dp', e.target.value)}
-                                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                        placeholder="Rp 0"
+                                        className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
                                     />
-                                    {errors.dp && <p className="mt-2 text-sm text-red-600">{errors.dp}</p>}
                                 </div>
                             </div>
+                        </div>
 
+                        {/* DESAIN & LAMPIRAN */}
+                        <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
+                            <h2 className="font-oswald text-[18px] font-bold text-ink mb-4 pb-2 border-b border-line uppercase tracking-wide">
+                                Desain & Lampiran
+                            </h2>
+
+                            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-line px-6 py-12 bg-white/50 relative">
+                                <div className="text-center">
+                                    <ArrowUpTrayIcon className="mx-auto h-10 w-10 text-ink-soft mb-3" aria-hidden="true" />
+                                    <div className="mt-4 flex flex-col text-[13px] leading-6 text-ink-soft">
+                                        <span className="font-bold text-ink">Klik untuk unggah file desain</span>
+                                        <span className="text-[11px] mt-1">Sistem Upload dinonaktifkan sementara</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CATATAN */}
+                    <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
+                        <h2 className="font-oswald text-[18px] font-bold text-ink mb-4 pb-2 border-b border-line uppercase tracking-wide">
+                            Catatan
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Desain</label>
+                                <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                    Catatan Desain
+                                </label>
                                 <textarea
                                     rows={3}
                                     value={data.catatan_desain}
                                     onChange={e => setData('catatan_desain', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                    placeholder="Instruksi khusus desain (warna, sablon, letak logo, dll)..."
+                                    className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2 resize-none"
                                 />
                             </div>
-
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Umum</label>
+                                <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                    Catatan Tambahan (Internal/Produksi)
+                                </label>
                                 <textarea
                                     rows={3}
                                     value={data.catatan}
                                     onChange={e => setData('catatan', e.target.value)}
-                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                    placeholder="Catatan untuk bagian produksi atau admin..."
+                                    className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2 resize-none"
                                 />
                             </div>
                         </div>
                     </div>
-
-                    <div className="mt-6 flex items-center justify-end gap-x-6 border-t border-gray-200 pt-6">
-                        <Link href={route('orders.index')} className="text-sm font-semibold leading-6 text-gray-900">
-                            Batal
-                        </Link>
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="rounded-md bg-navy px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-navy/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy disabled:opacity-50"
-                        >
-                            Simpan Order
-                        </button>
-                    </div>
                 </form>
-            </Card>
-
-            <Modal show={isCustomerModalOpen} onClose={() => setIsCustomerModalOpen(false)}>
-                <form onSubmit={submitCustomer} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Tambah Customer Baru</h2>
-                    
-                    <div className="space-y-4">
-                        <div>
-                            <InputLabel htmlFor="nama" value="Nama Customer" />
-                            <TextInput
-                                id="nama"
-                                type="text"
-                                className="mt-1 block w-full"
-                                value={customerForm.data.nama}
-                                onChange={e => customerForm.setData('nama', e.target.value)}
-                            />
-                            <InputError message={customerForm.errors.nama} className="mt-2" />
-                        </div>
-                        
-                        <div>
-                            <InputLabel htmlFor="kontak" value="Kontak (No HP/WA)" />
-                            <TextInput
-                                id="kontak"
-                                type="text"
-                                className="mt-1 block w-full"
-                                value={customerForm.data.kontak}
-                                onChange={e => customerForm.setData('kontak', e.target.value)}
-                            />
-                            <InputError message={customerForm.errors.kontak} className="mt-2" />
-                        </div>
-                        
-                        <div>
-                            <InputLabel htmlFor="email" value="Email (Opsional)" />
-                            <TextInput
-                                id="email"
-                                type="email"
-                                className="mt-1 block w-full"
-                                value={customerForm.data.email}
-                                onChange={e => customerForm.setData('email', e.target.value)}
-                            />
-                            <InputError message={customerForm.errors.email} className="mt-2" />
-                        </div>
-                        
-                        <div>
-                            <InputLabel htmlFor="alamat" value="Alamat (Opsional)" />
-                            <textarea
-                                id="alamat"
-                                className="mt-1 block w-full border-gray-300 focus:border-navy focus:ring-navy rounded-md shadow-sm"
-                                value={customerForm.data.alamat}
-                                onChange={e => customerForm.setData('alamat', e.target.value)}
-                                rows={2}
-                            />
-                            <InputError message={customerForm.errors.alamat} className="mt-2" />
-                        </div>
-                    </div>
-                    
-                    <div className="mt-6 flex justify-end gap-3">
-                        <SecondaryButton onClick={() => setIsCustomerModalOpen(false)}>Batal</SecondaryButton>
-                        <PrimaryButton disabled={customerForm.processing}>Simpan Customer</PrimaryButton>
-                    </div>
-                </form>
-            </Modal>
+            </div>
         </AppLayout>
     );
 }

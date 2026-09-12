@@ -1,5 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import colors from 'tailwindcss/colors';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -18,6 +19,7 @@ export default {
                 mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
             },
             colors: {
+                brand: colors.blue,
                 // Background & Surface
                 bg: '#F3EFE6',
                 panel: '#FBF9F4',
