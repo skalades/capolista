@@ -76,8 +76,21 @@ export default function UserIndex({ users, roles = [], filters = {} }) {
                                         <Link href={route('users.edit', user.id)} className="text-blue-600 hover:text-blue-900 mr-3">
                                             Edit
                                         </Link>
-                                        <button className="text-gray-600 hover:text-gray-900">
+                                        <button 
+                                            onClick={() => router.post(route('users.toggle-active', user.id))}
+                                            className="text-gray-600 hover:text-gray-900 mr-3"
+                                        >
                                             Toggle Status
+                                        </button>
+                                        <button 
+                                            onClick={() => {
+                                                if(confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
+                                                    router.delete(route('users.destroy', user.id));
+                                                }
+                                            }}
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            Hapus
                                         </button>
                                     </Table.Cell>
                                 </Table.Row>
