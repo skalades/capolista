@@ -134,6 +134,8 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::patch('/gudang/stok/{stok}', [GudangController::class, 'stokUpdate'])->name('gudang.stok.update');
         Route::get('/gudang/packing/{order}', [GudangController::class, 'packingShow'])->name('gudang.packing.show');
         Route::patch('/gudang/packing/{packing}', [GudangController::class, 'packingUpdate'])->name('gudang.packing.update');
+        Route::get('/gudang/packing/{order}/print-label', [GudangController::class, 'printLabel'])->name('gudang.packing.print-label');
+        Route::get('/gudang/packing/{order}/print-surat-jalan', [GudangController::class, 'printSuratJalan'])->name('gudang.packing.print-surat-jalan');
         Route::get('/gudang/opname', [GudangController::class, 'opnameIndex'])->name('gudang.opname.index');
         Route::get('/gudang/opname/create', [GudangController::class, 'opnameCreate'])->name('gudang.opname.create');
         Route::post('/gudang/opname', [GudangController::class, 'opnameStore'])->name('gudang.opname.store');

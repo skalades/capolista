@@ -7,10 +7,14 @@ import StatusTimeline from '@/Components/StatusTimeline';
 export default function Packing({ order }) {
   const packing = order.packing || {};
   
+  const isKurirInternal = packing.kurir?.startsWith('Internal - ');
+  const [jenisPengiriman, setJenisPengiriman] = useState(isKurirInternal ? 'internal' : 'eksternal');
+  const [supirInternal, setSupirInternal] = useState(isKurirInternal ? packing.kurir.replace('Internal - ', '') : '');
+
   const { data, setData, patch, processing } = useForm({
     kurir: packing.kurir || '',
     no_resi: packing.no_resi || '',
-    tanggal_kirim: packing.tanggal_kirim || '',
+    tanggal_kirim: packing.tanggal_kirim || new Date().toISOString().split('T')[0],
     catatan: packing.catatan || '',
     status: packing.status || 'packing',
   });
@@ -24,6 +28,21 @@ export default function Packing({ order }) {
 
   const handleChecklist = (field) => {
     setChecklist(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const handleJenisPengirimanChange = (jenis) => {
+    setJenisPengiriman(jenis);
+    if (jenis === 'internal') {
+      setData(data => ({ ...data, kurir: supirInternal ? `Internal - ${supirInternal}` : 'Internal - ', no_resi: `SJ-${order.no_order}` }));
+    } else {
+      setData(data => ({ ...data, kurir: '', no_resi: '' }));
+    }
+  };
+
+  const handleSupirChange = (e) => {
+    const val = e.target.value;
+    setSupirInternal(val);
+    setData('kurir', `Internal - ${val}`);
   };
 
   const handleSubmit = (e) => {
@@ -41,12 +60,20 @@ export default function Packing({ order }) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <Card title="Info Order">
-            <div className="grid grid-cols-2 gap-4">
+          <Card title="Info Order" className="flex justify-between items-start">
+            <div className="grid grid-cols-2 gap-4 flex-1">
               <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium">{order.customer?.nama} ({order.customer?.kontak})</p></div>
               <div><p className="text-sm text-gray-500">Alamat Pengiriman</p><p className="font-medium">{order.customer?.alamat}</p></div>
               <div><p className="text-sm text-gray-500">Jenis Produk</p><p className="font-medium">{order.jenis_produk}</p></div>
               <div><p className="text-sm text-gray-500">Jumlah Total</p><p className="font-medium">{order.jumlah}</p></div>
+            </div>
+            <div className="flex flex-col gap-2 ml-4">
+              <a href={route('gudang.packing.print-label', order.id)} target="_blank" className="text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm border">
+                Cetak Label (Stiker)
+              </a>
+              <a href={route('gudang.packing.print-surat-jalan', order.id)} target="_blank" className="text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-sm border">
+                Cetak Surat Jalan
+              </a>
             </div>
           </Card>
 
@@ -55,17 +82,37 @@ export default function Packing({ order }) {
               {Object.keys(checklist).map(key => (
                 <label key={key} className="flex items-center p-3 border rounded-md hover:bg-gray-50 cursor-pointer">
                   <input type="checkbox" checked={checklist[key]} onChange={() => handleChecklist(key)} className="h-5 w-5 rounded border-gray-300 text-brand-600 focus:ring-brand-500" />
-                  <span className="ml-3 text-sm text-gray-700 capitalize">{key.replace('_', ' ')}</span>
+                  <span className="ml-3 text-sm text-gray-700 capitalize">{key.replace(/_/g, ' ')}</span>
                 </label>
               ))}
             </div>
           </Card>
 
           <Card title="Data Pengiriman">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="mb-4 flex gap-4">
+              <label className="flex items-center">
+                <input type="radio" name="jenis_pengiriman" value="eksternal" checked={jenisPengiriman === 'eksternal'} onChange={() => handleJenisPengirimanChange('eksternal')} className="text-brand-600 focus:ring-brand-500" />
+                <span className="ml-2 text-sm text-gray-700">Ekspedisi Eksternal (JNE, dll)</span>
+              </label>
+              <label className="flex items-center">
+                <input type="radio" name="jenis_pengiriman" value="internal" checked={jenisPengiriman === 'internal'} onChange={() => handleJenisPengirimanChange('internal')} className="text-brand-600 focus:ring-brand-500" />
+                <span className="ml-2 text-sm text-gray-700">Kurir Internal (Surat Jalan)</span>
+              </label>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4 border-t pt-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-gray-700">Kurir / Ekspedisi</label><input type="text" value={data.kurir} onChange={e => setData('kurir', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
-                <div><label className="block text-sm font-medium text-gray-700">No. Resi</label><input type="text" value={data.no_resi} onChange={e => setData('no_resi', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                {jenisPengiriman === 'eksternal' ? (
+                  <>
+                    <div><label className="block text-sm font-medium text-gray-700">Nama Ekspedisi</label><input type="text" value={data.kurir} onChange={e => setData('kurir', e.target.value)} placeholder="Contoh: JNE / J&T" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                    <div><label className="block text-sm font-medium text-gray-700">No. Resi</label><input type="text" value={data.no_resi} onChange={e => setData('no_resi', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                  </>
+                ) : (
+                  <>
+                    <div><label className="block text-sm font-medium text-gray-700">Nama Supir Internal</label><input type="text" value={supirInternal} onChange={handleSupirChange} placeholder="Contoh: Budi" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
+                    <div><label className="block text-sm font-medium text-gray-700">No. Surat Jalan</label><input type="text" value={`SJ-${order.no_order}`} disabled className="mt-1 block w-full rounded-md border-gray-200 bg-gray-50 text-gray-500 shadow-sm sm:text-sm" /></div>
+                  </>
+                )}
                 <div><label className="block text-sm font-medium text-gray-700">Tanggal Kirim</label><input type="date" value={data.tanggal_kirim} onChange={e => setData('tanggal_kirim', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" /></div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Status Packing</label>

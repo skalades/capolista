@@ -12,6 +12,7 @@ use App\Models\StokOpnameItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GudangController extends Controller
 {
@@ -111,10 +112,12 @@ class GudangController extends Controller
 
     public function packingUpdate(Request $request, Packing $packing)
     {
+        $isInternal = str_starts_with($request->kurir, 'Internal -');
+
         $request->validate([
             'checklist_packing' => 'nullable|array',
-            'kurir'             => 'nullable|string|max:100',
-            'no_resi'           => 'nullable|string|max:100',
+            'kurir'             => 'required|string|max:100',
+            'no_resi'           => $isInternal ? 'nullable|string|max:100' : 'required_if:status,dikirim|string|max:100',
             'tanggal_kirim'     => 'nullable|date',
             'status'            => 'required|in:packing,siap_kirim,dikirim',
             'catatan'           => 'nullable|string',
@@ -127,18 +130,41 @@ class GudangController extends Controller
 
         if ($request->status === 'dikirim') {
             $order = $packing->order;
-            $order->update(['status' => Order::STATUS_DIKIRIM]);
-
-            OrderLog::create([
-                'order_id'    => $order->id,
-                'user_id'     => auth()->id(),
-                'status_lama' => Order::STATUS_PACKING,
-                'status_baru' => Order::STATUS_DIKIRIM,
-                'catatan'     => 'Order dikirim via ' . ($request->kurir ?? '-') . '. Resi: ' . ($request->no_resi ?? '-'),
-            ]);
+            // Hindari duplikasi OrderLog jika status sebelumnya sudah dikirim
+            if ($order->status !== Order::STATUS_DIKIRIM) {
+                $order->update(['status' => Order::STATUS_DIKIRIM]);
+                
+                OrderLog::create([
+                    'order_id'    => $order->id,
+                    'user_id'     => auth()->id(),
+                    'status_lama' => Order::STATUS_PACKING,
+                    'status_baru' => Order::STATUS_DIKIRIM,
+                    'catatan'     => 'Order dikirim via ' . ($request->kurir ?? '-') . '. Resi/SJ: ' . ($request->no_resi ?? '-'),
+                ]);
+            }
         }
 
-        return back()->with('success', 'Data packing diperbarui.');
+        return back()->with('success', 'Data pengiriman diperbarui.');
+    }
+
+    public function printLabel(Order $order)
+    {
+        $order->load(['customer', 'packing']);
+        
+        $pdf = Pdf::loadView('pdf.shipping_label', compact('order'))
+            ->setPaper(array(0,0,283.46,425.19), 'portrait'); // A6 size approx 10x15cm
+            
+        return $pdf->stream('Label_Pengiriman_' . $order->no_order . '.pdf');
+    }
+
+    public function printSuratJalan(Order $order)
+    {
+        $order->load(['customer', 'packing']);
+        
+        $pdf = Pdf::loadView('pdf.surat_jalan', compact('order'))
+            ->setPaper('a5', 'landscape');
+            
+        return $pdf->stream('Surat_Jalan_' . $order->no_order . '.pdf');
     }
     public function opnameIndex()
     {
