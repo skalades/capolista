@@ -8,13 +8,13 @@ import Badge from '@/Components/Badge';
 import EmptyState from '@/Components/EmptyState';
 import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
 
-export default function Index({ ordersPacking, lowStockCount }) {
+export default function Index({ ordersPacking, lowStockCount, pageTitle }) {
   const PACKING_STATUS_COLORS = { packing: 'gold', siap_kirim: 'accent', dikirim: 'accent' };
   const PACKING_STATUS_LABELS = { packing: 'Packing', siap_kirim: 'Siap Kirim', dikirim: 'Dikirim' };
 
   return (
     <AppLayout 
-      title="Gudang & Pengiriman"
+      title={pageTitle || "Gudang & Pengiriman"}
       headerActions={
         <div className="flex gap-2">
           <Link href={route('gudang.opname.index')} className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12.5px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20">
@@ -32,7 +32,7 @@ export default function Index({ ordersPacking, lowStockCount }) {
         </div>
       )}
 
-      <Card title="Daftar Order untuk Dipacking/Dikirim">
+      <Card title={pageTitle ? `Daftar ${pageTitle}` : "Daftar Order"}>
         {(!ordersPacking?.data || ordersPacking.data.length === 0) ? (
           <EmptyState 
             title="Tidak ada order" 

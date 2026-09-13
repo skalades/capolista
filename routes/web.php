@@ -128,7 +128,8 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
     // Gudang
     Route::middleware(['level:0,2,3,4', 'divisi:gudang'])->group(function () {
-        Route::get('/gudang', [GudangController::class, 'index'])->name('gudang.index');
+        Route::get('/gudang/packing', [GudangController::class, 'packingIndex'])->name('gudang.packing.index');
+        Route::get('/gudang/dikirim', [GudangController::class, 'dikirimIndex'])->name('gudang.dikirim.index');
         Route::get('/gudang/stok', [GudangController::class, 'stokIndex'])->name('gudang.stok');
         Route::post('/gudang/stok', [GudangController::class, 'stokStore'])->name('gudang.stok.store');
         Route::patch('/gudang/stok/{stok}', [GudangController::class, 'stokUpdate'])->name('gudang.stok.update');

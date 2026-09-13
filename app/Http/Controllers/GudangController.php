@@ -16,10 +16,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class GudangController extends Controller
 {
-    public function index(Request $request)
+    public function packingIndex(Request $request)
     {
         $ordersPacking = Order::with(['customer', 'packing'])
-            ->whereIn('status', [Order::STATUS_PACKING, Order::STATUS_DIKIRIM])
+            ->whereIn('status', [Order::STATUS_PACKING])
             ->latest()
             ->paginate(15);
 
@@ -28,6 +28,23 @@ class GudangController extends Controller
         return Inertia::render('Gudang/Index', [
             'ordersPacking' => $ordersPacking,
             'lowStockCount' => $lowStockCount,
+            'pageTitle' => 'Antrean Packing',
+        ]);
+    }
+
+    public function dikirimIndex(Request $request)
+    {
+        $ordersDikirim = Order::with(['customer', 'packing'])
+            ->whereIn('status', [Order::STATUS_DIKIRIM])
+            ->latest()
+            ->paginate(15);
+
+        $lowStockCount = StokBahan::whereColumn('jumlah_stok', '<=', 'minimum_stok')->count();
+
+        return Inertia::render('Gudang/Index', [
+            'ordersPacking' => $ordersDikirim,
+            'lowStockCount' => $lowStockCount,
+            'pageTitle' => 'Riwayat Pengiriman',
         ]);
     }
 
