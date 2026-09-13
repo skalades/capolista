@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\OrderHelper;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
+use App\Services\OrderService;
 use App\Models\Customer;
 use App\Models\Desain;
 use App\Models\Order;
@@ -17,6 +20,9 @@ use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+    public function __construct(private OrderService $orderService)
+    {
+    }
     public function index(Request $request)
     {
         $query = Order::with('customer')
@@ -57,116 +63,11 @@ class OrderController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
-        $validated = $request->validate([
-            'customer_id'       => 'nullable|exists:customers,id',
-            'nama_kustomer'     => 'required_without:customer_id|string|max:255',
-            'nomor_kontak'      => 'nullable|string|max:255',
-            'alamat_pengiriman' => 'nullable|string',
-            'items'             => 'required|array|min:1',
-            'items.*.jenis_produk' => 'required|string|max:255',
-            'items.*.ukuran_detail' => 'nullable|array',
-            'items.*.jumlah'    => 'required|integer|min:1',
-            'jumlah'            => 'required|integer|min:1',
-            'tanggal_order'     => 'required|date',
-            'deadline'          => 'required|date|after_or_equal:tanggal_order',
-            'total_harga'       => 'required|numeric|min:0',
-            'dp'                => 'nullable|numeric|min:0',
-            'catatan_desain'    => 'nullable|string',
-            'catatan'           => 'nullable|string',
-        ]);
-
-        $customerId = $validated['customer_id'] ?? null;
-
-        if (!$customerId && !empty($validated['nama_kustomer'])) {
-            $customer = Customer::where('nama', $validated['nama_kustomer'])->first();
-            
-            if ($customer) {
-                $needsUpdate = false;
-                if (empty($customer->kontak) && !empty($validated['nomor_kontak'])) {
-                    $customer->kontak = $validated['nomor_kontak'];
-                    $needsUpdate = true;
-                }
-                if (empty($customer->alamat) && !empty($validated['alamat_pengiriman'])) {
-                    $customer->alamat = $validated['alamat_pengiriman'];
-                    $needsUpdate = true;
-                }
-                if ($needsUpdate) {
-                    $customer->save();
-                }
-            } else {
-                $customer = Customer::create([
-                    'nama'   => $validated['nama_kustomer'],
-                    'kontak' => $validated['nomor_kontak'] ?? '',
-                    'alamat' => $validated['alamat_pengiriman'] ?? '',
-                ]);
-            }
-            $customerId = $customer->id;
-        }
-
-        $dp = $validated['dp'] ?? 0;
+        $validated = $request->validated();
         
-        // Gabungkan semua jenis produk untuk di tabel master order
-        $jenisProdukMaster = collect($validated['items'])->pluck('jenis_produk')->unique()->implode(', ');
-
-        $order = Order::create([
-            'customer_id'    => $customerId,
-            'jenis_produk'   => $jenisProdukMaster,
-            'jumlah'         => $validated['jumlah'],
-            'tanggal_order'  => $validated['tanggal_order'],
-            'deadline'       => $validated['deadline'],
-            'total_harga'    => $validated['total_harga'],
-            'catatan_desain' => $validated['catatan_desain'] ?? null,
-            'catatan'        => $validated['catatan'] ?? null,
-            'no_order'       => OrderHelper::generateNoOrder(),
-            'status'         => Order::STATUS_DRAFT,
-            'dp'             => $dp,
-            'sisa_bayar'     => $validated['total_harga'] - $dp,
-            'created_by'     => auth()->id(),
-        ]);
-
-        foreach ($validated['items'] as $itemData) {
-            $hargaSatuan = isset($itemData['harga_satuan']) ? str_replace(['Rp', '.', ' '], '', $itemData['harga_satuan']) : null;
-            
-            if (!empty($itemData['ukuran_detail'])) {
-                $hasSizes = false;
-                foreach ($itemData['ukuran_detail'] as $ukuran => $jumlah) {
-                    if ($jumlah > 0) {
-                        $order->items()->create([
-                            'jenis_produk' => $itemData['jenis_produk'],
-                            'ukuran' => $ukuran,
-                            'jumlah_pcs' => $jumlah,
-                            'harga_satuan' => $hargaSatuan,
-                        ]);
-                        $hasSizes = true;
-                    }
-                }
-                if (!$hasSizes) {
-                    $order->items()->create([
-                        'jenis_produk' => $itemData['jenis_produk'],
-                        'ukuran' => null,
-                        'jumlah_pcs' => $itemData['jumlah'],
-                        'harga_satuan' => $hargaSatuan,
-                    ]);
-                }
-            } else {
-                $order->items()->create([
-                    'jenis_produk' => $itemData['jenis_produk'],
-                    'ukuran' => null,
-                    'jumlah_pcs' => $itemData['jumlah'],
-                    'harga_satuan' => $hargaSatuan,
-                ]);
-            }
-        }
-
-        OrderLog::create([
-            'order_id'   => $order->id,
-            'user_id'    => auth()->id(),
-            'status_lama'=> null,
-            'status_baru'=> Order::STATUS_DRAFT,
-            'catatan'    => 'Order dibuat',
-        ]);
+        $order = $this->orderService->createOrder($validated, auth()->id());
 
         return redirect()->route('orders.show', $order)
             ->with('success', "Order {$order->no_order} berhasil dibuat.");
@@ -199,73 +100,11 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update(Request $request, Order $order)
+    public function update(UpdateOrderRequest $request, Order $order)
     {
-        $validated = $request->validate([
-            'customer_id'    => 'required|exists:customers,id',
-            'items'          => 'required|array|min:1',
-            'items.*.jenis_produk' => 'required|string|max:255',
-            'items.*.ukuran_detail' => 'nullable|array',
-            'items.*.jumlah'    => 'required|integer|min:1',
-            'jumlah'         => 'required|integer|min:1',
-            'tanggal_order'  => 'required|date',
-            'deadline'       => 'required|date',
-            'total_harga'    => 'required|numeric|min:0',
-            'dp'             => 'nullable|numeric|min:0',
-            'catatan_desain' => 'nullable|string',
-            'catatan'        => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
-        $dp = $validated['dp'] ?? 0;
-        $jenisProdukMaster = collect($validated['items'])->pluck('jenis_produk')->unique()->implode(', ');
-
-        $order->update([
-            'customer_id'    => $validated['customer_id'],
-            'jenis_produk'   => $jenisProdukMaster,
-            'jumlah'         => $validated['jumlah'],
-            'tanggal_order'  => $validated['tanggal_order'],
-            'deadline'       => $validated['deadline'],
-            'total_harga'    => $validated['total_harga'],
-            'catatan_desain' => $validated['catatan_desain'] ?? null,
-            'catatan'        => $validated['catatan'] ?? null,
-            'dp'         => $dp,
-            'sisa_bayar' => $validated['total_harga'] - $dp,
-        ]);
-
-        $order->items()->delete();
-        foreach ($validated['items'] as $itemData) {
-            $hargaSatuan = isset($itemData['harga_satuan']) ? str_replace(['Rp', '.', ' '], '', $itemData['harga_satuan']) : null;
-            
-            if (!empty($itemData['ukuran_detail'])) {
-                $hasSizes = false;
-                foreach ($itemData['ukuran_detail'] as $ukuran => $jumlah) {
-                    if ($jumlah > 0) {
-                        $order->items()->create([
-                            'jenis_produk' => $itemData['jenis_produk'],
-                            'ukuran' => $ukuran,
-                            'jumlah_pcs' => $jumlah,
-                            'harga_satuan' => $hargaSatuan,
-                        ]);
-                        $hasSizes = true;
-                    }
-                }
-                if (!$hasSizes) {
-                    $order->items()->create([
-                        'jenis_produk' => $itemData['jenis_produk'],
-                        'ukuran' => null,
-                        'jumlah_pcs' => $itemData['jumlah'],
-                        'harga_satuan' => $hargaSatuan,
-                    ]);
-                }
-            } else {
-                $order->items()->create([
-                    'jenis_produk' => $itemData['jenis_produk'],
-                    'ukuran' => null,
-                    'jumlah_pcs' => $itemData['jumlah'],
-                    'harga_satuan' => $hargaSatuan,
-                ]);
-            }
-        }
+        $this->orderService->updateOrder($order, $validated);
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Order berhasil diperbarui.');
