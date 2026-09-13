@@ -114,6 +114,16 @@ export default function OrderShow({ order = {} }) {
                         >
                             Ubah Status
                         </button>
+                        <button
+                            onClick={() => {
+                                if(confirm('Apakah Anda yakin ingin menghapus order ini?')) {
+                                    router.delete(route('orders.destroy', o.id));
+                                }
+                            }}
+                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-danger border border-transparent rounded-full text-[13px] font-bold text-white shadow-sm hover:bg-danger/90 transition-colors"
+                        >
+                            Hapus
+                        </button>
                     </div>
                 </div>
 

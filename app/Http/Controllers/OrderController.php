@@ -27,13 +27,26 @@ class OrderController extends Controller
             ->when($request->status, fn($q, $s) => $q->where('status', $s))
             ->when($request->deadline_from, fn($q, $d) => $q->where('deadline', '>=', $d))
             ->when($request->deadline_to, fn($q, $d) => $q->where('deadline', '<=', $d))
+            ->when($request->filter_deadline, function ($q, $filter) {
+                $today = \Carbon\Carbon::today();
+                if ($filter === 'lewat') {
+                    return $q->where('deadline', '<', $today)->whereNotIn('status', ['selesai', 'dikirim']);
+                }
+                if ($filter === 'hari_ini') {
+                    return $q->whereDate('deadline', $today);
+                }
+                if ($filter === 'mendekati') {
+                    // Mendekati deadline: hari ini sampai 3 hari ke depan
+                    return $q->whereBetween('deadline', [$today, $today->copy()->addDays(3)])->whereNotIn('status', ['selesai', 'dikirim']);
+                }
+            })
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
         return Inertia::render('Orders/Index', [
             'orders'  => $query,
-            'filters' => $request->only(['search', 'status', 'deadline_from', 'deadline_to']),
+            'filters' => $request->only(['search', 'status', 'deadline_from', 'deadline_to', 'filter_deadline']),
         ]);
     }
 

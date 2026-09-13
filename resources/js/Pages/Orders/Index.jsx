@@ -31,11 +31,15 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
     });
 
     const handleSearch = (search) => {
-        router.get(route('orders.index'), { search, status: filters.status }, { preserveState: true, replace: true });
+        router.get(route('orders.index'), { search, status: filters.status, filter_deadline: filters.filter_deadline }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (e) => {
-        router.get(route('orders.index'), { search: filters.search, status: e.target.value }, { preserveState: true, replace: true });
+        router.get(route('orders.index'), { search: filters.search, status: e.target.value, filter_deadline: filters.filter_deadline }, { preserveState: true, replace: true });
+    };
+
+    const handleDeadlineFilter = (e) => {
+        router.get(route('orders.index'), { search: filters.search, status: filters.status, filter_deadline: e.target.value }, { preserveState: true, replace: true });
     };
 
     const submitImport = (e) => {
@@ -85,6 +89,16 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                             <option key={val} value={val}>{label}</option>
                         ))}
                     </select>
+                    <select
+                        value={filters.filter_deadline || ''}
+                        onChange={handleDeadlineFilter}
+                        className="block w-full sm:w-48 rounded-md border-line py-1.5 text-ink text-[13px] focus:ring-2 focus:ring-navy focus:border-navy"
+                    >
+                        <option value="">Semua Deadline</option>
+                        <option value="hari_ini">Deadline Hari Ini</option>
+                        <option value="mendekati">Mendekati (H-3)</option>
+                        <option value="lewat">Terlewat</option>
+                    </select>
                 </div>
             </Card>
             
@@ -126,6 +140,16 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                                         <Link href={route('orders.edit', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">
                                             Edit
                                         </Link>
+                                        <button 
+                                            onClick={() => {
+                                                if(confirm('Apakah Anda yakin ingin menghapus order ini?')) {
+                                                    router.delete(route('orders.destroy', order.id));
+                                                }
+                                            }}
+                                            className="text-[12px] font-medium text-danger hover:text-danger/70"
+                                        >
+                                            Hapus
+                                        </button>
                                     </Table.Cell>
                                 </Table.Row>
                             ))}
