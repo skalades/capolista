@@ -32,7 +32,7 @@ class DashboardController extends Controller
         ];
         
         $today = now()->startOfDay();
-        $recentOrders = \App\Models\Order::with('customer')->latest()->take(5)->get();
+        $recentOrders = \App\Models\Order::with('customer')->latest()->take(10)->get();
         $upcomingDeadlines = \App\Models\Order::with('customer')
             ->whereNotIn('status', ['selesai', 'dikirim'])
             ->whereBetween('deadline', [$today->toDateString(), $today->copy()->addDays(3)->toDateString()])
@@ -126,7 +126,7 @@ class DashboardController extends Controller
                 'piutang_menunggak'   => \App\Models\Order::where('sisa_bayar', '>', 0)
                                             ->with('customer')
                                             ->orderBy('tanggal_order', 'asc')
-                                            ->take(3)
+                                            ->take(10)
                                             ->get()
                                             ->map(function ($order) {
                                                 $days = (int) \Carbon\Carbon::parse($order->tanggal_order)->diffInDays(\Carbon\Carbon::now());
