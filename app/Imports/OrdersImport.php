@@ -32,6 +32,10 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
     public function collection(Collection $rows)
     {
         $userId = Auth::id() ?? 1; // Fallback jika dijalankan via console
+        
+        $lastOrder = null;
+        $lastCustomerName = null;
+        $lastTanggalOrder = null;
 
         foreach ($rows as $row) {
             // Cek apakah kolom CUSTOMER kosong, jika ya, anggap baris kosong/akhir
@@ -43,14 +47,24 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
             try {
                 // 1. Parsing Tanggal (Kolom 0)
                 $tanggalOrder = now();
+                $isTanggalEmpty = empty(trim((string)($row[0] ?? '')));
+
                 if (isset($row[0]) && is_numeric($row[0])) {
                     $tanggalOrder = Date::excelToDateTimeObject($row[0]);
-                } elseif (!empty($row[0])) {
+                } elseif (!$isTanggalEmpty) {
                     try {
                         $tanggalOrder = Carbon::parse($row[0]);
                     } catch (\Exception $e) {
                         // fallback
                     }
+                } elseif ($isTanggalEmpty && $lastTanggalOrder && $customerName === $lastCustomerName) {
+                    $tanggalOrder = $lastTanggalOrder->copy();
+                }
+
+                // Cek apakah baris ini masuk ke order sebelumnya
+                $isGrouped = false;
+                if ($lastOrder && $customerName === $lastCustomerName && $tanggalOrder->isSameDay($lastTanggalOrder)) {
+                    $isGrouped = true;
                 }
 
                 // 2. Customer
@@ -92,7 +106,6 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
                     'pelunasan' => (float) preg_replace('/[^0-9]/', '', (string)($row[20] ?? '0')),
                 ];
 
-
                 $totalDp = array_sum($dps);
                 $sisaBayar = $totalHarga - $totalDp;
 
@@ -120,54 +133,102 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
                     $catatanProduksi .= "Penjahit: " . $penjahit . "\n";
                 }
 
-                $status = ($sisaBayar <= 0) ? Order::STATUS_SELESAI : Order::STATUS_DRAFT;
-
-                // 4. Buat Order
-                $order = Order::create([
-                    'no_order'       => OrderHelper::generateNoOrder(),
-                    'customer_id'    => $customer->id,
-                    'tanggal_order'  => $tanggalOrder,
-                    'deadline'       => $deadline,
-                    'status'         => $status,
-                    'jenis_produk'   => $jenisProduk,
-                    'jumlah'         => $qty > 0 ? $qty : 1,
-                    'total_harga'    => $totalHarga,
-                    'dp'             => $totalDp,
-                    'sisa_bayar'     => $sisaBayar,
-                    'catatan'        => trim($catatan),
-                    'catatan_produksi' => trim($catatanProduksi),
-                    'created_by'     => $userId,
-                ]);
-
-                // 5. Buat OrderItem
-                $order->items()->create([
-                    'jenis_produk' => $jenisProduk,
-                    'ukuran'       => null,
-                    'jumlah_pcs'   => $qty > 0 ? $qty : 1,
-                ]);
-
-                // 6. Buat OrderLog
-                OrderLog::create([
-                    'order_id'    => $order->id,
-                    'user_id'     => $userId,
-                    'status_lama' => null,
-                    'status_baru' => $status,
-                    'catatan'     => 'Order diimpor dari Excel',
-                ]);
-
-                // 7. Buat Pembayaran (Cicilan)
-                foreach ($dps as $tipe => $jumlahPembayaran) {
-                    if ($jumlahPembayaran > 0) {
-                        Pembayaran::create([
-                            'order_id'     => $order->id,
-                            'jumlah'       => $jumlahPembayaran,
-                            'tanggal'      => $tanggalOrder, // Gunakan tanggal order sbg default tanggal masuk
-                            'metode'       => 'transfer',
-                            'tipe'         => $tipe == 'pelunasan' ? 'pelunasan' : 'dp',
-                            'catatan'      => strtoupper($tipe) . ' (Import)',
-                            'dicatat_oleh' => $userId,
-                        ]);
+                if ($isGrouped) {
+                    // Tambahkan ke Order sebelumnya
+                    $lastOrder->jumlah += ($qty > 0 ? $qty : 1);
+                    $lastOrder->total_harga += $totalHarga;
+                    $lastOrder->dp += $totalDp;
+                    
+                    $sisaBayarBaru = $lastOrder->total_harga - $lastOrder->dp;
+                    $status = ($sisaBayarBaru <= 0) ? Order::STATUS_SELESAI : Order::STATUS_DRAFT;
+                    
+                    if (!empty(trim($catatan))) {
+                        $lastOrder->catatan = rtrim($lastOrder->catatan) . "\n---\n" . trim($catatan);
                     }
+                    if (!empty(trim($catatanProduksi))) {
+                        $lastOrder->catatan_produksi = rtrim($lastOrder->catatan_produksi) . "\n---\n" . trim($catatanProduksi);
+                    }
+                    
+                    $lastOrder->sisa_bayar = $sisaBayarBaru;
+                    $lastOrder->status = $status;
+                    $lastOrder->save();
+
+                    // Buat OrderItem
+                    $lastOrder->items()->create([
+                        'jenis_produk' => $jenisProduk,
+                        'ukuran'       => null,
+                        'jumlah_pcs'   => $qty > 0 ? $qty : 1,
+                    ]);
+
+                    // Buat Pembayaran jika ada di baris ini
+                    foreach ($dps as $tipe => $jumlahPembayaran) {
+                        if ($jumlahPembayaran > 0) {
+                            Pembayaran::create([
+                                'order_id'     => $lastOrder->id,
+                                'jumlah'       => $jumlahPembayaran,
+                                'tanggal'      => $tanggalOrder,
+                                'metode'       => 'transfer',
+                                'tipe'         => $tipe == 'pelunasan' ? 'pelunasan' : 'dp',
+                                'catatan'      => strtoupper($tipe) . ' (Import)',
+                                'dicatat_oleh' => $userId,
+                            ]);
+                        }
+                    }
+
+                } else {
+                    $status = ($sisaBayar <= 0) ? Order::STATUS_SELESAI : Order::STATUS_DRAFT;
+
+                    // 4. Buat Order Baru
+                    $order = Order::create([
+                        'no_order'       => OrderHelper::generateNoOrder(),
+                        'customer_id'    => $customer->id,
+                        'tanggal_order'  => $tanggalOrder,
+                        'deadline'       => $deadline,
+                        'status'         => $status,
+                        'jenis_produk'   => $jenisProduk, // Tetap set jenis produk awal (bisa diganti kalau misal multi item)
+                        'jumlah'         => $qty > 0 ? $qty : 1,
+                        'total_harga'    => $totalHarga,
+                        'dp'             => $totalDp,
+                        'sisa_bayar'     => $sisaBayar,
+                        'catatan'        => trim($catatan),
+                        'catatan_produksi' => trim($catatanProduksi),
+                        'created_by'     => $userId,
+                    ]);
+
+                    // 5. Buat OrderItem
+                    $order->items()->create([
+                        'jenis_produk' => $jenisProduk,
+                        'ukuran'       => null,
+                        'jumlah_pcs'   => $qty > 0 ? $qty : 1,
+                    ]);
+
+                    // 6. Buat OrderLog
+                    OrderLog::create([
+                        'order_id'    => $order->id,
+                        'user_id'     => $userId,
+                        'status_lama' => null,
+                        'status_baru' => $status,
+                        'catatan'     => 'Order diimpor dari Excel',
+                    ]);
+
+                    // 7. Buat Pembayaran
+                    foreach ($dps as $tipe => $jumlahPembayaran) {
+                        if ($jumlahPembayaran > 0) {
+                            Pembayaran::create([
+                                'order_id'     => $order->id,
+                                'jumlah'       => $jumlahPembayaran,
+                                'tanggal'      => $tanggalOrder, 
+                                'metode'       => 'transfer',
+                                'tipe'         => $tipe == 'pelunasan' ? 'pelunasan' : 'dp',
+                                'catatan'      => strtoupper($tipe) . ' (Import)',
+                                'dicatat_oleh' => $userId,
+                            ]);
+                        }
+                    }
+
+                    $lastOrder = $order;
+                    $lastCustomerName = $customerName;
+                    $lastTanggalOrder = Carbon::parse($tanggalOrder);
                 }
 
             } catch (\Exception $e) {
