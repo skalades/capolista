@@ -53,7 +53,7 @@ export default function Packing({ order }) {
   return (
     <AppLayout title={`Packing ${order.no_order}`}>
       <div className="mb-6 flex space-x-2 text-sm text-gray-500">
-        <Link href={route('gudang.index')} className="hover:text-brand-600">Gudang</Link>
+        <Link href={route('gudang.packing.index')} className="hover:text-brand-600">Gudang Packing</Link>
         <span>/</span>
         <span className="text-gray-900">{order.no_order}</span>
       </div>
