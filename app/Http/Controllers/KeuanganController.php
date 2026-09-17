@@ -84,6 +84,29 @@ class KeuanganController extends Controller
         ]);
     }
 
+    public function piutangIndex(Request $request)
+    {
+        $query = Order::where('sisa_bayar', '>', 0)
+            ->with('customer')
+            ->orderBy('tanggal_order', 'asc');
+
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('no_order', 'like', "%{$request->search}%")
+                  ->orWhereHas('customer', function ($q2) use ($request) {
+                      $q2->where('nama', 'like', "%{$request->search}%");
+                  });
+            });
+        }
+
+        $piutangs = $query->paginate(15)->withQueryString();
+
+        return Inertia::render('Keuangan/Piutang', [
+            'piutangs' => $piutangs,
+            'filters' => $request->only(['search'])
+        ]);
+    }
+
     public function pembayaranIndex(Request $request)
     {
         $query = Pembayaran::with(['order.customer', 'pencatat'])->latest();

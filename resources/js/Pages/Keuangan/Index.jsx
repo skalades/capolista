@@ -55,7 +55,7 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                         value={"Rp " + formatShort(piutang)}
                         caption={`${piutangMenunggak.length} order menunggak > 7 hari`}
                         status="gold"
-                        actionLink={route('keuangan.pembayaran.index')}
+                        actionLink={route('keuangan.piutang.index')}
                         actionLabel="Lihat detail piutang"
                     />
                     <StatsCard 

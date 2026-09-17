@@ -162,6 +162,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     // Keuangan
     Route::prefix('keuangan')->name('keuangan.')->middleware(['level:0,1,2,3,4', 'divisi:keuangan'])->group(function () {
         Route::get('/', [KeuanganController::class, 'index'])->name('index');
+        Route::get('/piutang', [KeuanganController::class, 'piutangIndex'])->name('piutang.index');
         Route::get('/pembayaran', [KeuanganController::class, 'pembayaranIndex'])->name('pembayaran.index');
         Route::post('/pembayaran', [KeuanganController::class, 'pembayaranStore'])->name('pembayaran.store');
         Route::get('/pembayaran/{pembayaran}/kwitansi', [KeuanganController::class, 'pembayaranKwitansi'])->name('pembayaran.kwitansi');
