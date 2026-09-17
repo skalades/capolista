@@ -337,23 +337,43 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                                             chart: {
                                                 type: 'bar',
                                                 toolbar: { show: false },
-                                                fontFamily: 'inherit'
+                                                fontFamily: '"IBM Plex Sans", sans-serif'
                                             },
-                                            colors: ['#0f172a', '#ef4444'], // navy for pemasukan, red for pengeluaran
+                                            colors: ['#29394A', '#A8402F'], // navy and danger
                                             plotOptions: {
                                                 bar: {
                                                     horizontal: false,
                                                     columnWidth: '55%',
-                                                    endingShape: 'rounded'
+                                                    borderRadius: 2
                                                 },
                                             },
                                             dataLabels: { enabled: false },
                                             stroke: { show: true, width: 2, colors: ['transparent'] },
-                                            xaxis: { categories: chartData.labels },
-                                            yaxis: {
+                                            xaxis: { 
+                                                categories: chartData.labels,
+                                                tickAmount: 15,
                                                 labels: {
-                                                    formatter: (value) => 'Rp ' + formatShort(value)
+                                                    rotate: -45,
+                                                    rotateAlways: false,
+                                                    hideOverlappingLabels: true,
+                                                    style: { colors: '#6B655C', fontSize: '11px' }
+                                                },
+                                                axisBorder: { show: false },
+                                                axisTicks: { show: false }
+                                            },
+                                            yaxis: {
+                                                min: 0,
+                                                forceNiceScale: true,
+                                                decimalsInFloat: 0,
+                                                labels: {
+                                                    formatter: (value) => 'Rp ' + formatShort(value),
+                                                    style: { colors: '#6B655C', fontSize: '11px' }
                                                 }
+                                            },
+                                            grid: {
+                                                borderColor: '#DCD3BF',
+                                                strokeDashArray: 4,
+                                                padding: { top: 0, right: 0, bottom: 0, left: 10 }
                                             },
                                             fill: { opacity: 1 },
                                             tooltip: {
@@ -363,7 +383,9 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                                             },
                                             legend: {
                                                 position: 'top',
-                                                horizontalAlign: 'right'
+                                                horizontalAlign: 'right',
+                                                markers: { radius: 2 },
+                                                itemMargin: { horizontal: 10, vertical: 0 }
                                             }
                                         }}
                                         series={[
