@@ -11,11 +11,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-class OrdersImport implements ToCollection, WithStartRow
+class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
 {
     /**
      * @return int
