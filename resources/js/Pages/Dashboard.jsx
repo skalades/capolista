@@ -19,7 +19,7 @@ export default function Dashboard({ stats = {}, recentOrders = [], upcomingDeadl
     const renderRoleView = () => {
         switch (user?.level_akses) {
             case 0: // LEVEL_SUPERADMIN
-                return <SuperadminView stats={stats} extraData={extraData} recentOrders={recentOrders} />;
+                return <SuperadminView stats={stats} extraData={extraData} recentOrders={recentOrders} lowStockCount={lowStockCount} upcomingDeadlines={upcomingDeadlines} />;
             case 1: // LEVEL_OWNER
                 return <OwnerView extraData={extraData} recentOrders={recentOrders} upcomingDeadlines={upcomingDeadlines} />;
             case 2: // LEVEL_ADMIN
