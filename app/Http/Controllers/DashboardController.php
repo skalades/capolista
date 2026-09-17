@@ -58,9 +58,9 @@ class DashboardController extends Controller
                 'total_roles'         => \Spatie\Permission\Models\Role::count(),
                 'ringkasan_divisi'    => \App\Models\User::selectRaw('divisi, count(*) as total')->groupBy('divisi')->pluck('total', 'divisi'),
                 'recent_users'        => \App\Models\User::with('roles')->latest()->take(5)->get(),
-                'total_piutang'       => \App\Models\Order::whereNotIn('status', ['selesai', 'draft'])->sum('sisa_bayar'),
+                'total_piutang'       => \App\Models\Order::where('status', '!=', 'draft')->sum('sisa_bayar'),
                 'piutang_lama'        => \App\Models\Order::with('customer')
-                                            ->whereNotIn('status', ['selesai', 'draft'])
+                                            ->where('status', '!=', 'draft')
                                             ->where('sisa_bayar', '>', 0)
                                             ->orderBy('created_at', 'asc')
                                             ->take(5)
@@ -71,7 +71,8 @@ class DashboardController extends Controller
                 ->whereMonth('updated_at', now()->month)
                 ->whereYear('updated_at', now()->year)
                 ->sum('total_harga');
-            $totalPiutang = \App\Models\Order::whereNotIn('status', ['selesai', 'draft'])
+            $totalPiutang = \App\Models\Order::where('status', '!=', 'draft')
+                ->where('sisa_bayar', '>', 0)
                 ->sum('sisa_bayar');
             $extraData = [
                 'omzet_bulan_ini'  => $omzetBulanIni,
