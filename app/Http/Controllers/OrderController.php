@@ -315,8 +315,6 @@ class OrderController extends Controller
                 \App\Models\Desain::where('order_id', $order->id)->delete();
                 \App\Models\Printing::where('order_id', $order->id)->delete();
                 \App\Models\Pemasangan::where('order_id', $order->id)->delete();
-                \App\Models\Cutting::where('order_id', $order->id)->delete();
-                \App\Models\Jahit::where('order_id', $order->id)->delete();
                 \App\Models\Packing::where('order_id', $order->id)->delete();
                 \App\Models\OrderLog::where('order_id', $order->id)->delete();
                 
