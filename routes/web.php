@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
         Route::post('/orders/bulk-delete', [OrderController::class, 'bulkDelete'])->name('orders.bulk-delete');
+        Route::post('/orders/bulk-merge', [OrderController::class, 'bulkMerge'])->name('orders.bulk-merge');
         Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::get('/orders/template', [OrderController::class, 'template'])->name('orders.template');
         Route::post('/orders/import', [OrderController::class, 'import'])->name('orders.import');

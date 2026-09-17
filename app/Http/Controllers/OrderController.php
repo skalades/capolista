@@ -263,6 +263,85 @@ class OrderController extends Controller
         return back()->with('success', 'Pesanan yang dipilih berhasil dihapus secara massal.');
     }
 
+    public function bulkMerge(Request $request)
+    {
+        if (auth()->user()->level_akses > 2) {
+            abort(403, 'Anda tidak berhak menggabungkan order.');
+        }
+
+        $request->validate([
+            'order_ids' => 'required|array|min:2',
+            'order_ids.*' => 'exists:orders,id',
+        ]);
+
+        $orders = Order::whereIn('id', $request->order_ids)
+                       ->orderBy('id', 'asc')
+                       ->get();
+
+        if ($orders->count() < 2) {
+            return back()->with('error', 'Pilih minimal 2 order untuk digabungkan.');
+        }
+
+        // Order pertama menjadi primary
+        $primaryOrder = $orders->first();
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($orders, $primaryOrder) {
+            $otherOrders = $orders->where('id', '!=', $primaryOrder->id);
+
+            foreach ($otherOrders as $order) {
+                // 1. Pindahkan Items
+                \App\Models\OrderItem::where('order_id', $order->id)->update(['order_id' => $primaryOrder->id]);
+                
+                // 2. Pindahkan Pembayaran
+                \App\Models\Pembayaran::where('order_id', $order->id)->update(['order_id' => $primaryOrder->id]);
+                
+                // 3. Pindahkan Files
+                \App\Models\OrderFile::where('order_id', $order->id)->update(['order_id' => $primaryOrder->id]);
+                
+                // 4. Update akumulasi primaryOrder
+                $primaryOrder->jumlah += $order->jumlah;
+                $primaryOrder->total_harga += $order->total_harga;
+                $primaryOrder->dp += $order->dp;
+                
+                // 5. Gabung catatan
+                if (!empty(trim($order->catatan))) {
+                    $primaryOrder->catatan = rtrim($primaryOrder->catatan) . "\n---\n" . trim($order->catatan);
+                }
+                if (!empty(trim($order->catatan_produksi))) {
+                    $primaryOrder->catatan_produksi = rtrim($primaryOrder->catatan_produksi) . "\n---\n" . trim($order->catatan_produksi);
+                }
+
+                // 6. Hapus records divisi dari order yang digabung
+                \App\Models\Desain::where('order_id', $order->id)->delete();
+                \App\Models\Printing::where('order_id', $order->id)->delete();
+                \App\Models\Pemasangan::where('order_id', $order->id)->delete();
+                \App\Models\Cutting::where('order_id', $order->id)->delete();
+                \App\Models\Jahit::where('order_id', $order->id)->delete();
+                \App\Models\Packing::where('order_id', $order->id)->delete();
+                \App\Models\OrderLog::where('order_id', $order->id)->delete();
+                
+                // 7. Hapus order 
+                $order->delete();
+            }
+
+            $primaryOrder->sisa_bayar = $primaryOrder->total_harga - $primaryOrder->dp;
+            if ($primaryOrder->sisa_bayar <= 0 && $primaryOrder->status == Order::STATUS_DRAFT) {
+                $primaryOrder->status = Order::STATUS_SELESAI;
+            }
+            $primaryOrder->save();
+
+            \App\Models\OrderLog::create([
+                'order_id'    => $primaryOrder->id,
+                'user_id'     => auth()->id(),
+                'status_lama' => $primaryOrder->status,
+                'status_baru' => $primaryOrder->status,
+                'catatan'     => 'Order digabungkan dari ID lama: ' . $otherOrders->pluck('id')->implode(', '),
+            ]);
+        });
+
+        return back()->with('success', 'Pesanan berhasil digabungkan ke ' . $primaryOrder->no_order . '.');
+    }
+
     public function printSpk(Order $order)
     {
         $order->load(['customer', 'creator']);

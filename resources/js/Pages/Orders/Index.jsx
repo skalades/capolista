@@ -157,20 +157,40 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                                 ))}
                             </select>
                             {canCreate && (
-                                <button
-                                    onClick={() => {
-                                        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedOrders.length} order secara massal? Ini tidak dapat dibatalkan.`)) {
-                                            router.post(route('orders.bulk-delete'), {
-                                                order_ids: selectedOrders,
-                                            }, {
-                                                onSuccess: () => setSelectedOrders([])
-                                            });
-                                        }
-                                    }}
-                                    className="ml-2 inline-flex items-center justify-center rounded bg-danger px-3 py-1 text-[12px] font-medium text-white hover:bg-danger/90"
-                                >
-                                    Hapus Massal
-                                </button>
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            if (selectedOrders.length < 2) {
+                                                alert("Pilih minimal 2 order untuk digabungkan.");
+                                                return;
+                                            }
+                                            if (confirm(`Apakah Anda yakin ingin menggabungkan ${selectedOrders.length} order? Item, pembayaran, dan catatan akan dipindahkan ke order yang paling awal, lalu order lainnya akan dihapus.`)) {
+                                                router.post(route('orders.bulk-merge'), {
+                                                    order_ids: selectedOrders,
+                                                }, {
+                                                    onSuccess: () => setSelectedOrders([])
+                                                });
+                                            }
+                                        }}
+                                        className="ml-2 inline-flex items-center justify-center rounded bg-gold px-3 py-1 text-[12px] font-medium text-white hover:bg-gold/90"
+                                    >
+                                        Gabungkan Order
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (confirm(`Apakah Anda yakin ingin menghapus ${selectedOrders.length} order secara massal? Ini tidak dapat dibatalkan.`)) {
+                                                router.post(route('orders.bulk-delete'), {
+                                                    order_ids: selectedOrders,
+                                                }, {
+                                                    onSuccess: () => setSelectedOrders([])
+                                                });
+                                            }
+                                        }}
+                                        className="ml-2 inline-flex items-center justify-center rounded bg-danger px-3 py-1 text-[12px] font-medium text-white hover:bg-danger/90"
+                                    >
+                                        Hapus Massal
+                                    </button>
+                                </>
                             )}
                         </div>
                         <Table>
