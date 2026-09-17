@@ -44,6 +44,7 @@ export default function Piutang({ piutangs, filters }) {
                             <th className="p-4">Total Harga</th>
                             <th className="p-4">Sisa Bayar (Piutang)</th>
                             <th className="p-4">Status</th>
+                            <th className="p-4 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,10 +58,20 @@ export default function Piutang({ piutangs, filters }) {
                                 <td className="p-4 capitalize">
                                     <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">{o.status}</span>
                                 </td>
+                                <td className="p-4 text-right">
+                                    <a 
+                                        href={route('orders.invoice', o.id)} 
+                                        target="_blank"
+                                        className="inline-flex items-center justify-center rounded bg-danger px-3 py-1.5 text-xs font-medium text-white hover:bg-danger/90 transition-colors"
+                                    >
+                                        <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                        PDF Tagihan
+                                    </a>
+                                </td>
                             </tr>
                         ))}
                         {piutangs.data.length === 0 && (
-                            <tr><td colSpan="6" className="p-4 text-center">Tidak ada piutang.</td></tr>
+                            <tr><td colSpan="7" className="p-4 text-center">Tidak ada piutang.</td></tr>
                         )}
                     </tbody>
                 </table>
