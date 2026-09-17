@@ -9,7 +9,7 @@ import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import EmptyState from '@/Components/EmptyState';
-import { Link, router, useForm } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { PlusIcon, ArrowUpTrayIcon, DocumentDuplicateIcon } from '@heroicons/react/20/solid';
 
 const STATUS_SEMANTICS = {
@@ -25,6 +25,9 @@ const STATUS_LABELS = {
 };
 
 export default function OrderIndex({ orders, filters = {}, customers = [] }) {
+    const { auth } = usePage().props;
+    const canCreate = auth.user.level_akses <= 2;
+    
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [selectedOrders, setSelectedOrders] = useState([]);
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -74,22 +77,24 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
         <AppLayout 
             title="Kelola Order"
             headerActions={
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setIsImportModalOpen(true)}
-                        className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12.5px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20"
-                    >
-                        <ArrowUpTrayIcon className="-ml-0.5 h-4 w-4 mr-1 text-ink-soft" aria-hidden="true" />
-                        Import Excel
-                    </button>
-                    <Link
-                        href={route('orders.create')}
-                        className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90"
-                    >
-                        <PlusIcon className="-ml-0.5 h-4 w-4 mr-1 text-white" aria-hidden="true" />
-                        Buat Order
-                    </Link>
-                </div>
+                canCreate && (
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setIsImportModalOpen(true)}
+                            className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12.5px] font-medium font-sans text-ink shadow-sm transition-colors hover:bg-line/20"
+                        >
+                            <ArrowUpTrayIcon className="-ml-0.5 h-4 w-4 mr-1 text-ink-soft" aria-hidden="true" />
+                            Import Excel
+                        </button>
+                        <Link
+                            href={route('orders.create')}
+                            className="inline-flex items-center justify-center rounded bg-navy px-3 py-1.5 text-[12.5px] font-medium font-sans text-white shadow-sm transition-colors hover:bg-navy/90"
+                        >
+                            <PlusIcon className="-ml-0.5 h-4 w-4 mr-1 text-white" aria-hidden="true" />
+                            Buat Order
+                        </Link>
+                    </div>
+                )
             }
         >
             <Card className="mb-6">

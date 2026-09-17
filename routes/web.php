@@ -48,19 +48,28 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
         Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+
+        // Order Creation & Management Restricted to Level 0, 1, 2
+        Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+        Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::get('/orders/template', [OrderController::class, 'template'])->name('orders.template');
+        Route::post('/orders/import', [OrderController::class, 'import'])->name('orders.import');
     });
 
     // --- Orders (Accessible to all staffs 0,1,2,3,4) ---
     Route::middleware('level:0,1,2,3,4')->group(function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::patch('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        
         Route::post('/orders/bulk-update-status', [OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
-        Route::resource('orders', OrderController::class)->except(['show']);
         Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::post('/orders/{order}/upload-file', [OrderController::class, 'uploadFile'])->name('orders.upload-file');
         Route::delete('/order-files/{file}', [OrderController::class, 'deleteFile'])->name('orders.delete-file');
         Route::get('/orders/{order}/spk', [OrderController::class, 'printSpk'])->name('orders.spk');
         Route::get('/orders/{order}/invoice', [OrderController::class, 'printInvoice'])->name('orders.invoice');
-        Route::get('/orders/template', [OrderController::class, 'template'])->name('orders.template');
-        Route::post('/orders/import', [OrderController::class, 'import'])->name('orders.import');
     });
 
     // Orders Show (Accessible to all staffs that might need it)
