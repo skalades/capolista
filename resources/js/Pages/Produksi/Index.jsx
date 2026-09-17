@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Alert from '@/Components/Alert';
@@ -46,6 +46,19 @@ export default function Index({ ordersByStatus, bottlenecks, statsPerDivisi, esk
 
     const totalBottleneck = bottlenecks?.length ?? 0;
     const totalEskalasi   = eskalasiOrders?.length ?? 0;
+
+    // Auto-update (polling) setiap 30 detik
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['ordersByStatus', 'bottlenecks', 'statsPerDivisi', 'eskalasiOrders'],
+                preserveState: true,
+                preserveScroll: true,
+            });
+        }, 30000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     // Terapkan filter ke ordersByStatus
     const filteredOrdersByStatus = React.useMemo(() => {
