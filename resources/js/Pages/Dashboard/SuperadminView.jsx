@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StatsCard from '@/Components/StatsCard';
 import Card from '@/Components/Card';
 import Table from '@/Components/Table';
@@ -10,6 +10,16 @@ import Chart from 'react-apexcharts';
 
 export default function SuperadminView({ stats, extraData, recentOrders, lowStockCount, upcomingDeadlines }) {
     
+    // Pagination for Piutang
+    const [piutangPage, setPiutangPage] = useState(1);
+    const piutangPerPage = 10;
+    const totalPiutang = extraData.piutang_menunggak?.length || 0;
+    const totalPiutangPages = Math.ceil(totalPiutang / piutangPerPage);
+    const currentPiutang = extraData.piutang_menunggak?.slice(
+        (piutangPage - 1) * piutangPerPage, 
+        piutangPage * piutangPerPage
+    ) || [];
+
     const formatShort = (num) => {
         if (!num) return '0';
         if (num >= 1000000) {
@@ -291,7 +301,7 @@ export default function SuperadminView({ stats, extraData, recentOrders, lowStoc
                                 <h3 className="text-[18px] font-oswald font-bold text-ink">Piutang menunggak</h3>
                             </div>
                             <div className="divide-y divide-line flex-1">
-                                {extraData.piutang_menunggak?.map(p => (
+                                {currentPiutang.map(p => (
                                     <div key={p.id} className="p-4 flex justify-between items-center hover:bg-line/20 transition-colors">
                                         <div>
                                             <p className="font-bold text-[13px] text-ink uppercase">{p.customer}</p>
@@ -303,13 +313,36 @@ export default function SuperadminView({ stats, extraData, recentOrders, lowStoc
                                         </div>
                                     </div>
                                 ))}
-                                {(!extraData.piutang_menunggak || extraData.piutang_menunggak.length === 0) && (
+                                {(!currentPiutang || currentPiutang.length === 0) && (
                                     <div className="p-8 h-full flex flex-col items-center justify-center">
                                         <BanknotesIcon className="w-8 h-8 text-line mb-3" />
                                         <div className="text-center text-[12px] text-ink-soft">Tidak ada piutang menunggak.</div>
                                     </div>
                                 )}
                             </div>
+                            
+                            {/* Pagination Buttons */}
+                            {totalPiutangPages > 1 && (
+                                <div className="p-3 border-t border-line flex items-center justify-between bg-panel/50">
+                                    <button 
+                                        onClick={() => setPiutangPage(prev => Math.max(1, prev - 1))}
+                                        disabled={piutangPage === 1}
+                                        className="px-3 py-1.5 text-[11px] font-medium text-ink-soft hover:text-ink disabled:opacity-50 disabled:cursor-not-allowed border border-line rounded bg-white hover:bg-panel transition-colors"
+                                    >
+                                        &laquo; Prev
+                                    </button>
+                                    <span className="text-[11px] text-ink-soft font-mono">
+                                        Hal {piutangPage} / {totalPiutangPages}
+                                    </span>
+                                    <button 
+                                        onClick={() => setPiutangPage(prev => Math.min(totalPiutangPages, prev + 1))}
+                                        disabled={piutangPage === totalPiutangPages}
+                                        className="px-3 py-1.5 text-[11px] font-medium text-ink-soft hover:text-ink disabled:opacity-50 disabled:cursor-not-allowed border border-line rounded bg-white hover:bg-panel transition-colors"
+                                    >
+                                        Next &raquo;
+                                    </button>
+                                </div>
+                            )}
                         </Card>
                     </div>
 

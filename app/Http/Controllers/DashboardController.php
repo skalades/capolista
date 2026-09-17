@@ -126,7 +126,6 @@ class DashboardController extends Controller
                 'piutang_menunggak'   => \App\Models\Order::where('sisa_bayar', '>', 0)
                                             ->with('customer')
                                             ->orderBy('tanggal_order', 'asc')
-                                            ->take(10)
                                             ->get()
                                             ->map(function ($order) {
                                                 $days = (int) \Carbon\Carbon::parse($order->tanggal_order)->diffInDays(\Carbon\Carbon::now());
