@@ -23,7 +23,7 @@ export default function UserCreate() {
         mesin_pos: '',
     });
 
-    const roles = ['superadmin', 'owner', 'admin', 'kepala_divisi', 'staf', 'customer'];
+    const roles = ['superadmin', 'owner', 'admin', 'kepala divisi', 'staf', 'customer'];
     const divisis = ['Desain', 'Printing', 'Pemasangan', 'Produksi', 'Gudang', 'Cutting', 'Jahit', 'HR/Personalia', 'Keuangan', 'Pembelian'];
     const tipeGajis = ['borongan', 'harian', 'bulanan'];
     
@@ -33,14 +33,14 @@ export default function UserCreate() {
         if (role === 'superadmin') level = 0;
         else if (role === 'owner') level = 1;
         else if (role === 'admin') level = 2;
-        else if (role === 'kepala_divisi') level = 3;
+        else if (role === 'kepala divisi') level = 3;
         else if (role === 'customer') level = 5;
 
         setData(data => ({
             ...data,
             role,
             level_akses: level,
-            divisi: (role === 'kepala_divisi' || role === 'staf') ? data.divisi : ''
+            divisi: (role === 'kepala divisi' || role === 'staf') ? data.divisi : ''
         }));
     };
 
@@ -49,7 +49,7 @@ export default function UserCreate() {
         post(route('users.store'));
     };
 
-    const showDivisi = data.role === 'kepala_divisi' || data.role === 'staf';
+    const showDivisi = data.role === 'kepala divisi' || data.role === 'staf';
 
     return (
         <AppLayout title="Tambah Pengguna">
