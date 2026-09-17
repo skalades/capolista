@@ -2,7 +2,7 @@ import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
 import { useForm, Link } from '@inertiajs/react';
 
-export default function UserCreate() {
+export default function UserCreate({ roles, divisiList }) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
@@ -23,8 +23,6 @@ export default function UserCreate() {
         mesin_pos: '',
     });
 
-    const roles = ['superadmin', 'owner', 'admin', 'kepala divisi', 'staf', 'customer'];
-    const divisis = ['Desain', 'Printing', 'Pemasangan', 'Produksi', 'Gudang', 'Cutting', 'Jahit', 'HR/Personalia', 'Keuangan', 'Pembelian'];
     const tipeGajis = ['borongan', 'harian', 'bulanan'];
     
     // Auto set level_akses based on role
@@ -124,7 +122,7 @@ export default function UserCreate() {
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 >
                                     <option value="">Pilih Role</option>
-                                    {roles.map(r => <option key={r} value={r}>{r.replace('_', ' ').toUpperCase()}</option>)}
+                                    {roles.map(r => <option key={r.id} value={r.name}>{r.name.replace('_', ' ').toUpperCase()}</option>)}
                                 </select>
                                 {errors.role && <p className="mt-2 text-sm text-red-600">{errors.role}</p>}
                             </div>
@@ -149,7 +147,9 @@ export default function UserCreate() {
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                     >
                                         <option value="">Pilih Divisi</option>
-                                        {divisis.map(d => <option key={d} value={d.toLowerCase()}>{d}</option>)}
+                                        {Object.entries(divisiList).map(([key, label]) => (
+                                            <option key={key} value={key}>{label}</option>
+                                        ))}
                                     </select>
                                     {errors.divisi && <p className="mt-2 text-sm text-red-600">{errors.divisi}</p>}
                                 </div>
