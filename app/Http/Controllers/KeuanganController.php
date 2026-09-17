@@ -217,4 +217,76 @@ class KeuanganController extends Controller
             'piutangCustomer' => $piutangCustomer
         ]);
     }
+
+    public function apiAnalitik(Request $request)
+    {
+        $filter = $request->query('filter', 'bulan_ini'); // hari_ini, bulan_ini, custom, perbandingan_bulan
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $labels = [];
+        $pemasukan = [];
+        $pengeluaran = [];
+
+        if ($filter === 'hari_ini') {
+            $date = Carbon::now()->toDateString();
+            $labels[] = Carbon::now()->format('d M Y');
+            $pemasukan[] = (float) Pembayaran::whereDate('tanggal', $date)->sum('jumlah');
+            $pengeluaran[] = (float) Pengeluaran::whereDate('tanggal', $date)->sum('jumlah');
+        } elseif ($filter === 'bulan_ini') {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now()->endOfMonth();
+            $days = $start->diffInDays($end);
+            for ($i = 0; $i <= $days; $i++) {
+                $date = $start->copy()->addDays($i);
+                $labels[] = $date->format('d M');
+                $pemasukan[] = (float) Pembayaran::whereDate('tanggal', $date->toDateString())->sum('jumlah');
+                $pengeluaran[] = (float) Pengeluaran::whereDate('tanggal', $date->toDateString())->sum('jumlah');
+            }
+        } elseif ($filter === 'custom' && $startDate && $endDate) {
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+            $days = $start->diffInDays($end);
+            
+            if ($days > 60) {
+                // Group by month if range is very long
+                $months = $start->diffInMonths($end);
+                for ($i = 0; $i <= $months; $i++) {
+                    $date = $start->copy()->addMonths($i);
+                    $mStart = $date->copy()->startOfMonth();
+                    $mEnd = $date->copy()->endOfMonth();
+                    if ($i === 0) $mStart = $start->copy();
+                    if ($i === $months) $mEnd = $end->copy();
+
+                    $labels[] = $date->format('M Y');
+                    $pemasukan[] = (float) Pembayaran::whereBetween('tanggal', [$mStart->toDateString(), $mEnd->toDateString()])->sum('jumlah');
+                    $pengeluaran[] = (float) Pengeluaran::whereBetween('tanggal', [$mStart->toDateString(), $mEnd->toDateString()])->sum('jumlah');
+                }
+            } else {
+                for ($i = 0; $i <= $days; $i++) {
+                    $date = $start->copy()->addDays($i);
+                    $labels[] = $date->format('d M');
+                    $pemasukan[] = (float) Pembayaran::whereDate('tanggal', $date->toDateString())->sum('jumlah');
+                    $pengeluaran[] = (float) Pengeluaran::whereDate('tanggal', $date->toDateString())->sum('jumlah');
+                }
+            }
+        } elseif ($filter === 'perbandingan_bulan') {
+            $currentMonth = Carbon::now()->month;
+            $year = Carbon::now()->year;
+            for ($m = 1; $m <= $currentMonth; $m++) {
+                $start = Carbon::createFromDate($year, $m, 1)->startOfMonth();
+                $end = Carbon::createFromDate($year, $m, 1)->endOfMonth();
+                
+                $labels[] = $start->format('M Y');
+                $pemasukan[] = (float) Pembayaran::whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])->sum('jumlah');
+                $pengeluaran[] = (float) Pengeluaran::whereBetween('tanggal', [$start->toDateString(), $end->toDateString()])->sum('jumlah');
+            }
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'pemasukan' => $pemasukan,
+            'pengeluaran' => $pengeluaran
+        ]);
+    }
 }
