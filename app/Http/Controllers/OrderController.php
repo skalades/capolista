@@ -247,6 +247,22 @@ class OrderController extends Controller
             ->with('success', "Order {$order->no_order} berhasil dihapus.");
     }
 
+    public function bulkDelete(Request $request)
+    {
+        if (auth()->user()->level_akses > 2) {
+            abort(403, 'Anda tidak berhak menghapus order.');
+        }
+
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id',
+        ]);
+
+        Order::whereIn('id', $request->order_ids)->delete();
+
+        return back()->with('success', 'Pesanan yang dipilih berhasil dihapus secara massal.');
+    }
+
     public function printSpk(Order $order)
     {
         $order->load(['customer', 'creator']);

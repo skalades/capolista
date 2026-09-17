@@ -156,6 +156,22 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                                     <option key={val} value={val}>{label}</option>
                                 ))}
                             </select>
+                            {canCreate && (
+                                <button
+                                    onClick={() => {
+                                        if (confirm(`Apakah Anda yakin ingin menghapus ${selectedOrders.length} order secara massal? Ini tidak dapat dibatalkan.`)) {
+                                            router.post(route('orders.bulk-delete'), {
+                                                order_ids: selectedOrders,
+                                            }, {
+                                                onSuccess: () => setSelectedOrders([])
+                                            });
+                                        }
+                                    }}
+                                    className="ml-2 inline-flex items-center justify-center rounded bg-danger px-3 py-1 text-[12px] font-medium text-white hover:bg-danger/90"
+                                >
+                                    Hapus Massal
+                                </button>
+                            )}
                         </div>
                         <Table>
                             <Table.Head>
