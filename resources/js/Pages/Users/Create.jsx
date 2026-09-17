@@ -55,6 +55,20 @@ export default function UserCreate() {
         <AppLayout title="Tambah Pengguna">
             <Card className="max-w-4xl mx-auto">
                 <form onSubmit={submit} className="space-y-8">
+                    {Object.keys(errors).length > 0 && (
+                        <div className="bg-red-50 p-4 rounded-md border border-red-200">
+                            <div className="flex">
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium text-red-800">Terdapat kesalahan pada isian form:</h3>
+                                    <ul className="mt-2 text-sm text-red-700 list-disc list-inside">
+                                        {Object.values(errors).map((err, index) => (
+                                            <li key={index}>{err}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     
                     <div>
                         <h2 className="text-lg font-semibold leading-7 text-gray-900">Informasi Dasar</h2>
@@ -89,6 +103,7 @@ export default function UserCreate() {
                                     onChange={e => setData('password', e.target.value)}
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
+                                {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password}</p>}
                             </div>
 
                             <div>
@@ -111,6 +126,7 @@ export default function UserCreate() {
                                     <option value="">Pilih Role</option>
                                     {roles.map(r => <option key={r} value={r}>{r.replace('_', ' ').toUpperCase()}</option>)}
                                 </select>
+                                {errors.role && <p className="mt-2 text-sm text-red-600">{errors.role}</p>}
                             </div>
                             
                             <div>
@@ -121,6 +137,7 @@ export default function UserCreate() {
                                     onChange={e => setData('level_akses', e.target.value)}
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6 bg-gray-50"
                                 />
+                                {errors.level_akses && <p className="mt-2 text-sm text-red-600">{errors.level_akses}</p>}
                             </div>
 
                             {showDivisi && (
@@ -134,6 +151,7 @@ export default function UserCreate() {
                                         <option value="">Pilih Divisi</option>
                                         {divisis.map(d => <option key={d} value={d.toLowerCase()}>{d}</option>)}
                                     </select>
+                                    {errors.divisi && <p className="mt-2 text-sm text-red-600">{errors.divisi}</p>}
                                 </div>
                             )}
 
@@ -161,7 +179,7 @@ export default function UserCreate() {
                         <h2 className="text-lg font-semibold leading-7 text-gray-900">Data HR & Penggajian</h2>
                         <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">NIK</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">NIK (Opsional)</label>
                                 <input
                                     type="text"
                                     value={data.nik}
@@ -181,7 +199,7 @@ export default function UserCreate() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Tanggal Masuk</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Tanggal Masuk (Opsional)</label>
                                 <input
                                     type="date"
                                     value={data.tanggal_masuk}
@@ -223,7 +241,7 @@ export default function UserCreate() {
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Nomor HP</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Nomor HP (Opsional)</label>
                                 <input
                                     type="text"
                                     value={data.no_hp}
@@ -244,7 +262,7 @@ export default function UserCreate() {
                             </div>
 
                             <div className="sm:col-span-3">
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Alamat</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Alamat (Opsional)</label>
                                 <textarea
                                     value={data.alamat}
                                     onChange={e => setData('alamat', e.target.value)}
