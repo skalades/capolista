@@ -54,7 +54,7 @@ export default function Pembayaran({ pembayarans, orders }) {
                     <tbody>
                         {pembayarans.data.map(p => (
                             <tr key={p.id} className="border-b">
-                                <td className="p-4">{p.tanggal}</td>
+                                <td className="p-4">{p.tanggal ? new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
                                 <td className="p-4">#{p.order_id} - {p.order?.customer?.nama}</td>
                                 <td className="p-4 uppercase">{p.tipe} - {p.metode}</td>
                                 <td className="p-4 font-medium text-green-600">{fmtRupiah(p.jumlah)}</td>

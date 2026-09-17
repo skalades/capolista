@@ -49,7 +49,7 @@ export default function Piutang({ piutangs, filters }) {
                     <tbody>
                         {piutangs.data.map(o => (
                             <tr key={o.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4">{o.tanggal_order}</td>
+                                <td className="p-4">{o.tanggal_order ? new Date(o.tanggal_order).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
                                 <td className="p-4 font-mono">#{o.no_order}</td>
                                 <td className="p-4">{o.customer?.nama}</td>
                                 <td className="p-4">{fmtRupiah(o.total_harga)}</td>

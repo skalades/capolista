@@ -212,7 +212,7 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                                                 <div key={p.id} className="p-4 flex justify-between items-center hover:bg-line/20 transition-colors">
                                                     <div>
                                                         <p className="font-bold text-[13px] text-ink">{p.kategori}</p>
-                                                        <p className="text-[11.5px] text-ink-soft">{p.tanggal} &middot; {p.deskripsi}</p>
+                                                        <p className="text-[11.5px] text-ink-soft">{p.tanggal ? new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} &middot; {p.deskripsi}</p>
                                                     </div>
                                                     <div className="font-bold text-danger font-mono text-[14px]">
                                                         -Rp {fmtRupiah(p.jumlah)}

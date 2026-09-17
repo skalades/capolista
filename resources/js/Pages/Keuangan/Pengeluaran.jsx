@@ -59,7 +59,7 @@ export default function Pengeluaran({ pengeluarans }) {
                         <Table.Body>
                             {pengeluarans.data.map(p => (
                                 <Table.Row key={p.id}>
-                                    <Table.Cell className="text-ink-soft">{p.tanggal}</Table.Cell>
+                                    <Table.Cell className="text-ink-soft">{p.tanggal ? new Date(p.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</Table.Cell>
                                     <Table.Cell className="uppercase text-[11px] font-bold text-ink-soft">{p.kategori.replace('_', ' ')}</Table.Cell>
                                     <Table.Cell className="text-ink">{p.deskripsi} {p.order_id ? <span className="text-ink-soft">(Order #{p.order_id})</span> : ''}</Table.Cell>
                                     <Table.Cell className="font-mono text-danger font-bold text-[14px]">{fmtRupiah(p.jumlah)}</Table.Cell>
