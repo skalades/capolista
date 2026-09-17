@@ -237,7 +237,18 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                                         <Table.Cell className="font-mono font-medium text-[13px] text-ink">{order.no_order}</Table.Cell>
 
                                         <Table.Cell>{order.customer?.nama || '-'}</Table.Cell>
-                                        <Table.Cell>{order.jenis_produk}</Table.Cell>
+                                        <Table.Cell>
+                                            {order.items && order.items.length > 1 ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium">{order.items.length} Item</span>
+                                                    <span className="text-[11px] text-ink-soft truncate max-w-[200px]" title={order.items.map(i => i.jenis_produk).join(', ')}>
+                                                        {order.items.map(i => i.jenis_produk).join(', ')}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                order.jenis_produk
+                                            )}
+                                        </Table.Cell>
                                         <Table.Cell>{order.jumlah}</Table.Cell>
                                         <Table.Cell className="text-ink-soft">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</Table.Cell>
                                         <Table.Cell className="text-center">

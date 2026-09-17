@@ -25,7 +25,7 @@ class OrderController extends Controller
     }
     public function index(Request $request)
     {
-        $query = Order::with('customer')
+        $query = Order::with(['customer', 'items'])
             ->when($request->search, fn($q, $s) =>
                 $q->where('no_order', 'like', "%{$s}%")
                   ->orWhereHas('customer', fn($q2) => $q2->where('nama', 'like', "%{$s}%"))
