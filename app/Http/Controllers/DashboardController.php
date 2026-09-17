@@ -58,6 +58,13 @@ class DashboardController extends Controller
                 'total_roles'         => \Spatie\Permission\Models\Role::count(),
                 'ringkasan_divisi'    => \App\Models\User::selectRaw('divisi, count(*) as total')->groupBy('divisi')->pluck('total', 'divisi'),
                 'recent_users'        => \App\Models\User::with('roles')->latest()->take(5)->get(),
+                'total_piutang'       => \App\Models\Order::whereNotIn('status', ['selesai', 'draft'])->sum('sisa_bayar'),
+                'piutang_lama'        => \App\Models\Order::with('customer')
+                                            ->whereNotIn('status', ['selesai', 'draft'])
+                                            ->where('sisa_bayar', '>', 0)
+                                            ->orderBy('created_at', 'asc')
+                                            ->take(5)
+                                            ->get(),
             ];
         } elseif ($level === \App\Models\User::LEVEL_OWNER) {
             $omzetBulanIni = \App\Models\Order::where('status', 'selesai')
