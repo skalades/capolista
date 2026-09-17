@@ -50,7 +50,7 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
                 $isTanggalEmpty = empty(trim((string)($row[0] ?? '')));
 
                 if (isset($row[0]) && is_numeric($row[0])) {
-                    $tanggalOrder = Date::excelToDateTimeObject($row[0]);
+                    $tanggalOrder = Carbon::instance(Date::excelToDateTimeObject($row[0]));
                 } elseif (!$isTanggalEmpty) {
                     try {
                         $tanggalOrder = Carbon::parse($row[0]);
@@ -89,7 +89,7 @@ class OrdersImport implements ToCollection, WithStartRow, WithCalculatedFormulas
                 
                 $deadline = Carbon::parse($tanggalOrder)->addDays(14);
                 if (isset($row[7]) && is_numeric($row[7])) {
-                    $deadline = Date::excelToDateTimeObject($row[7]);
+                    $deadline = Carbon::instance(Date::excelToDateTimeObject($row[7]));
                 } elseif (!empty($row[7])) {
                     try {
                         $deadline = Carbon::parse($row[7]);
