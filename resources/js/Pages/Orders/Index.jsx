@@ -26,20 +26,38 @@ const STATUS_LABELS = {
 
 export default function OrderIndex({ orders, filters = {}, customers = [] }) {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [selectedOrders, setSelectedOrders] = useState([]);
     const { data, setData, post, processing, errors, reset } = useForm({
         file: null,
     });
 
+    const handleBulkUpdate = (status) => {
+        if (!status || selectedOrders.length === 0) return;
+        if (confirm(`Apakah Anda yakin ingin mengubah status ${selectedOrders.length} order yang dipilih menjadi "${STATUS_LABELS[status]}"?`)) {
+            router.post(route('orders.bulk-update-status'), {
+                order_ids: selectedOrders,
+                status: status
+            }, {
+                onSuccess: () => setSelectedOrders([])
+            });
+        }
+    };
+
     const handleSearch = (search) => {
-        router.get(route('orders.index'), { search, status: filters.status, filter_deadline: filters.filter_deadline }, { preserveState: true, replace: true });
+        router.get(route('orders.index'), { search, status: filters.status, filter_deadline: filters.filter_deadline, source: filters.source }, { preserveState: true, replace: true });
     };
 
     const handleStatusFilter = (e) => {
-        router.get(route('orders.index'), { search: filters.search, status: e.target.value, filter_deadline: filters.filter_deadline }, { preserveState: true, replace: true });
+        router.get(route('orders.index'), { search: filters.search, status: e.target.value, filter_deadline: filters.filter_deadline, source: filters.source }, { preserveState: true, replace: true });
     };
 
+
     const handleDeadlineFilter = (e) => {
-        router.get(route('orders.index'), { search: filters.search, status: filters.status, filter_deadline: e.target.value }, { preserveState: true, replace: true });
+        router.get(route('orders.index'), { search: filters.search, status: filters.status, filter_deadline: e.target.value, source: filters.source }, { preserveState: true, replace: true });
+    };
+
+    const handleSourceFilter = (e) => {
+        router.get(route('orders.index'), { search: filters.search, status: filters.status, filter_deadline: filters.filter_deadline, source: e.target.value }, { preserveState: true, replace: true });
     };
 
     const submitImport = (e) => {
@@ -99,6 +117,14 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                         <option value="mendekati">Mendekati (H-3)</option>
                         <option value="lewat">Terlewat</option>
                     </select>
+                    <select
+                        value={filters.source || ''}
+                        onChange={handleSourceFilter}
+                        className="block w-full sm:w-48 rounded-md border-line py-1.5 text-ink text-[13px] focus:ring-2 focus:ring-navy focus:border-navy"
+                    >
+                        <option value="">Semua Sumber</option>
+                        <option value="import">Hasil Import Excel</option>
+                    </select>
                 </div>
             </Card>
             
@@ -110,51 +136,97 @@ export default function OrderIndex({ orders, filters = {}, customers = [] }) {
                         icon={DocumentDuplicateIcon}
                     />
                 ) : (
-                    <Table>
-                        <Table.Head>
-                            <Table.HeadCell>No. Order</Table.HeadCell>
-                            <Table.HeadCell>Customer</Table.HeadCell>
-                            <Table.HeadCell>Jenis Produk</Table.HeadCell>
-                            <Table.HeadCell>Jumlah</Table.HeadCell>
-                            <Table.HeadCell>Deadline</Table.HeadCell>
-                            <Table.HeadCell className="text-center">Status</Table.HeadCell>
-                            <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body>
-                            {orders.data.map((order) => (
-                                <Table.Row key={order.id}>
-                                    <Table.Cell className="font-mono font-medium text-[13px] text-ink">{order.no_order}</Table.Cell>
-                                    <Table.Cell>{order.customer?.nama || '-'}</Table.Cell>
-                                    <Table.Cell>{order.jenis_produk}</Table.Cell>
-                                    <Table.Cell>{order.jumlah}</Table.Cell>
-                                    <Table.Cell className="text-ink-soft">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</Table.Cell>
-                                    <Table.Cell className="text-center">
-                                        <Badge status={STATUS_SEMANTICS[order.status] || 'neutral'}>
-                                            {STATUS_LABELS[order.status] || order.status}
-                                        </Badge>
-                                    </Table.Cell>
-                                    <Table.Cell className="text-right space-x-3">
-                                        <Link href={route('orders.show', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">
-                                            Detail
-                                        </Link>
-                                        <Link href={route('orders.edit', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">
-                                            Edit
-                                        </Link>
-                                        <button 
-                                            onClick={() => {
-                                                if(confirm('Apakah Anda yakin ingin menghapus order ini?')) {
-                                                    router.delete(route('orders.destroy', order.id));
-                                                }
-                                            }}
-                                            className="text-[12px] font-medium text-danger hover:text-danger/70"
-                                        >
-                                            Hapus
-                                        </button>
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
+                    <>
+                        <div className="mb-4 flex gap-2 items-center" style={{ display: selectedOrders.length > 0 ? 'flex' : 'none' }}>
+                            <span className="text-[13px] font-medium text-ink-soft mr-2">
+                                {selectedOrders.length} order dipilih
+                            </span>
+                            <select
+                                onChange={(e) => handleBulkUpdate(e.target.value)}
+                                className="block rounded-md border-line py-1 text-ink text-[12px] focus:ring-2 focus:ring-navy focus:border-navy"
+                                value=""
+                            >
+                                <option value="" disabled>Ubah Status Massal...</option>
+                                {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                                    <option key={val} value={val}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <Table>
+                            <Table.Head>
+                                <Table.HeadCell className="w-8">
+                                    <input 
+                                        type="checkbox" 
+                                        className="rounded border-line text-navy focus:ring-navy"
+                                        checked={orders.data.length > 0 && selectedOrders.length === orders.data.length}
+                                        onChange={(e) => {
+                                            if (e.target.checked) {
+                                                setSelectedOrders(orders.data.map(o => o.id));
+                                            } else {
+                                                setSelectedOrders([]);
+                                            }
+                                        }}
+                                    />
+                                </Table.HeadCell>
+                                <Table.HeadCell>No. Order</Table.HeadCell>
+                                <Table.HeadCell>Customer</Table.HeadCell>
+                                <Table.HeadCell>Jenis Produk</Table.HeadCell>
+                                <Table.HeadCell>Jumlah</Table.HeadCell>
+                                <Table.HeadCell>Deadline</Table.HeadCell>
+                                <Table.HeadCell className="text-center">Status</Table.HeadCell>
+                                <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
+                            </Table.Head>
+                            <Table.Body>
+                                {orders.data.map((order) => (
+                                    <Table.Row key={order.id}>
+                                        <Table.Cell>
+                                            <input 
+                                                type="checkbox" 
+                                                className="rounded border-line text-navy focus:ring-navy"
+                                                checked={selectedOrders.includes(order.id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedOrders([...selectedOrders, order.id]);
+                                                    } else {
+                                                        setSelectedOrders(selectedOrders.filter(id => id !== order.id));
+                                                    }
+                                                }}
+                                            />
+                                        </Table.Cell>
+                                        <Table.Cell className="font-mono font-medium text-[13px] text-ink">{order.no_order}</Table.Cell>
+
+                                        <Table.Cell>{order.customer?.nama || '-'}</Table.Cell>
+                                        <Table.Cell>{order.jenis_produk}</Table.Cell>
+                                        <Table.Cell>{order.jumlah}</Table.Cell>
+                                        <Table.Cell className="text-ink-soft">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</Table.Cell>
+                                        <Table.Cell className="text-center">
+                                            <Badge status={STATUS_SEMANTICS[order.status] || 'neutral'}>
+                                                {STATUS_LABELS[order.status] || order.status}
+                                            </Badge>
+                                        </Table.Cell>
+                                        <Table.Cell className="text-right space-x-3">
+                                            <Link href={route('orders.show', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">
+                                                Detail
+                                            </Link>
+                                            <Link href={route('orders.edit', order.id)} className="text-[12px] font-medium text-navy hover:text-navy/70">
+                                                Edit
+                                            </Link>
+                                            <button 
+                                                onClick={() => {
+                                                    if(confirm('Apakah Anda yakin ingin menghapus order ini?')) {
+                                                        router.delete(route('orders.destroy', order.id));
+                                                    }
+                                                }}
+                                                className="text-[12px] font-medium text-danger hover:text-danger/70"
+                                            >
+                                                Hapus
+                                            </button>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table>
+                    </>
                 )}
 
                 {orders?.links && orders.data.length > 0 && (

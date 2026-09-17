@@ -46,13 +46,16 @@ class OrderController extends Controller
                     return $q->whereBetween('deadline', [$today, $today->copy()->addDays(3)])->whereNotIn('status', ['selesai', 'dikirim']);
                 }
             })
+            ->when($request->source === 'import', fn($q) => 
+                $q->whereHas('orderLogs', fn($log) => $log->where('catatan', 'like', '%Excel%')->whereNull('status_lama'))
+            )
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
         return Inertia::render('Orders/Index', [
             'orders'  => $query,
-            'filters' => $request->only(['search', 'status', 'deadline_from', 'deadline_to', 'filter_deadline']),
+            'filters' => $request->only(['search', 'status', 'deadline_from', 'deadline_to', 'filter_deadline', 'source']),
         ]);
     }
 
@@ -154,6 +157,50 @@ class OrderController extends Controller
         return back()->with('success', 'Status order berhasil diperbarui.');
     }
 
+    public function bulkUpdateStatus(Request $request)
+    {
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id',
+            'status' => 'required|string',
+        ]);
+        
+        $orders = Order::whereIn('id', $request->order_ids)->get();
+        foreach ($orders as $order) {
+            $statusLama = $order->status;
+            $statusBaru = $request->status;
+
+            if ($statusLama === $statusBaru) {
+                continue;
+            }
+
+            $order->update(['status' => $statusBaru]);
+
+            OrderLog::create([
+                'order_id'    => $order->id,
+                'user_id'     => auth()->id(),
+                'status_lama' => $statusLama,
+                'status_baru' => $statusBaru,
+                'catatan'     => 'Bulk update status',
+            ]);
+
+            if ($statusBaru === Order::STATUS_DESAIN && !$order->desain) {
+                Desain::create(['order_id' => $order->id, 'versi' => 1, 'dikerjakan_oleh' => auth()->id()]);
+            }
+            if ($statusBaru === Order::STATUS_PRINTING && !$order->printing) {
+                Printing::create(['order_id' => $order->id]);
+            }
+            if ($statusBaru === Order::STATUS_PEMASANGAN && !$order->pemasangan) {
+                Pemasangan::create(['order_id' => $order->id]);
+            }
+            if ($statusBaru === Order::STATUS_PACKING && !$order->packing) {
+                Packing::create(['order_id' => $order->id]);
+            }
+        }
+
+        return back()->with('success', 'Status pesanan berhasil diperbarui secara massal.');
+    }
+
     public function uploadFile(Request $request, Order $order)
     {
         $request->validate([
@@ -191,6 +238,10 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        if (auth()->user()->level_akses > 2) {
+            abort(403, 'Anda tidak berhak menghapus order.');
+        }
+
         $order->delete();
         return redirect()->route('orders.index')
             ->with('success', "Order {$order->no_order} berhasil dihapus.");

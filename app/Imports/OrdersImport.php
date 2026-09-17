@@ -68,7 +68,9 @@ class OrdersImport implements ToCollection, WithStartRow
                 $penjahit    = trim((string) ($row[11] ?? ''));
                 $kategori    = trim((string) ($row[12] ?? ''));
                 
-                $totalHarga  = (float) ($row[14] ?? 0);
+                $totalHargaStr = (string) ($row[14] ?? '0');
+                $totalHargaStr = preg_replace('/[^0-9]/', '', $totalHargaStr);
+                $totalHarga  = (float) $totalHargaStr;
                 
                 $deadline = Carbon::parse($tanggalOrder)->addDays(14);
                 if (isset($row[7]) && is_numeric($row[7])) {
@@ -81,13 +83,14 @@ class OrdersImport implements ToCollection, WithStartRow
 
                 // DPs (Kolom 15 sampai 20)
                 $dps = [
-                    'dp1'       => (float) ($row[15] ?? 0),
-                    'dp2'       => (float) ($row[16] ?? 0),
-                    'dp3'       => (float) ($row[17] ?? 0),
-                    'dp4'       => (float) ($row[18] ?? 0),
-                    'dp5'       => (float) ($row[19] ?? 0),
-                    'pelunasan' => (float) ($row[20] ?? 0),
+                    'dp1'       => (float) preg_replace('/[^0-9]/', '', (string)($row[15] ?? '0')),
+                    'dp2'       => (float) preg_replace('/[^0-9]/', '', (string)($row[16] ?? '0')),
+                    'dp3'       => (float) preg_replace('/[^0-9]/', '', (string)($row[17] ?? '0')),
+                    'dp4'       => (float) preg_replace('/[^0-9]/', '', (string)($row[18] ?? '0')),
+                    'dp5'       => (float) preg_replace('/[^0-9]/', '', (string)($row[19] ?? '0')),
+                    'pelunasan' => (float) preg_replace('/[^0-9]/', '', (string)($row[20] ?? '0')),
                 ];
+
 
                 $totalDp = array_sum($dps);
                 $sisaBayar = $totalHarga - $totalDp;
@@ -124,7 +127,7 @@ class OrdersImport implements ToCollection, WithStartRow
                     'customer_id'    => $customer->id,
                     'tanggal_order'  => $tanggalOrder,
                     'deadline'       => $deadline,
-                    'status'         => Order::STATUS_DRAFT,
+                    'status'         => $status,
                     'jenis_produk'   => $jenisProduk,
                     'jumlah'         => $qty > 0 ? $qty : 1,
                     'total_harga'    => $totalHarga,
@@ -147,7 +150,7 @@ class OrdersImport implements ToCollection, WithStartRow
                     'order_id'    => $order->id,
                     'user_id'     => $userId,
                     'status_lama' => null,
-                    'status_baru' => Order::STATUS_DRAFT,
+                    'status_baru' => $status,
                     'catatan'     => 'Order diimpor dari Excel',
                 ]);
 

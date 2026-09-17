@@ -48,7 +48,11 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
         Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
-        
+    });
+
+    // --- Orders (Accessible to all staffs 0,1,2,3,4) ---
+    Route::middleware('level:0,1,2,3,4')->group(function () {
+        Route::post('/orders/bulk-update-status', [OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
         Route::resource('orders', OrderController::class)->except(['show']);
         Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
         Route::post('/orders/{order}/upload-file', [OrderController::class, 'uploadFile'])->name('orders.upload-file');
