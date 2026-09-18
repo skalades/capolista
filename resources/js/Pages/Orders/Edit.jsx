@@ -3,8 +3,9 @@ import Card from '@/Components/Card';
 import { useForm, Link } from '@inertiajs/react';
 import { PlusIcon } from '@heroicons/react/20/solid';
 
+const baseSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
+
 export default function OrderEdit({ order, customers = [] }) {
-    const defaultUkuran = { S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 };
     
     // Group order items by jenis_produk to build the initial repeater items
     const initialItems = [];
@@ -14,20 +15,24 @@ export default function OrderEdit({ order, customers = [] }) {
             if (!acc[key]) {
                 acc[key] = {
                     jenis_produk: item.jenis_produk,
-                    ukuran_detail: { ...defaultUkuran },
+                    ukuran_detail: {},
                     jumlah: 0,
-                    harga_satuan: item.harga_satuan ? parseInt(item.harga_satuan, 10).toString() : ''
+                    harga_satuan: item.harga_satuan ? parseInt(item.harga_satuan, 10).toString() : '',
+                    show_panjang: false
                 };
             }
             if (item.ukuran) {
                 acc[key].ukuran_detail[item.ukuran] = item.jumlah_pcs;
+                if (item.ukuran.includes('Panjang')) {
+                    acc[key].show_panjang = true;
+                }
             }
             acc[key].jumlah += item.jumlah_pcs;
             return acc;
         }, {});
         initialItems.push(...Object.values(grouped));
     } else {
-        initialItems.push({ jenis_produk: order?.jenis_produk || '', ukuran_detail: { ...defaultUkuran }, jumlah: order?.jumlah || 0, harga_satuan: '' });
+        initialItems.push({ jenis_produk: order?.jenis_produk || '', ukuran_detail: {}, jumlah: order?.jumlah || 0, harga_satuan: '', show_panjang: false });
     }
 
     const { data, setData, put, processing, errors } = useForm({
@@ -99,7 +104,7 @@ export default function OrderEdit({ order, customers = [] }) {
     const addItem = () => {
         setData('items', [
             ...data.items, 
-            { jenis_produk: '', ukuran_detail: { ...defaultUkuran }, jumlah: 0, harga_satuan: '' }
+            { jenis_produk: '', ukuran_detail: {}, jumlah: 0, harga_satuan: '', show_panjang: false }
         ]);
     };
 
@@ -191,10 +196,20 @@ export default function OrderEdit({ order, customers = [] }) {
                                                     <label className="block text-xs font-medium text-gray-700 mb-1">Jenis Produk #{index + 1}</label>
                                                     <input
                                                         type="text"
+                                                        list="jenis-produk-list-edit"
                                                         value={item.jenis_produk}
                                                         onChange={e => handleJenisProdukChange(index, e.target.value)}
                                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                                     />
+                                                    {index === 0 && (
+                                                        <datalist id="jenis-produk-list-edit">
+                                                            <option value="Kaos Oblong" />
+                                                            <option value="Kemeja PDH" />
+                                                            <option value="Jaket" />
+                                                            <option value="Jersey" />
+                                                            <option value="Celana" />
+                                                        </datalist>
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <label className="block text-xs font-medium text-gray-700 mb-1">Harga Satuan</label>
@@ -209,21 +224,56 @@ export default function OrderEdit({ order, customers = [] }) {
                                             </div>
 
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-700 mb-2">Detail Ukuran</label>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <label className="block text-xs font-medium text-gray-700">Detail Ukuran</label>
+                                                    <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer hover:text-brand-600">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={item.show_panjang || false}
+                                                            onChange={e => {
+                                                                const newItems = [...data.items];
+                                                                newItems[index].show_panjang = e.target.checked;
+                                                                setData('items', newItems);
+                                                            }}
+                                                            className="rounded border-gray-300 text-brand-600 focus:ring-brand-600 w-4 h-4"
+                                                        />
+                                                        Ada Ukuran Panjang?
+                                                    </label>
+                                                </div>
                                                 <div className="grid grid-cols-3 gap-3">
-                                                    {Object.keys(item.ukuran_detail).map(size => (
+                                                    {baseSizes.map(size => (
                                                         <div key={size} className="flex items-center gap-2">
                                                             <span className="w-8 text-xs font-medium text-gray-500">{size}</span>
                                                             <input
                                                                 type="number"
                                                                 min="0"
-                                                                value={item.ukuran_detail[size] || ''}
+                                                                value={item.ukuran_detail?.[size] || ''}
                                                                 onChange={e => handleUkuranChange(index, size, e.target.value)}
                                                                 className="block w-full rounded-md border-0 py-1 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm"
                                                             />
                                                         </div>
                                                     ))}
                                                 </div>
+                                                
+                                                {item.show_panjang && (
+                                                    <div className="grid grid-cols-3 gap-3 mt-3 pt-3 border-t border-gray-200 border-dashed">
+                                                        {baseSizes.map(size => {
+                                                            const pSize = `${size} Panjang`;
+                                                            return (
+                                                                <div key={pSize} className="flex items-center gap-2">
+                                                                    <span className="w-16 text-xs font-medium text-gray-500 leading-tight whitespace-nowrap">{pSize}</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        value={item.ukuran_detail?.[pSize] || ''}
+                                                                        onChange={e => handleUkuranChange(index, pSize, e.target.value)}
+                                                                        className="block w-full rounded-md border-0 py-1 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm"
+                                                                    />
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}

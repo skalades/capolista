@@ -3,6 +3,8 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { ArrowLeftIcon, ArrowUpTrayIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
+const baseSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
+
 export default function OrderCreate({ customers = [] }) {
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
@@ -10,7 +12,7 @@ export default function OrderCreate({ customers = [] }) {
         nomor_kontak: '',
         alamat_pengiriman: '',
         items: [
-            { jenis_produk: '', ukuran_detail: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 }, jumlah: 0, harga_satuan: '' }
+            { jenis_produk: '', ukuran_detail: {}, jumlah: 0, harga_satuan: '', show_panjang: false }
         ],
         jumlah: 0,
         tanggal_order: new Date().toISOString().split('T')[0],
@@ -92,7 +94,7 @@ export default function OrderCreate({ customers = [] }) {
     const addItem = () => {
         setData('items', [
             ...data.items, 
-            { jenis_produk: '', ukuran_detail: { S: 0, M: 0, L: 0, XL: 0, XXL: 0 }, jumlah: 0, harga_satuan: '' }
+            { jenis_produk: '', ukuran_detail: {}, jumlah: 0, harga_satuan: '', show_panjang: false }
         ]);
     };
 
@@ -246,19 +248,23 @@ export default function OrderCreate({ customers = [] }) {
                                             <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
                                                 Jenis Produk #{index + 1}
                                             </label>
-                                            <select
+                                            <input
+                                                type="text"
+                                                list="jenis-produk-list"
                                                 value={item.jenis_produk}
                                                 onChange={e => handleJenisProdukChange(index, e.target.value)}
+                                                placeholder="Pilih atau ketik..."
                                                 className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2"
-                                            >
-                                                <option value="">Pilih Jenis Produk...</option>
-                                                <option value="Kaos Oblong">Kaos Oblong</option>
-                                                <option value="Kemeja PDH">Kemeja PDH</option>
-                                                <option value="Jaket">Jaket</option>
-                                                <option value="Jersey">Jersey</option>
-                                                <option value="Celana">Celana</option>
-                                                <option value="Lainnya">Lainnya...</option>
-                                            </select>
+                                            />
+                                            {index === 0 && (
+                                                <datalist id="jenis-produk-list">
+                                                    <option value="Kaos Oblong" />
+                                                    <option value="Kemeja PDH" />
+                                                    <option value="Jaket" />
+                                                    <option value="Jersey" />
+                                                    <option value="Celana" />
+                                                </datalist>
+                                            )}
                                             {errors[`items.${index}.jenis_produk`] && <p className="mt-1 text-[11px] text-danger">{errors[`items.${index}.jenis_produk`]}</p>}
                                         </div>
                                         <div>
@@ -276,24 +282,61 @@ export default function OrderCreate({ customers = [] }) {
                                     </div>
 
                                     <div>
-                                        <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-2">
-                                            Rincian Ukuran (Pcs)
-                                        </label>
+                                        <div className="flex justify-between items-center mb-3">
+                                            <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider">
+                                                Rincian Ukuran (Pcs)
+                                            </label>
+                                            <label className="flex items-center gap-2 text-[12px] font-medium text-ink cursor-pointer hover:text-navy">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={item.show_panjang || false}
+                                                    onChange={e => {
+                                                        const newItems = [...data.items];
+                                                        newItems[index].show_panjang = e.target.checked;
+                                                        setData('items', newItems);
+                                                    }}
+                                                    className="rounded border-line text-navy focus:ring-navy w-4 h-4"
+                                                />
+                                                Ada Ukuran Panjang?
+                                            </label>
+                                        </div>
+                                        
                                         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                                            {Object.keys(item.ukuran_detail).map(size => (
+                                            {baseSizes.map(size => (
                                                 <div key={size} className="flex items-center gap-3">
-                                                    <span className="font-bold text-[14px] text-ink w-4">{size}</span>
+                                                    <span className="font-bold text-[14px] text-ink w-8">{size}</span>
                                                     <input
                                                         type="number"
                                                         min="0"
-                                                        value={item.ukuran_detail[size] || ''}
+                                                        value={item.ukuran_detail?.[size] || ''}
                                                         onChange={e => handleUkuranChange(index, size, e.target.value)}
                                                         placeholder="0"
-                                                        className="block w-24 border-line bg-white rounded-md text-[13px] text-center font-semibold text-ink focus:ring-navy focus:border-navy py-1.5"
+                                                        className="block w-20 border-line bg-white rounded-md text-[13px] text-center font-semibold text-ink focus:ring-navy focus:border-navy py-1.5"
                                                     />
                                                 </div>
                                             ))}
                                         </div>
+
+                                        {item.show_panjang && (
+                                            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-3 pt-3 border-t border-line border-dashed bg-navy/5 p-3 rounded-md">
+                                                {baseSizes.map(size => {
+                                                    const pSize = `${size} Panjang`;
+                                                    return (
+                                                        <div key={pSize} className="flex items-center gap-3">
+                                                            <span className="font-bold text-[13px] text-ink w-16 leading-tight whitespace-nowrap">{pSize}</span>
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                value={item.ukuran_detail?.[pSize] || ''}
+                                                                onChange={e => handleUkuranChange(index, pSize, e.target.value)}
+                                                                placeholder="0"
+                                                                className="block w-20 border-line bg-white rounded-md text-[13px] text-center font-semibold text-ink focus:ring-navy focus:border-navy py-1.5"
+                                                            />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
