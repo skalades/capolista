@@ -19,11 +19,58 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
     const [chartData, setChartData] = useState({ labels: [], pemasukan: [], pengeluaran: [] });
     const [loadingChart, setLoadingChart] = useState(false);
 
+    // Arus Kas chart filter state
+    const [kasFilter, setKasFilter] = useState('7_hari');
+    const [kasStart, setKasStart] = useState('');
+    const [kasEnd, setKasEnd] = useState('');
+    const [kasChartData, setKasChartData] = useState({
+        labels: arusKas.map(d => d.date),
+        pemasukan: arusKas.map(d => d.pemasukan),
+        pengeluaran: arusKas.map(d => d.pengeluaran),
+    });
+    const [kasLoading, setKasLoading] = useState(false);
+
+    const toDateStr = (date) => date.toISOString().split('T')[0];
+
+    const fetchKasData = (filter, start, end) => {
+        if (filter === 'custom' && (!start || !end)) return;
+        setKasLoading(true);
+        const today = new Date();
+        let params = {};
+        if (filter === '7_hari') {
+            const s = new Date(today); s.setDate(today.getDate() - 6);
+            params = { filter: 'custom', start_date: toDateStr(s), end_date: toDateStr(today) };
+        } else if (filter === '14_hari') {
+            const s = new Date(today); s.setDate(today.getDate() - 13);
+            params = { filter: 'custom', start_date: toDateStr(s), end_date: toDateStr(today) };
+        } else if (filter === '30_hari') {
+            const s = new Date(today); s.setDate(today.getDate() - 29);
+            params = { filter: 'custom', start_date: toDateStr(s), end_date: toDateStr(today) };
+        } else if (filter === 'custom') {
+            params = { filter: 'custom', start_date: start, end_date: end };
+        }
+        axios.get(route('keuangan.api.analitik'), { params })
+            .then(res => {
+                setKasChartData({
+                    labels: res.data.labels,
+                    pemasukan: res.data.pemasukan,
+                    pengeluaran: res.data.pengeluaran,
+                });
+            })
+            .finally(() => setKasLoading(false));
+    };
+
     useEffect(() => {
         if (activeTab === 'analitik') {
             fetchAnalitik();
         }
     }, [activeTab, analitikFilter]);
+
+    useEffect(() => {
+        if (kasFilter !== 'custom') {
+            fetchKasData(kasFilter);
+        }
+    }, [kasFilter]);
 
     const fetchAnalitik = () => {
         if (analitikFilter === 'custom' && (!customStart || !customEnd)) return;
@@ -36,6 +83,7 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
             setLoadingChart(false);
         });
     };
+
 
     // Short formatter e.g., 32,7jt, 900rb
     const formatShort = (num) => {
@@ -125,94 +173,150 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                                 
                                 {/* Arus Kas Chart */}
                                 <Card className="!p-0 overflow-hidden">
-                                    <div className="flex justify-between items-start px-5 pt-5 pb-2">
+                                    {/* Header row */}
+                                    <div className="flex flex-wrap justify-between items-start gap-3 px-5 pt-5 pb-3 border-b border-line">
                                         <div>
-                                            <h3 className="text-[18px] font-oswald font-bold text-ink">Arus Kas 7 Hari Terakhir</h3>
+                                            <h3 className="text-[18px] font-oswald font-bold text-ink">Arus Kas</h3>
                                             <p className="text-[11.5px] text-ink-soft mt-0.5">Perkembangan harian pemasukan vs pengeluaran</p>
                                         </div>
-                                        <span className="text-[10.5px] font-medium text-ink-soft bg-bg border border-line rounded-full px-3 py-1 mt-1">
-                                            {arusKas.length > 0 ? arusKas[arusKas.length - 1].date : '—'}
-                                        </span>
+                                        {/* Filter preset buttons */}
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            {[
+                                                { key: '7_hari',  label: '7H' },
+                                                { key: '14_hari', label: '14H' },
+                                                { key: '30_hari', label: '30H' },
+                                                { key: 'custom',  label: 'Custom' },
+                                            ].map(opt => (
+                                                <button
+                                                    key={opt.key}
+                                                    onClick={() => setKasFilter(opt.key)}
+                                                    className={`text-[11px] font-medium px-3 py-1 rounded-full border transition-colors ${
+                                                        kasFilter === opt.key
+                                                            ? 'bg-navy text-white border-navy'
+                                                            : 'bg-bg text-ink-soft border-line hover:border-navy hover:text-ink'
+                                                    }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <Chart
-                                        options={{
-                                            chart: {
-                                                type: 'area',
-                                                toolbar: { show: false },
-                                                fontFamily: '"IBM Plex Sans", sans-serif',
-                                                animations: { enabled: true, easing: 'easeinout', speed: 600 },
-                                                background: 'transparent',
-                                            },
-                                            colors: ['#2F6F62', '#A8402F'],
-                                            fill: {
-                                                type: 'gradient',
-                                                gradient: {
-                                                    shadeIntensity: 1,
-                                                    opacityFrom: 0.28,
-                                                    opacityTo: 0.02,
-                                                    stops: [0, 100],
-                                                }
-                                            },
-                                            stroke: {
-                                                curve: 'smooth',
-                                                width: 2,
-                                            },
-                                            dataLabels: { enabled: false },
-                                            markers: {
-                                                size: 0,
-                                                hover: { size: 5 }
-                                            },
-                                            xaxis: {
-                                                categories: arusKas.map(d => d.date),
-                                                labels: {
-                                                    style: {
-                                                        colors: '#6B655C',
-                                                        fontSize: '10px',
-                                                        fontFamily: '"IBM Plex Mono", monospace',
+
+                                    {/* Custom date picker row */}
+                                    {kasFilter === 'custom' && (
+                                        <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-line bg-bg/50">
+                                            <span className="text-[11.5px] text-ink-soft font-medium">Periode:</span>
+                                            <input
+                                                type="date"
+                                                value={kasStart}
+                                                onChange={e => setKasStart(e.target.value)}
+                                                className="text-[12px] font-mono border border-line rounded px-2 py-1 bg-panel text-ink focus:outline-none focus:border-accent"
+                                            />
+                                            <span className="text-ink-soft text-[11px]">s/d</span>
+                                            <input
+                                                type="date"
+                                                value={kasEnd}
+                                                onChange={e => setKasEnd(e.target.value)}
+                                                className="text-[12px] font-mono border border-line rounded px-2 py-1 bg-panel text-ink focus:outline-none focus:border-accent"
+                                            />
+                                            <button
+                                                onClick={() => fetchKasData('custom', kasStart, kasEnd)}
+                                                disabled={!kasStart || !kasEnd || kasLoading}
+                                                className="text-[11.5px] font-medium px-3 py-1 rounded border bg-accent text-white border-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                Terapkan
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Chart area */}
+                                    {kasLoading ? (
+                                        <div className="h-[220px] flex items-center justify-center text-ink-soft text-[13px]">
+                                            <svg className="animate-spin w-5 h-5 mr-2 text-accent" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                                            </svg>
+                                            Memuat data...
+                                        </div>
+                                    ) : (
+                                        <Chart
+                                            options={{
+                                                chart: {
+                                                    type: 'area',
+                                                    toolbar: { show: false },
+                                                    fontFamily: '"IBM Plex Sans", sans-serif',
+                                                    animations: { enabled: true, easing: 'easeinout', speed: 600 },
+                                                    background: 'transparent',
+                                                },
+                                                colors: ['#2F6F62', '#A8402F'],
+                                                fill: {
+                                                    type: 'gradient',
+                                                    gradient: {
+                                                        shadeIntensity: 1,
+                                                        opacityFrom: 0.28,
+                                                        opacityTo: 0.02,
+                                                        stops: [0, 100],
                                                     }
                                                 },
-                                                axisBorder: { show: false },
-                                                axisTicks: { show: false },
-                                            },
-                                            yaxis: {
-                                                min: 0,
-                                                forceNiceScale: true,
-                                                labels: {
-                                                    formatter: (val) => 'Rp ' + formatShort(val),
-                                                    style: {
-                                                        colors: '#6B655C',
-                                                        fontSize: '10px',
-                                                        fontFamily: '"IBM Plex Sans", sans-serif',
+                                                stroke: { curve: 'smooth', width: 2 },
+                                                dataLabels: { enabled: false },
+                                                markers: { size: 0, hover: { size: 5 } },
+                                                xaxis: {
+                                                    categories: kasChartData.labels,
+                                                    tickAmount: Math.min(kasChartData.labels.length, 14),
+                                                    labels: {
+                                                        rotate: -30,
+                                                        hideOverlappingLabels: true,
+                                                        style: {
+                                                            colors: '#6B655C',
+                                                            fontSize: '10px',
+                                                            fontFamily: '"IBM Plex Mono", monospace',
+                                                        }
+                                                    },
+                                                    axisBorder: { show: false },
+                                                    axisTicks: { show: false },
+                                                },
+                                                yaxis: {
+                                                    min: 0,
+                                                    forceNiceScale: true,
+                                                    labels: {
+                                                        formatter: (val) => 'Rp ' + formatShort(val),
+                                                        style: {
+                                                            colors: '#6B655C',
+                                                            fontSize: '10px',
+                                                            fontFamily: '"IBM Plex Sans", sans-serif',
+                                                        }
                                                     }
+                                                },
+                                                grid: {
+                                                    borderColor: '#DCD3BF',
+                                                    strokeDashArray: 4,
+                                                    padding: { top: -10, right: 10, bottom: 0, left: 10 }
+                                                },
+                                                tooltip: {
+                                                    theme: 'light',
+                                                    y: { formatter: (val) => 'Rp ' + fmtRupiah(val) }
+                                                },
+                                                legend: {
+                                                    position: 'top',
+                                                    horizontalAlign: 'right',
+                                                    markers: { radius: 2, width: 10, height: 10 },
+                                                    labels: { colors: '#6B655C' },
+                                                    fontFamily: '"IBM Plex Sans", sans-serif',
+                                                    fontSize: '11px',
+                                                    itemMargin: { horizontal: 10 },
                                                 }
-                                            },
-                                            grid: {
-                                                borderColor: '#DCD3BF',
-                                                strokeDashArray: 4,
-                                                padding: { top: -10, right: 10, bottom: 0, left: 10 }
-                                            },
-                                            tooltip: {
-                                                theme: 'light',
-                                                y: { formatter: (val) => 'Rp ' + fmtRupiah(val) }
-                                            },
-                                            legend: {
-                                                position: 'top',
-                                                horizontalAlign: 'right',
-                                                markers: { radius: 2, width: 10, height: 10 },
-                                                labels: { colors: '#6B655C' },
-                                                fontFamily: '"IBM Plex Sans", sans-serif',
-                                                fontSize: '11px',
-                                                itemMargin: { horizontal: 10 },
-                                            }
-                                        }}
-                                        series={[
-                                            { name: 'Pemasukan', data: arusKas.map(d => d.pemasukan) },
-                                            { name: 'Pengeluaran', data: arusKas.map(d => d.pengeluaran) }
-                                        ]}
-                                        type="area"
-                                        height={220}
-                                    />
+                                            }}
+                                            series={[
+                                                { name: 'Pemasukan', data: kasChartData.pemasukan },
+                                                { name: 'Pengeluaran', data: kasChartData.pengeluaran }
+                                            ]}
+                                            type="area"
+                                            height={220}
+                                        />
+                                    )}
                                 </Card>
+
 
 
                                 {/* Pembayaran Terakhir */}
