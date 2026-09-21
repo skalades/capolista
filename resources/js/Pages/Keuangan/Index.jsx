@@ -52,13 +52,7 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
         return new Intl.NumberFormat('id-ID').format(num);
     };
 
-    // Calculate max value for Arus Kas chart height
-    let maxKas = 0;
-    arusKas.forEach(d => {
-        if (d.pemasukan > maxKas) maxKas = d.pemasukan;
-        if (d.pengeluaran > maxKas) maxKas = d.pengeluaran;
-    });
-    if (maxKas === 0) maxKas = 1; // Prevent divide by zero
+
 
     return (
         <AppLayout title="Dashboard Keuangan">
@@ -130,43 +124,96 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                             <div className="lg:col-span-2 space-y-6">
                                 
                                 {/* Arus Kas Chart */}
-                                <Card>
-                                    <div className="flex justify-between items-end mb-6">
-                                        <h3 className="text-[18px] font-oswald font-bold text-ink">Arus kas 7 hari terakhir</h3>
-                                        <span className="text-[11px] text-ink-soft">Pemasukan vs pengeluaran</span>
+                                <Card className="!p-0 overflow-hidden">
+                                    <div className="flex justify-between items-start px-5 pt-5 pb-2">
+                                        <div>
+                                            <h3 className="text-[18px] font-oswald font-bold text-ink">Arus Kas 7 Hari Terakhir</h3>
+                                            <p className="text-[11.5px] text-ink-soft mt-0.5">Perkembangan harian pemasukan vs pengeluaran</p>
+                                        </div>
+                                        <span className="text-[10.5px] font-medium text-ink-soft bg-bg border border-line rounded-full px-3 py-1 mt-1">
+                                            {arusKas.length > 0 ? arusKas[arusKas.length - 1].date : '—'}
+                                        </span>
                                     </div>
-                                    
-                                    <div className="flex justify-around items-end h-32 mb-4 overflow-hidden">
-                                        {arusKas.map((data, i) => {
-                                            const BAR_MAX_PX = 96; // corresponds to h-24
-                                            const pemH = Math.round((data.pemasukan / maxKas) * BAR_MAX_PX);
-                                            const pengH = Math.round((data.pengeluaran / maxKas) * BAR_MAX_PX);
-                                            
-                                            return (
-                                                <div key={i} className="flex flex-col items-center flex-1">
-                                                    <div className="flex items-end gap-1 w-full justify-center overflow-hidden" style={{ height: '96px' }}>
-                                                        <div 
-                                                            style={{ height: `${pemH}px`, minHeight: data.pemasukan > 0 ? '4px' : '0' }} 
-                                                            className="w-3 bg-navy rounded-t-sm flex-shrink-0"
-                                                            title={`Pemasukan: Rp ${fmtRupiah(data.pemasukan)}`}
-                                                        ></div>
-                                                        <div 
-                                                            style={{ height: `${pengH}px`, minHeight: data.pengeluaran > 0 ? '4px' : '0' }} 
-                                                            className="w-3 bg-danger rounded-t-sm flex-shrink-0"
-                                                            title={`Pengeluaran: Rp ${fmtRupiah(data.pengeluaran)}`}
-                                                        ></div>
-                                                    </div>
-                                                    <span className="text-[10px] text-ink-soft font-mono mt-2">{data.date}</span>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                    
-                                    <div className="flex gap-4 text-[11px] font-medium text-ink-soft border-t border-line pt-4 justify-center">
-                                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-navy"></div> Pemasukan</div>
-                                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-danger"></div> Pengeluaran</div>
-                                    </div>
+                                    <Chart
+                                        options={{
+                                            chart: {
+                                                type: 'area',
+                                                toolbar: { show: false },
+                                                fontFamily: '"IBM Plex Sans", sans-serif',
+                                                animations: { enabled: true, easing: 'easeinout', speed: 600 },
+                                                background: 'transparent',
+                                            },
+                                            colors: ['#2F6F62', '#A8402F'],
+                                            fill: {
+                                                type: 'gradient',
+                                                gradient: {
+                                                    shadeIntensity: 1,
+                                                    opacityFrom: 0.28,
+                                                    opacityTo: 0.02,
+                                                    stops: [0, 100],
+                                                }
+                                            },
+                                            stroke: {
+                                                curve: 'smooth',
+                                                width: 2,
+                                            },
+                                            dataLabels: { enabled: false },
+                                            markers: {
+                                                size: 0,
+                                                hover: { size: 5 }
+                                            },
+                                            xaxis: {
+                                                categories: arusKas.map(d => d.date),
+                                                labels: {
+                                                    style: {
+                                                        colors: '#6B655C',
+                                                        fontSize: '10px',
+                                                        fontFamily: '"IBM Plex Mono", monospace',
+                                                    }
+                                                },
+                                                axisBorder: { show: false },
+                                                axisTicks: { show: false },
+                                            },
+                                            yaxis: {
+                                                min: 0,
+                                                forceNiceScale: true,
+                                                labels: {
+                                                    formatter: (val) => 'Rp ' + formatShort(val),
+                                                    style: {
+                                                        colors: '#6B655C',
+                                                        fontSize: '10px',
+                                                        fontFamily: '"IBM Plex Sans", sans-serif',
+                                                    }
+                                                }
+                                            },
+                                            grid: {
+                                                borderColor: '#DCD3BF',
+                                                strokeDashArray: 4,
+                                                padding: { top: -10, right: 10, bottom: 0, left: 10 }
+                                            },
+                                            tooltip: {
+                                                theme: 'light',
+                                                y: { formatter: (val) => 'Rp ' + fmtRupiah(val) }
+                                            },
+                                            legend: {
+                                                position: 'top',
+                                                horizontalAlign: 'right',
+                                                markers: { radius: 2, width: 10, height: 10 },
+                                                labels: { colors: '#6B655C' },
+                                                fontFamily: '"IBM Plex Sans", sans-serif',
+                                                fontSize: '11px',
+                                                itemMargin: { horizontal: 10 },
+                                            }
+                                        }}
+                                        series={[
+                                            { name: 'Pemasukan', data: arusKas.map(d => d.pemasukan) },
+                                            { name: 'Pengeluaran', data: arusKas.map(d => d.pengeluaran) }
+                                        ]}
+                                        type="area"
+                                        height={220}
+                                    />
                                 </Card>
+
 
                                 {/* Pembayaran Terakhir */}
                                 <Card className="!p-0 overflow-hidden">
