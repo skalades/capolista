@@ -3,7 +3,7 @@ import Card from '@/Components/Card';
 import { useForm, Link } from '@inertiajs/react';
 import { PlusIcon } from '@heroicons/react/20/solid';
 
-const baseSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
+const baseSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
 
 export default function OrderEdit({ order, customers = [] }) {
     

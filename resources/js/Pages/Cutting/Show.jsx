@@ -7,7 +7,7 @@ import TextInput from '@/Components/TextInput';
 import Badge from '@/Components/Badge';
 
 export default function Show({ order }) {
-    const defaultSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
+    const defaultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
     
     let expectedSizes = {};
     if (order.items && order.items.length > 0) {

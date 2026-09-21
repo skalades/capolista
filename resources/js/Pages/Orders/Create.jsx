@@ -3,7 +3,7 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { ArrowLeftIcon, ArrowUpTrayIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
-const baseSizes = ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
+const baseSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
 
 export default function OrderCreate({ customers = [] }) {
     const { data, setData, post, processing, errors } = useForm({
