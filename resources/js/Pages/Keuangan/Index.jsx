@@ -136,26 +136,27 @@ export default function Index({ omzet, kasKeluar, piutang, labaBersih, recentPem
                                         <span className="text-[11px] text-ink-soft">Pemasukan vs pengeluaran</span>
                                     </div>
                                     
-                                    <div className="flex justify-around items-end h-32 mb-4">
+                                    <div className="flex justify-around items-end h-32 mb-4 overflow-hidden">
                                         {arusKas.map((data, i) => {
-                                            const pemPct = (data.pemasukan / maxKas) * 100;
-                                            const pengPct = (data.pengeluaran / maxKas) * 100;
+                                            const BAR_MAX_PX = 96; // corresponds to h-24
+                                            const pemH = Math.round((data.pemasukan / maxKas) * BAR_MAX_PX);
+                                            const pengH = Math.round((data.pengeluaran / maxKas) * BAR_MAX_PX);
                                             
                                             return (
                                                 <div key={i} className="flex flex-col items-center flex-1">
-                                                    <div className="flex items-end gap-1 w-full justify-center h-24 mb-2">
+                                                    <div className="flex items-end gap-1 w-full justify-center overflow-hidden" style={{ height: '96px' }}>
                                                         <div 
-                                                            style={{ height: `${pemPct}%`, minHeight: data.pemasukan > 0 ? '4px' : '0' }} 
-                                                            className="w-3 bg-navy rounded-t-sm"
+                                                            style={{ height: `${pemH}px`, minHeight: data.pemasukan > 0 ? '4px' : '0' }} 
+                                                            className="w-3 bg-navy rounded-t-sm flex-shrink-0"
                                                             title={`Pemasukan: Rp ${fmtRupiah(data.pemasukan)}`}
                                                         ></div>
                                                         <div 
-                                                            style={{ height: `${pengPct}%`, minHeight: data.pengeluaran > 0 ? '4px' : '0' }} 
-                                                            className="w-3 bg-danger rounded-t-sm"
+                                                            style={{ height: `${pengH}px`, minHeight: data.pengeluaran > 0 ? '4px' : '0' }} 
+                                                            className="w-3 bg-danger rounded-t-sm flex-shrink-0"
                                                             title={`Pengeluaran: Rp ${fmtRupiah(data.pengeluaran)}`}
                                                         ></div>
                                                     </div>
-                                                    <span className="text-[10px] text-ink-soft font-mono">{data.date}</span>
+                                                    <span className="text-[10px] text-ink-soft font-mono mt-2">{data.date}</span>
                                                 </div>
                                             )
                                         })}
