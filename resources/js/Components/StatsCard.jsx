@@ -15,7 +15,7 @@ export default function StatsCard({ title, value, caption, status = 'accent', ac
     const activeStitch = stitchClasses[status] || 'kpi-stitch';
 
     return (
-        <div className={`panel kpi-stitch ${activeStitch} p-4 flex flex-col justify-between h-full`}>
+        <div className={`panel ${activeStitch} p-4 flex flex-col justify-between h-full`}>
             <div>
                 <p className="text-[11px] text-ink-soft font-sans uppercase tracking-wider">{title}</p>
                 <p className="text-[28px] sm:text-[32px] font-oswald font-semibold text-ink mt-1 leading-tight">{value}</p>

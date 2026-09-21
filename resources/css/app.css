@@ -49,19 +49,34 @@
     background-size: 10px 1px;
     background-repeat: repeat-x;
     background-position: top;
-    padding-top: 0.75rem; /* Space for the stitch */
+    padding-top: 0.75rem;
     position: relative;
   }
 
-  /* Different colors for stitches */
+  /* Different colors for stitches — self-contained (no need to combine with .kpi-stitch) */
   .kpi-stitch-accent {
-    --stitch-color: theme('colors.accent');
+    background-image: linear-gradient(to right, var(--accent) 50%, transparent 50%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: top;
+    padding-top: 0.75rem;
+    position: relative;
   }
   .kpi-stitch-gold {
-    --stitch-color: theme('colors.gold');
+    background-image: linear-gradient(to right, var(--gold) 50%, transparent 50%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: top;
+    padding-top: 0.75rem;
+    position: relative;
   }
   .kpi-stitch-danger {
-    --stitch-color: theme('colors.danger');
+    background-image: linear-gradient(to right, var(--danger) 50%, transparent 50%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: top;
+    padding-top: 0.75rem;
+    position: relative;
   }
 
   /* Badge / Pill Base */
