@@ -28,6 +28,7 @@ class UpdateOrderRequest extends FormRequest
             'items.*.jenis_produk' => 'required|string|max:255',
             'items.*.ukuran_detail' => 'nullable|array',
             'items.*.jumlah'    => 'required|integer|min:1',
+            'items.*.harga_satuan' => 'nullable|numeric|min:0',
             'jumlah'         => 'required|integer|min:1',
             'tanggal_order'  => 'required|date',
             'deadline'       => 'required|date',

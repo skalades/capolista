@@ -122,7 +122,9 @@ class OrderService
     private function createOrderItems(Order $order, array $items): void
     {
         foreach ($items as $itemData) {
-            $hargaSatuan = isset($itemData['harga_satuan']) ? str_replace(['Rp', '.', ' '], '', $itemData['harga_satuan']) : null;
+            $hargaSatuan = isset($itemData['harga_satuan']) && $itemData['harga_satuan'] !== '' && $itemData['harga_satuan'] !== null
+                ? (float) str_replace(['Rp', '.', ' ', ','], '', $itemData['harga_satuan'])
+                : null;
             
             if (!empty($itemData['ukuran_detail'])) {
                 $hasSizes = false;
