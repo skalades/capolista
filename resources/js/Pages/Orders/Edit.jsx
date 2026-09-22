@@ -17,7 +17,7 @@ export default function OrderEdit({ order, customers = [] }) {
                     jenis_produk: item.jenis_produk,
                     ukuran_detail: {},
                     jumlah: 0,
-                    harga_satuan: item.harga_satuan ? parseInt(item.harga_satuan, 10).toString() : '',
+                    harga_satuan: item.harga_satuan != null && item.harga_satuan !== '' ? parseInt(item.harga_satuan, 10).toString() : '',
                     show_panjang: false
                 };
             }
