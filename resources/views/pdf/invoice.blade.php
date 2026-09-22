@@ -130,7 +130,6 @@
                     <th>Item Produksi</th>
                     <th>Ukuran</th>
                     <th>Jumlah</th>
-                    <th>Harga Satuan</th>
                     <th>Total</th>
                 </tr>
             </thead>
@@ -141,8 +140,7 @@
                             <td>{{ $item->jenis_produk ?: $order->jenis_produk }}</td>
                             <td>{{ $item->ukuran ?: 'All' }}</td>
                             <td>{{ $item->jumlah_pcs }} pcs</td>
-                            <td>{{ $item->harga_satuan ? 'Rp ' . number_format($item->harga_satuan, 0, ',', '.') : '-' }}</td>
-                            <td>{{ $item->harga_satuan ? 'Rp ' . number_format($item->harga_satuan * $item->jumlah_pcs, 0, ',', '.') : '-' }}</td>
+                            <td>{{ $item->total_harga ? 'Rp ' . number_format($item->total_harga, 0, ',', '.') : ($item->harga_satuan ? 'Rp ' . number_format($item->harga_satuan * $item->jumlah_pcs, 0, ',', '.') : 'Rp ' . number_format($order->total_harga, 0, ',', '.')) }}</td>
                         </tr>
                     @endforeach
                 @else
@@ -150,8 +148,7 @@
                         <td>{{ $order->jenis_produk }}</td>
                         <td>All</td>
                         <td>{{ $order->jumlah }} pcs</td>
-                        <td>-</td>
-                        <td>-</td>
+                        <td>{{ $order->total_harga ? 'Rp ' . number_format($order->total_harga, 0, ',', '.') : '-' }}</td>
                     </tr>
                 @endif
             </tbody>
