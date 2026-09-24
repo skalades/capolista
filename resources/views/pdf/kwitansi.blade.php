@@ -127,7 +127,7 @@
                             <td>{{ \Carbon\Carbon::parse($bayar->tanggal)->format('d/m/Y') }}</td>
                             <td><span class="badge-tipe {{ $tipeClass }}">{{ $tipeLabel }}</span></td>
                             <td><span class="badge-metode">{{ ucfirst($bayar->metode) }}</span></td>
-                            <td>{{ $bayar->catatan ?: '-' }}{{ $isCurrent ? ' ★' : '' }}</td>
+                            <td>{{ $bayar->catatan ?: '-' }}</td>
                             <td style="color: #10B981; font-weight: bold;">Rp {{ number_format($bayar->jumlah, 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
