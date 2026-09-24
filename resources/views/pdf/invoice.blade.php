@@ -51,8 +51,22 @@
         .text-red { color: #EF4444; }
         
         .clearfix { clear: both; }
-        
-        .bottom-section { width: 100%; margin-top: 50px; }
+
+        .history-section { width: 100%; margin-top: 30px; margin-bottom: 25px; }
+        .history-section h3 { color: #29394A; font-size: 14px; margin: 0 0 10px 0; border-left: 4px solid #29394A; padding-left: 10px; }
+        .history-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .history-table th { background-color: #F1F5F9; color: #29394A; padding: 8px 10px; text-align: left; font-size: 11px; border-bottom: 2px solid #CBD5E1; }
+        .history-table th:last-child { text-align: right; }
+        .history-table td { padding: 8px 10px; font-size: 12px; border-bottom: 1px solid #E5E7EB; }
+        .history-table td:last-child { text-align: right; }
+        .badge-tipe { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .badge-dp { background-color: #DBEAFE; color: #1D4ED8; }
+        .badge-pelunasan { background-color: #D1FAE5; color: #065F46; }
+        .badge-lainnya { background-color: #F3F4F6; color: #374151; }
+        .badge-metode { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background-color: #FEF3C7; color: #92400E; }
+        .history-empty { color: #9CA3AF; font-size: 12px; padding: 10px 0; text-align: center; }
+
+        .bottom-section { width: 100%; margin-top: 30px; }
         .bottom-left { width: 45%; float: left; }
         .payment-info { background-color: #F0F8FF; padding: 15px; border-radius: 8px; }
         .payment-info h4 { color: #0284C7; margin: 0 0 5px 0; font-size: 13px; }
@@ -172,6 +186,55 @@
         </div>
         
         <div class="clearfix"></div>
+        
+        {{-- Histori Pembayaran --}}
+        <div class="history-section">
+            <h3>Histori Pembayaran</h3>
+            @if($order->pembayarans && $order->pembayarans->count() > 0)
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tanggal</th>
+                            <th>Tipe</th>
+                            <th>Metode</th>
+                            <th>Catatan</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($order->pembayarans->sortBy('tanggal') as $i => $bayar)
+                            <tr>
+                                <td>{{ $i + 1 }}</td>
+                                <td>{{ \Carbon\Carbon::parse($bayar->tanggal)->format('d/m/Y') }}</td>
+                                <td>
+                                    @php
+                                        $tipeClass = match($bayar->tipe) {
+                                            'dp'         => 'badge-dp',
+                                            'pelunasan'  => 'badge-pelunasan',
+                                            default      => 'badge-lainnya',
+                                        };
+                                        $tipeLabel = match($bayar->tipe) {
+                                            'dp'         => 'DP',
+                                            'pelunasan'  => 'Pelunasan',
+                                            default      => ucfirst($bayar->tipe),
+                                        };
+                                    @endphp
+                                    <span class="badge-tipe {{ $tipeClass }}">{{ $tipeLabel }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge-metode">{{ ucfirst($bayar->metode) }}</span>
+                                </td>
+                                <td>{{ $bayar->catatan ?: '-' }}</td>
+                                <td style="color: #10B981; font-weight: bold;">Rp {{ number_format($bayar->jumlah, 0, ',', '.') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p class="history-empty">Belum ada histori pembayaran.</p>
+            @endif
+        </div>
         
         <div class="bottom-section">
             <div class="bottom-left">
