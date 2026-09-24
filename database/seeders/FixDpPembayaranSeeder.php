@@ -26,11 +26,14 @@ class FixDpPembayaranSeeder extends Seeder
         $skipped = 0;
 
         foreach ($orders as $order) {
-            $dpDB       = (float) $order->dp;
+            // Hitung berapa SEHARUSNYA uang yang sudah masuk berdasarkan sisa bayar
+            $truePaid   = (float) ($order->total_harga - $order->sisa_bayar);
             $sumBayar   = (float) $order->pembayarans->sum('jumlah');
-            $selisih    = round($dpDB - $sumBayar, 2);
+            
+            // Selisih antara uang yang seharusnya masuk vs yang ada di histori
+            $selisih    = round($truePaid - $sumBayar, 2);
 
-            // Jika sum pembayarans sudah >= dp, tidak perlu fix
+            // Jika histori sudah mencakup semua pembayaran, lewati
             if ($selisih <= 0) {
                 $skipped++;
                 continue;
