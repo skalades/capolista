@@ -53,7 +53,8 @@ export default function OrderShow({ order = {} }) {
         });
     };
 
-    const sisa = o.total_harga - o.dp;
+    const totalBayar = (o.pembayarans || []).reduce((sum, p) => sum + parseFloat(p.jumlah || 0), 0);
+    const sisa = Math.max(0, parseFloat(o.total_harga || 0) - totalBayar);
 
     return (
         <AppLayout title={`Detail Order ${o.no_order}`}>
@@ -236,12 +237,12 @@ export default function OrderShow({ order = {} }) {
                                         <div className="font-mono text-[16px] font-bold text-ink">{formatRupiah(o.total_harga)}</div>
                                     </div>
                                     <div className="border-l border-line pl-6">
-                                        <div className="text-[11px] text-ink-soft mb-1">Terbayar (DP)</div>
-                                        <div className="font-mono text-[16px] font-bold text-ink">{formatRupiah(o.dp)}</div>
+                                        <div className="text-[11px] text-ink-soft mb-1">Sudah Dibayar</div>
+                                        <div className="font-mono text-[16px] font-bold text-ink">{formatRupiah(totalBayar)}</div>
                                     </div>
                                     <div className="border-l border-line pl-6">
                                         <div className="text-[11px] text-ink-soft mb-1">Sisa Pembayaran</div>
-                                        <div className={`font-mono text-[16px] font-bold ${sisa > 0 ? 'text-danger' : 'text-danger'}`}>{formatRupiah(sisa)}</div>
+                                        <div className={`font-mono text-[16px] font-bold ${sisa > 0 ? 'text-danger' : 'text-accent'}`}>{formatRupiah(sisa)}</div>
                                     </div>
                                 </div>
                             </div>
