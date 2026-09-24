@@ -114,7 +114,7 @@ export default function OrderShow({ order = {} }) {
                                         o.pembayarans.map((p) => (
                                             <a
                                                 key={p.id}
-                                                href={route('pembayaran.kwitansi', p.id)}
+                                                href={route('keuangan.pembayaran.kwitansi', p.id)}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="flex items-center justify-between px-4 py-2.5 text-[12px] hover:bg-gray-50 border-b border-line last:border-0"
