@@ -203,23 +203,27 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php $dpCounter = 0; @endphp
                         @foreach($order->pembayarans->sortBy('tanggal') as $i => $bayar)
+                            @php
+                                $tipeClass = match($bayar->tipe) {
+                                    'dp'        => 'badge-dp',
+                                    'pelunasan' => 'badge-pelunasan',
+                                    default     => 'badge-lainnya',
+                                };
+                                if ($bayar->tipe === 'dp') {
+                                    $dpCounter++;
+                                    $tipeLabel = 'DP ' . $dpCounter;
+                                } elseif ($bayar->tipe === 'pelunasan') {
+                                    $tipeLabel = 'Pelunasan';
+                                } else {
+                                    $tipeLabel = ucfirst($bayar->tipe);
+                                }
+                            @endphp
                             <tr>
-                                <td>{{ $i + 1 }}</td>
+                                <td>{{ $loop->iteration }}</td>
                                 <td>{{ \Carbon\Carbon::parse($bayar->tanggal)->format('d/m/Y') }}</td>
                                 <td>
-                                    @php
-                                        $tipeClass = match($bayar->tipe) {
-                                            'dp'         => 'badge-dp',
-                                            'pelunasan'  => 'badge-pelunasan',
-                                            default      => 'badge-lainnya',
-                                        };
-                                        $tipeLabel = match($bayar->tipe) {
-                                            'dp'         => 'DP',
-                                            'pelunasan'  => 'Pelunasan',
-                                            default      => ucfirst($bayar->tipe),
-                                        };
-                                    @endphp
                                     <span class="badge-tipe {{ $tipeClass }}">{{ $tipeLabel }}</span>
                                 </td>
                                 <td>

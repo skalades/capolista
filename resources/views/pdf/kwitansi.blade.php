@@ -104,6 +104,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php $dpCounter = 0; @endphp
                     @foreach($semuaPembayaran as $i => $bayar)
                         @php
                             $isCurrent = $bayar->id === $pembayaran->id;
@@ -112,14 +113,17 @@
                                 'pelunasan' => 'badge-pelunasan',
                                 default     => 'badge-lainnya',
                             };
-                            $tipeLabel = match($bayar->tipe) {
-                                'dp'        => 'DP',
-                                'pelunasan' => 'Pelunasan',
-                                default     => ucfirst($bayar->tipe),
-                            };
+                            if ($bayar->tipe === 'dp') {
+                                $dpCounter++;
+                                $tipeLabel = 'DP ' . $dpCounter;
+                            } elseif ($bayar->tipe === 'pelunasan') {
+                                $tipeLabel = 'Pelunasan';
+                            } else {
+                                $tipeLabel = ucfirst($bayar->tipe);
+                            }
                         @endphp
                         <tr class="{{ $isCurrent ? 'current-row' : '' }}">
-                            <td>{{ $i + 1 }}</td>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ \Carbon\Carbon::parse($bayar->tanggal)->format('d/m/Y') }}</td>
                             <td><span class="badge-tipe {{ $tipeClass }}">{{ $tipeLabel }}</span></td>
                             <td><span class="badge-metode">{{ ucfirst($bayar->metode) }}</span></td>
