@@ -36,6 +36,7 @@ export default function OrderShow({ order = {} }) {
     };
 
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [isKwitansiOpen, setIsKwitansiOpen] = useState(false);
     const { data, setData, post, processing, reset } = useForm({
         status: o.status,
         catatan: '',
@@ -95,12 +96,45 @@ export default function OrderShow({ order = {} }) {
                             <PrinterIcon className="w-4 h-4" />
                             Invoice
                         </a>
-                        <button
-                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-line rounded-full text-[13px] font-semibold text-ink shadow-sm hover:bg-gray-50 transition-colors"
-                        >
-                            <DocumentTextIcon className="w-4 h-4" />
-                            Kwitansi
-                        </button>
+                        {/* Kwitansi Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsKwitansiOpen(!isKwitansiOpen)}
+                                onBlur={() => setTimeout(() => setIsKwitansiOpen(false), 150)}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-line rounded-full text-[13px] font-semibold text-ink shadow-sm hover:bg-gray-50 transition-colors"
+                            >
+                                <DocumentTextIcon className="w-4 h-4" />
+                                Kwitansi
+                                <svg className="w-3 h-3 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+                            {isKwitansiOpen && (
+                                <div className="absolute right-0 mt-1 w-64 bg-white border border-line rounded-lg shadow-lg z-50 overflow-hidden">
+                                    {o.pembayarans && o.pembayarans.length > 0 ? (
+                                        o.pembayarans.map((p) => (
+                                            <a
+                                                key={p.id}
+                                                href={route('pembayaran.kwitansi', p.id)}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="flex items-center justify-between px-4 py-2.5 text-[12px] hover:bg-gray-50 border-b border-line last:border-0"
+                                            >
+                                                <div>
+                                                    <div className="font-semibold text-ink capitalize">{p.tipe} — {new Date(p.tanggal).toLocaleDateString('id-ID')}</div>
+                                                    <div className="text-ink-soft capitalize">{p.metode}</div>
+                                                </div>
+                                                <div className="font-bold text-green-600">
+                                                    Rp {Number(p.jumlah).toLocaleString('id-ID')}
+                                                </div>
+                                            </a>
+                                        ))
+                                    ) : (
+                                        <div className="px-4 py-3 text-[12px] text-ink-soft text-center">
+                                            Belum ada pembayaran tercatat.
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         <Link
                             href={route('orders.edit', o.id)}
                             className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-line rounded-full text-[13px] font-semibold text-ink shadow-sm hover:bg-gray-50 transition-colors"

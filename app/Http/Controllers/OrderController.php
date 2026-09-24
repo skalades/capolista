@@ -88,6 +88,7 @@ class OrderController extends Controller
             'pemasangan.pekerja',
             'packing.pekerja',
             'orderFiles.uploader',
+            'pembayarans',
         ]);
 
         return Inertia::render('Orders/Show', [
