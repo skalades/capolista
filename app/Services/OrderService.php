@@ -6,6 +6,7 @@ use App\Helpers\OrderHelper;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderLog;
+use App\Models\Pembayaran;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -18,7 +19,7 @@ class OrderService
         return DB::transaction(function () use ($data, $userId) {
             $customerId = $this->resolveCustomerId($data);
             
-            $dp = $data['dp'] ?? 0;
+            $dp = (float) ($data['dp'] ?? 0);
             $jenisProdukMaster = collect($data['items'])->pluck('jenis_produk')->unique()->implode(', ');
 
             $order = Order::create([
@@ -38,6 +39,19 @@ class OrderService
             ]);
 
             $this->createOrderItems($order, $data['items']);
+
+            // Auto-create pembayaran record jika ada DP
+            if ($dp > 0) {
+                Pembayaran::create([
+                    'order_id'    => $order->id,
+                    'jumlah'      => $dp,
+                    'tanggal'     => $data['tanggal_order'],
+                    'metode'      => $data['metode_dp'] ?? 'transfer',
+                    'tipe'        => 'dp',
+                    'catatan'     => 'DP Awal',
+                    'dicatat_oleh'=> $userId,
+                ]);
+            }
 
             OrderLog::create([
                 'order_id'   => $order->id,
