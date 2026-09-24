@@ -143,6 +143,7 @@ class KeuanganController extends Controller
             $pembayaran->save();
 
             $order->sisa_bayar = max(0, $order->sisa_bayar - $validated['jumlah']);
+            $order->dp         = $order->total_harga - $order->sisa_bayar;
             $order->save();
         });
 

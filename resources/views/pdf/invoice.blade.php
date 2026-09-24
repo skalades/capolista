@@ -82,7 +82,8 @@
 </head>
 <body>
     @php
-        $isLunas = $order->sisa_bayar <= 0;
+        $totalBayarSemua = $order->pembayarans->sum('jumlah');
+        $isLunas = $totalBayarSemua >= $order->total_harga;
     @endphp
 
     <div class="top-bar"></div>
@@ -169,18 +170,22 @@
         </table>
         
         <div class="summary-wrapper">
+            @php
+                $totalBayar  = $order->pembayarans->sum('jumlah');
+                $sisaBayar   = max(0, $order->total_harga - $totalBayar);
+            @endphp
             <table class="summary-table">
                 <tr class="summary-divider">
                     <td>Total Harga:</td>
                     <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
                 </tr>
                 <tr class="summary-divider">
-                    <td>Sudah Dibayar (DP):</td>
-                    <td class="text-green">Rp {{ number_format($order->dp, 0, ',', '.') }}</td>
+                    <td>Sudah Dibayar:</td>
+                    <td class="text-green">Rp {{ number_format($totalBayar, 0, ',', '.') }}</td>
                 </tr>
                 <tr>
                     <td>Sisa Bayar:</td>
-                    <td class="text-red">Rp {{ number_format($order->sisa_bayar, 0, ',', '.') }}</td>
+                    <td class="text-red">Rp {{ number_format($sisaBayar, 0, ',', '.') }}</td>
                 </tr>
             </table>
         </div>
