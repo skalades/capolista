@@ -248,6 +248,82 @@ export default function OrderShow({ order = {} }) {
                             </div>
                         </div>
 
+                        {/* HISTORI PEMBAYARAN */}
+                        <div className="bg-panel rounded-md border border-line shadow-sm overflow-hidden mt-6">
+                            <div className="bg-line/20 px-6 py-4 border-b border-line">
+                                <h2 className="font-oswald text-[18px] font-bold text-ink uppercase tracking-wide">
+                                    Histori Pembayaran
+                                </h2>
+                            </div>
+                            
+                            <div className="p-0">
+                                {o.pembayarans && o.pembayarans.length > 0 ? (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-body text-ink-soft text-[11px] uppercase tracking-wider">
+                                                    <th className="px-6 py-3 font-semibold border-b border-line w-12">#</th>
+                                                    <th className="px-6 py-3 font-semibold border-b border-line whitespace-nowrap">Tanggal</th>
+                                                    <th className="px-6 py-3 font-semibold border-b border-line">Tipe</th>
+                                                    <th className="px-6 py-3 font-semibold border-b border-line">Metode</th>
+                                                    <th className="px-6 py-3 font-semibold border-b border-line w-full">Catatan</th>
+                                                    <th className="px-6 py-3 font-semibold border-b border-line text-right">Jumlah</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="text-[13px] text-ink">
+                                                {(() => {
+                                                    let dpCounter = 0;
+                                                    const sorted = [...o.pembayarans].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+                                                    
+                                                    return sorted.map((bayar, idx) => {
+                                                        let tipeLabel = bayar.tipe;
+                                                        if (bayar.tipe === 'dp') {
+                                                            dpCounter++;
+                                                            tipeLabel = `DP ${dpCounter}`;
+                                                        } else if (bayar.tipe === 'pelunasan') {
+                                                            tipeLabel = 'Pelunasan';
+                                                        } else {
+                                                            tipeLabel = bayar.tipe.charAt(0).toUpperCase() + bayar.tipe.slice(1);
+                                                        }
+
+                                                        return (
+                                                            <tr key={idx} className="border-b border-line last:border-b-0 hover:bg-line/10 transition-colors">
+                                                                <td className="px-6 py-3 text-ink-soft font-mono">{idx + 1}</td>
+                                                                <td className="px-6 py-3 whitespace-nowrap">{new Date(bayar.tanggal).toLocaleDateString('id-ID')}</td>
+                                                                <td className="px-6 py-3 whitespace-nowrap">
+                                                                    <span className={`px-2 py-1 rounded text-[11px] font-bold uppercase tracking-wider ${
+                                                                        bayar.tipe === 'dp' ? 'bg-[#FDF6B2] text-[#723B13]' :
+                                                                        bayar.tipe === 'pelunasan' ? 'bg-[#DEF7EC] text-[#03543F]' :
+                                                                        'bg-slate-100 text-slate-700'
+                                                                    }`}>
+                                                                        {tipeLabel}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-3 capitalize">{bayar.metode}</td>
+                                                                <td className="px-6 py-3 text-ink-soft">{bayar.catatan || '-'}</td>
+                                                                <td className="px-6 py-3 text-right font-mono font-bold text-accent whitespace-nowrap">
+                                                                    {formatRupiah(bayar.jumlah)}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    });
+                                                })()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center flex flex-col items-center justify-center text-ink-soft border-b border-line/50">
+                                        <div className="w-12 h-12 bg-line/20 rounded-full flex items-center justify-center mb-3">
+                                            <svg className="w-6 h-6 text-ink-lighter" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <p className="text-[13px] font-medium">Belum ada histori pembayaran.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Right Column */}
