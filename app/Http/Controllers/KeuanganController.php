@@ -151,7 +151,7 @@ class KeuanganController extends Controller
 
     public function pembayaranKwitansi(Pembayaran $pembayaran)
     {
-        $pembayaran->load(['order.customer', 'pencatat']);
+        $pembayaran->load(['order.customer', 'order.pembayarans', 'pencatat']);
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.kwitansi', compact('pembayaran'));
         return $pdf->stream("KWITANSI-{$pembayaran->order->no_order}-{$pembayaran->id}.pdf");
     }

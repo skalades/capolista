@@ -23,6 +23,20 @@
             display: inline-block;
             margin-top: 10px;
         }
+        .history-section { width: 100%; margin-top: 30px; margin-bottom: 20px; }
+        .history-section h3 { color: #29394A; font-size: 13px; margin: 0 0 10px 0; border-left: 4px solid #29394A; padding-left: 10px; }
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table th { background-color: #F1F5F9; color: #29394A; padding: 7px 10px; text-align: left; font-size: 11px; border-bottom: 2px solid #CBD5E1; }
+        .history-table th:last-child { text-align: right; }
+        .history-table td { padding: 7px 10px; font-size: 12px; border-bottom: 1px solid #E5E7EB; }
+        .history-table td:last-child { text-align: right; }
+        .history-table tr.current-row td { background-color: #F0FDF4; font-weight: bold; }
+        .badge-tipe { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .badge-dp { background-color: #DBEAFE; color: #1D4ED8; }
+        .badge-pelunasan { background-color: #D1FAE5; color: #065F46; }
+        .badge-lainnya { background-color: #F3F4F6; color: #374151; }
+        .badge-metode { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; background-color: #FEF3C7; color: #92400E; }
+        .history-empty { color: #9CA3AF; font-size: 12px; padding: 10px 0; text-align: center; }
         .signature-section { margin-top: 50px; display: table; width: 100%; }
         .signature-box { display: table-cell; width: 30%; text-align: center; }
         .signature-line { border-bottom: 1px solid #000; margin-top: 60px; width: 100%; }
@@ -69,6 +83,55 @@
         <div class="amount-box">
             Jumlah: Rp {{ number_format($pembayaran->jumlah, 0, ',', '.') }}
         </div>
+    </div>
+
+    {{-- Histori Pembayaran --}}
+    <div class="history-section">
+        <h3>Histori Pembayaran Order Ini</h3>
+        @php
+            $semuaPembayaran = $pembayaran->order->pembayarans->sortBy('tanggal');
+        @endphp
+        @if($semuaPembayaran->count() > 0)
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tanggal</th>
+                        <th>Tipe</th>
+                        <th>Metode</th>
+                        <th>Catatan</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($semuaPembayaran as $i => $bayar)
+                        @php
+                            $isCurrent = $bayar->id === $pembayaran->id;
+                            $tipeClass = match($bayar->tipe) {
+                                'dp'        => 'badge-dp',
+                                'pelunasan' => 'badge-pelunasan',
+                                default     => 'badge-lainnya',
+                            };
+                            $tipeLabel = match($bayar->tipe) {
+                                'dp'        => 'DP',
+                                'pelunasan' => 'Pelunasan',
+                                default     => ucfirst($bayar->tipe),
+                            };
+                        @endphp
+                        <tr class="{{ $isCurrent ? 'current-row' : '' }}">
+                            <td>{{ $i + 1 }}</td>
+                            <td>{{ \Carbon\Carbon::parse($bayar->tanggal)->format('d/m/Y') }}</td>
+                            <td><span class="badge-tipe {{ $tipeClass }}">{{ $tipeLabel }}</span></td>
+                            <td><span class="badge-metode">{{ ucfirst($bayar->metode) }}</span></td>
+                            <td>{{ $bayar->catatan ?: '-' }}{{ $isCurrent ? ' ★' : '' }}</td>
+                            <td style="color: #10B981; font-weight: bold;">Rp {{ number_format($bayar->jumlah, 0, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p class="history-empty">Belum ada histori pembayaran.</p>
+        @endif
     </div>
 
     <div class="signature-section">
