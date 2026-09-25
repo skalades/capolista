@@ -5,12 +5,14 @@ import {
     ScissorsIcon, 
     ClockIcon, 
     BanknotesIcon,
-    CheckCircleIcon
+    CheckCircleIcon,
+    CameraIcon
 } from '@heroicons/react/24/outline';
 import { 
     ScissorsIcon as ScissorsSolid, 
     ClockIcon as ClockSolid, 
-    BanknotesIcon as BanknotesSolid 
+    BanknotesIcon as BanknotesSolid,
+    CameraIcon as CameraSolid
 } from '@heroicons/react/24/solid';
 
 export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, upahBulanIni, tanggal }) {
@@ -60,6 +62,14 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
             icon: BanknotesIcon,
             activeIcon: BanknotesSolid,
             activeColorClass: 'text-amber-600'
+        },
+        {
+            id: 'absensi',
+            label: 'Absen',
+            icon: CameraIcon,
+            activeIcon: CameraSolid,
+            activeColorClass: 'text-teal-600',
+            href: route('karyawan.absensi.index')
         }
     ];
 

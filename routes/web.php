@@ -207,6 +207,13 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::get('/output-rekap', [HRController::class, 'outputRekap'])->name('output.rekap');
     });
 
+    // Karyawan (Self Service)
+    Route::prefix('karyawan')->name('karyawan.')->group(function () {
+        Route::get('/absensi', [App\Http\Controllers\KaryawanAbsensiController::class, 'index'])->name('absensi.index');
+        Route::post('/absensi/masuk', [App\Http\Controllers\KaryawanAbsensiController::class, 'masuk'])->name('absensi.masuk');
+        Route::post('/absensi/keluar', [App\Http\Controllers\KaryawanAbsensiController::class, 'keluar'])->name('absensi.keluar');
+    });
+
     // Laporan
     Route::prefix('laporan')->name('laporan.')->middleware('level:0,1,2')->group(function () {
         Route::get('/', [LaporanController::class, 'index'])->name('index');

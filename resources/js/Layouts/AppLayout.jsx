@@ -73,10 +73,16 @@ const MENU_SECTIONS = [
         ],
     },
     {
+        title: 'KARYAWAN (SELF SERVICE)',
+        items: [
+            { name: 'Self Absensi', routeName: 'karyawan.absensi.index', icon: ClipboardCheck, levels: [0, 1, 2, 3, 4] },
+        ],
+    },
+    {
         title: 'HR & SUMBER DAYA',
         items: [
             { name: 'Data Karyawan', routeName: 'users.index', icon: Users, levels: [0, 1, 2] },
-            { name: 'Absensi', routeName: 'hr.absensi.index', icon: ClipboardCheck, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
+            { name: 'Absensi (Admin)', routeName: 'hr.absensi.index', icon: ClipboardCheck, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
             { name: 'Approval Borongan', routeName: 'hr.output.rekap', icon: ClipboardList, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
             { name: 'Penggajian', routeName: 'hr.penggajian.index', icon: Banknote, levels: [0, 1, 2, 3, 4], divisi: ['hr'] },
         ],

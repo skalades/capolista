@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
@@ -6,27 +6,29 @@ import StatusTimeline from '@/Components/StatusTimeline';
 
 export default function Show({ order }) {
   const pemasangan = order.pemasangan || {};
-  
+
   const { data: updateData, setData: setUpdateData, patch: patchUpdate, processing: updateProcessing } = useForm({
     suhu_heat_press: pemasangan.suhu_heat_press || '',
     waktu_curing: pemasangan.waktu_curing || '',
   });
 
   const { data: completeData, setData: setCompleteData, post: postComplete, processing: completeProcessing } = useForm({
-    status_qc: 'Lulus',
+    checklist_qc: {
+      kerekatan: false,
+      kerapian: false,
+      kebersihan: false,
+      warna_sesuai: false,
+    },
+    status_qc: 'lulus',
     catatan: '',
     foto_qc: null,
   });
 
-  const [qcChecklist, setQcChecklist] = useState({
-    kerekatan: false,
-    kerapian: false,
-    kebersihan: false,
-    warna_sesuai: false
-  });
-
   const handleQcChange = (field) => {
-    setQcChecklist(prev => ({ ...prev, [field]: !prev[field] }));
+    setCompleteData('checklist_qc', {
+      ...completeData.checklist_qc,
+      [field]: !completeData.checklist_qc[field],
+    });
   };
 
   const handleUpdate = (e) => {
@@ -36,7 +38,9 @@ export default function Show({ order }) {
 
   const handleComplete = (e) => {
     e.preventDefault();
-    postComplete(route('pemasangan.complete', pemasangan.id));
+    postComplete(route('pemasangan.complete', pemasangan.id), {
+      forceFormData: true,
+    });
   };
 
   return (
@@ -85,7 +89,7 @@ export default function Show({ order }) {
                   <div className="space-y-2">
                     {['kerekatan', 'kerapian', 'kebersihan', 'warna_sesuai'].map((item) => (
                       <label key={item} className="flex items-center">
-                        <input type="checkbox" checked={qcChecklist[item]} onChange={() => handleQcChange(item)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200 focus:ring-opacity-50" />
+                        <input type="checkbox" checked={completeData.checklist_qc[item]} onChange={() => handleQcChange(item)} className="rounded border-gray-300 text-brand-600 shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200 focus:ring-opacity-50" />
                         <span className="ml-2 text-sm text-gray-700 capitalize">{item.replace('_', ' ')}</span>
                       </label>
                     ))}
@@ -96,11 +100,11 @@ export default function Show({ order }) {
                   <label className="block text-sm font-medium text-gray-700">Status QC</label>
                   <div className="mt-2 space-x-4">
                     <label className="inline-flex items-center">
-                      <input type="radio" value="Lulus" checked={completeData.status_qc === 'Lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
+                      <input type="radio" value="lulus" checked={completeData.status_qc === 'lulus'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Lulus</span>
                     </label>
                     <label className="inline-flex items-center">
-                      <input type="radio" value="Gagal" checked={completeData.status_qc === 'Gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
+                      <input type="radio" value="gagal" checked={completeData.status_qc === 'gagal'} onChange={e => setCompleteData('status_qc', e.target.value)} className="text-brand-600" />
                       <span className="ml-2 text-sm">Gagal</span>
                     </label>
                   </div>
