@@ -127,12 +127,19 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
         
         const video = videoRef.current;
         const canvas = canvasRef.current;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+
+        // Kompresi: Batasi dimensi maksimal gambar (misal lebar maks 800px)
+        const MAX_WIDTH = 800;
+        const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
+        
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
+        
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+        // Kompresi: Simpan sebagai JPEG dengan kualitas 70% (0.7)
+        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
 
         // Set semua data sekaligus lalu langsung submit
         // React batches state updates sehingga form.data sudah terupdate saat post dipanggil
