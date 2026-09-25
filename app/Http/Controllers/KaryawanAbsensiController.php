@@ -140,23 +140,43 @@ class KaryawanAbsensiController extends Controller
 
     /**
      * Validasi koordinat terhadap lokasi kantor yang tersimpan di system_settings.
-     * Haversine formula — sama dengan yang dipakai di frontend.
+     * Haversine formula — mendukung hingga 2 lokasi.
      */
     private function validateGeofencing(float $userLat, float $userLng): array
     {
-        $lat    = (float) (DB::table('system_settings')->where('key', 'hr.absensi.lat')->value('value') ?? -6.200000);
-        $lng    = (float) (DB::table('system_settings')->where('key', 'hr.absensi.lng')->value('value') ?? 106.816666);
-        $radius = (int)   (DB::table('system_settings')->where('key', 'hr.absensi.radius')->value('value') ?? 100);
+        // Lokasi 1 (Utama)
+        $lat1    = (float) (DB::table('system_settings')->where('key', 'hr.absensi.lat')->value('value') ?? -6.200000);
+        $lng1    = (float) (DB::table('system_settings')->where('key', 'hr.absensi.lng')->value('value') ?? 106.816666);
+        $radius1 = (int)   (DB::table('system_settings')->where('key', 'hr.absensi.radius')->value('value') ?? 100);
 
-        $distance = $this->haversineMeters($userLat, $userLng, $lat, $lng);
+        $jarak1 = $this->haversineMeters($userLat, $userLng, $lat1, $lng1);
+        if ($jarak1 <= $radius1) {
+            return ['valid' => true, 'nama' => 'Kantor Utama', 'jarak' => $jarak1];
+        }
 
-        if ($distance <= $radius) {
-            return ['valid' => true, 'nama' => 'Kantor Utama', 'jarak' => $distance];
+        // Lokasi 2 (Opsional - Cabang/Gudang)
+        $lat2Str = DB::table('system_settings')->where('key', 'hr.absensi.lat_2')->value('value');
+        $lng2Str = DB::table('system_settings')->where('key', 'hr.absensi.lng_2')->value('value');
+        $radius2 = (int)   (DB::table('system_settings')->where('key', 'hr.absensi.radius_2')->value('value') ?? 100);
+
+        if ($lat2Str && $lng2Str) {
+            $lat2 = (float) $lat2Str;
+            $lng2 = (float) $lng2Str;
+            $jarak2 = $this->haversineMeters($userLat, $userLng, $lat2, $lng2);
+
+            if ($jarak2 <= $radius2) {
+                return ['valid' => true, 'nama' => 'Lokasi Cabang', 'jarak' => $jarak2];
+            }
+
+            return [
+                'valid'   => false,
+                'message' => "Anda di luar radius semua lokasi (Jarak Utama: {$jarak1}m, Cabang: {$jarak2}m).",
+            ];
         }
 
         return [
             'valid'   => false,
-            'message' => "Anda berada di luar radius kantor (jarak {$distance}m, radius {$radius}m).",
+            'message' => "Anda berada di luar radius kantor (jarak {$jarak1}m, maksimal {$radius1}m).",
         ];
     }
 
