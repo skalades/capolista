@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, useForm, usePage, Link, router } from '@inertiajs/react';
 import MobileStaffLayout from '@/Layouts/MobileStaffLayout';
+import Modal from '@/Components/Modal';
 import { 
     CheckCircleIcon as CheckCircle, 
     XCircleIcon as XCircle,
@@ -33,10 +34,11 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
     
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    // Gunakan ref untuk menyimpan foto agar tidak terjadi race condition dengan setData
     const fotoRef = useRef('');
     const submitTypeRef = useRef(null);
     const [cameraActive, setCameraActive] = useState(false);
+    const [showCameraModal, setShowCameraModal] = useState(false);
+    const [absenType, setAbsenType] = useState('masuk');
 
     const { data, setData, post, processing, errors } = useForm({
         foto: '',
@@ -100,14 +102,18 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
             setDistanceInfo('Browser tidak mendukung Geolocation.');
         }
 
-        startCamera();
-
         return () => {
-            if (videoRef.current && videoRef.current.srcObject) {
-                videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-            }
+            stopCamera();
         };
     }, [lokasiKantor]);
+
+    const stopCamera = () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+            videoRef.current.srcObject = null;
+        }
+        setCameraActive(false);
+    };
 
     const startCamera = async () => {
         try {
@@ -156,6 +162,14 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
         // Submit langsung dengan data yang sudah final, menghindari race condition setData
         router.post(route(routeName), formData, {
             preserveScroll: true,
+            onSuccess: () => {
+                setShowCameraModal(false);
+                stopCamera();
+            },
+            onError: () => {
+                setShowCameraModal(false);
+                stopCamera();
+            }
         });
     };
 
@@ -231,38 +245,34 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                             {!isAbsenMasukDone ? 'Absen Masuk' : 'Absen Keluar'}
                         </h2>
                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
-                            <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center">
-                                <video ref={videoRef} autoPlay playsInline muted className={`object-cover w-full h-full transform scale-x-[-1] ${cameraActive ? 'block' : 'hidden'}`}></video>
-                                {!cameraActive && (
-                                    <CameraIcon className="text-gray-400 w-12 h-12 absolute" />
-                                )}
+                            <div className="relative w-24 h-24 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mb-4">
+                                <CameraIcon className="w-10 h-10" />
                             </div>
-                            <canvas ref={canvasRef} className="hidden"></canvas>
                             
-                            <p className="text-xs text-gray-500 mt-4 mb-5 text-center">
-                                Pastikan wajah terlihat jelas untuk verifikasi
+                            <p className="text-xs text-gray-500 mb-5 text-center">
+                                Pastikan wajah Anda terlihat jelas saat mengambil foto.
                             </p>
                             
                             {!isAbsenMasukDone ? (
                                 <button 
-                                    onClick={() => takePhotoAndSubmit('masuk')}
-                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive}
+                                    onClick={() => { setAbsenType('masuk'); setShowCameraModal(true); startCamera(); }}
+                                    disabled={locationStatus !== 'dalam_radius' || processing}
                                     className="w-full bg-[#1e40af] hover:bg-blue-800 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center space-x-2 transition shadow-md"
                                 >
                                     <CameraIcon className="w-5 h-5" />
-                                    <span>{processing ? 'Memproses...' : 'AMBIL SELFIE & ABSEN MASUK'}</span>
+                                    <span>{processing ? 'Memproses...' : 'BUKA KAMERA & ABSEN MASUK'}</span>
                                 </button>
                             ) : (
                                 <button 
-                                    onClick={() => takePhotoAndSubmit('keluar')}
-                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive || waktuSekarang < shiftKeluar}
+                                    onClick={() => { setAbsenType('keluar'); setShowCameraModal(true); startCamera(); }}
+                                    disabled={locationStatus !== 'dalam_radius' || processing || waktuSekarang < shiftKeluar}
                                     className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center space-x-2 transition shadow-md"
                                 >
                                     <CameraIcon className="w-5 h-5" />
                                     <span>
                                         {waktuSekarang < shiftKeluar 
                                             ? `BELUM WAKTUNYA PULANG (${shiftKeluar.substring(0,5)})`
-                                            : processing ? 'Memproses...' : 'AMBIL SELFIE & ABSEN KELUAR'}
+                                            : processing ? 'Memproses...' : 'BUKA KAMERA & ABSEN KELUAR'}
                                     </span>
                                 </button>
                             )}
@@ -321,6 +331,43 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                     </div>
                 )}
             </div>
+            <canvas ref={canvasRef} className="hidden"></canvas>
+            <Modal show={showCameraModal} onClose={() => { setShowCameraModal(false); stopCamera(); }} maxWidth="sm">
+                <div className="p-6">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center justify-center">
+                        <CameraIcon className="w-5 h-5 mr-2" />
+                        Ambil Foto Wajah
+                    </h2>
+                    
+                    <div className="relative w-full aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden shadow-inner flex items-center justify-center mb-4">
+                        <video ref={videoRef} autoPlay playsInline muted className={`object-cover w-full h-full transform scale-x-[-1] ${cameraActive ? 'block' : 'hidden'}`}></video>
+                        {!cameraActive && (
+                            <div className="flex flex-col items-center justify-center text-gray-400">
+                                <CameraIcon className="w-12 h-12 mb-2" />
+                                <span className="text-sm">Menyiapkan kamera...</span>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="flex space-x-3">
+                        <button 
+                            onClick={() => { setShowCameraModal(false); stopCamera(); }}
+                            className="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl"
+                            type="button"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            onClick={() => takePhotoAndSubmit(absenType)}
+                            disabled={processing || !cameraActive}
+                            className="flex-1 bg-navy hover:bg-blue-800 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center"
+                            type="button"
+                        >
+                            {processing ? 'Memproses...' : 'Jepret & Simpan'}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </MobileStaffLayout>
     );
 }
