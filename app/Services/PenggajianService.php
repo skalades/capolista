@@ -122,6 +122,14 @@ class PenggajianService
         $totalMenitTelat = 0;
 
         foreach ($rows as $row) {
+            // PATCH CELAH: Batalkan status Hadir jika absen mandiri tapi tidak absen pulang
+            if ($row->status_hadir === Absensi::STATUS_HADIR && is_null($row->jam_keluar)) {
+                // Jika dicatat oleh dirinya sendiri (atau null), berarti absen mandiri.
+                if (is_null($row->dicatat_oleh) || $row->dicatat_oleh === $karyawan->id) {
+                    $row->status_hadir = Absensi::STATUS_ALPHA; // Hanguskan kehadiran (menjadi Alpha)
+                }
+            }
+
             if ($row->status_hadir === Absensi::STATUS_HADIR && $row->jam_masuk) {
                 try {
                     $jamMasukReal = \Carbon\Carbon::createFromFormat('H:i:s', $row->jam_masuk);

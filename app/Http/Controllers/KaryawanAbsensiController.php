@@ -134,6 +134,8 @@ class KaryawanAbsensiController extends Controller
         $absensi->foto_keluar      = $fotoPath;
 
         // Kalkulasi lembur: jika keluar > 1 jam setelah shift berakhir
+        // DIBEKUKAN SEMENTARA (DISABLED)
+        /*
         $shiftKeluar = $user->shift_keluar ?? '15:00:00';
         $shiftEnd = Carbon::createFromFormat('H:i:s', $shiftKeluar);
         
@@ -141,6 +143,7 @@ class KaryawanAbsensiController extends Controller
             $diffMinutes       = $jamKeluar->diffInMinutes($shiftEnd);
             $absensi->jam_lembur = floor($diffMinutes / 60);
         }
+        */
 
         $absensi->save();
 
