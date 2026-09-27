@@ -90,24 +90,14 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                     }
                 },
                 (error) => {
-                    console.log("Geolocation error, using mock data for testing.");
-                    const mockLat = -6.200000;
-                    const mockLng = 106.816666;
-                    setCoords({ latitude: mockLat, longitude: mockLng });
-                    setData(data => ({ ...data, latitude: mockLat, longitude: mockLng, lokasi_absen: 'Kantor Utama' }));
-                    setLocationStatus('dalam_radius');
-                    setDistanceInfo('Menggunakan lokasi simulasi (Testing).');
+                    setLocationStatus('error');
+                    setDistanceInfo('Gagal mendapatkan lokasi. Pastikan GPS aktif dan diizinkan.');
                 },
                 { enableHighAccuracy: true }
             );
         } else {
-            console.log("No Geolocation support, using mock data for testing.");
-            const mockLat = -6.200000;
-            const mockLng = 106.816666;
-            setCoords({ latitude: mockLat, longitude: mockLng });
-            setData(data => ({ ...data, latitude: mockLat, longitude: mockLng, lokasi_absen: 'Kantor Utama' }));
-            setLocationStatus('dalam_radius');
-            setDistanceInfo('Menggunakan lokasi simulasi (Testing).');
+            setLocationStatus('error');
+            setDistanceInfo('Browser tidak mendukung Geolocation.');
         }
 
         startCamera();
@@ -138,26 +128,15 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
-        // Handle if camera is blocked/failed
-        if (video.videoWidth === 0) {
-            canvas.width = 400;
-            canvas.height = 300;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#cccccc';
-            ctx.fillRect(0, 0, 400, 300);
-            ctx.fillStyle = '#000000';
-            ctx.font = '20px Arial';
-            ctx.fillText('No Camera', 150, 150);
-        } else {
-            const MAX_WIDTH = 800;
-            const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
-            
-            canvas.width = video.videoWidth * scale;
-            canvas.height = video.videoHeight * scale;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        }
+        // Kompresi: Batasi dimensi maksimal gambar (misal lebar maks 800px)
+        const MAX_WIDTH = 800;
+        const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
+        
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         
         // Kompresi: Simpan sebagai JPEG dengan kualitas 70% (0.7)
         const base64Image = canvas.toDataURL('image/jpeg', 0.7);
@@ -253,10 +232,9 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                         </h2>
                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center">
                             <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center">
-                                {cameraActive ? (
-                                    <video ref={videoRef} autoPlay playsInline muted className="object-cover w-full h-full transform scale-x-[-1]"></video>
-                                ) : (
-                                    <CameraIcon className="text-gray-400 w-12 h-12" />
+                                <video ref={videoRef} autoPlay playsInline muted className={`object-cover w-full h-full transform scale-x-[-1] ${cameraActive ? 'block' : 'hidden'}`}></video>
+                                {!cameraActive && (
+                                    <CameraIcon className="text-gray-400 w-12 h-12 absolute" />
                                 )}
                             </div>
                             <canvas ref={canvasRef} className="hidden"></canvas>
@@ -268,7 +246,7 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                             {!isAbsenMasukDone ? (
                                 <button 
                                     onClick={() => takePhotoAndSubmit('masuk')}
-                                    disabled={locationStatus !== 'dalam_radius' || processing}
+                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive}
                                     className="w-full bg-[#1e40af] hover:bg-blue-800 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center space-x-2 transition shadow-md"
                                 >
                                     <CameraIcon className="w-5 h-5" />
@@ -277,7 +255,7 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                             ) : (
                                 <button 
                                     onClick={() => takePhotoAndSubmit('keluar')}
-                                    disabled={locationStatus !== 'dalam_radius' || processing}
+                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive}
                                     className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center space-x-2 transition shadow-md"
                                 >
                                     <CameraIcon className="w-5 h-5" />
