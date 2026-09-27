@@ -21,6 +21,8 @@ export default function UserCreate({ roles, divisiList }) {
         no_hp: '',
         alamat: '',
         mesin_pos: '',
+        shift_masuk: '07:00',
+        shift_keluar: '15:00',
     });
 
     const tipeGajis = ['borongan', 'harian', 'bulanan'];
@@ -238,6 +240,28 @@ export default function UserCreate({ roles, divisiList }) {
                                     onChange={e => setData('tarif_lembur', e.target.value)}
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Jadwal Jam Masuk</label>
+                                <input
+                                    type="time"
+                                    value={data.shift_masuk}
+                                    onChange={e => setData('shift_masuk', e.target.value)}
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                />
+                                {errors.shift_masuk && <p className="mt-2 text-sm text-red-600">{errors.shift_masuk}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Jadwal Jam Pulang</label>
+                                <input
+                                    type="time"
+                                    value={data.shift_keluar}
+                                    onChange={e => setData('shift_keluar', e.target.value)}
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-navy sm:text-sm sm:leading-6"
+                                />
+                                {errors.shift_keluar && <p className="mt-2 text-sm text-red-600">{errors.shift_keluar}</p>}
                             </div>
                             
                             <div>

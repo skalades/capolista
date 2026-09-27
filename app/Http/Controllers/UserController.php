@@ -60,6 +60,8 @@ class UserController extends Controller
             'no_hp'         => 'nullable|string|max:255',
             'alamat'        => 'nullable|string',
             'mesin_pos'     => 'nullable|string|max:255',
+            'shift_masuk'   => 'nullable|date_format:H:i',
+            'shift_keluar'  => 'nullable|date_format:H:i',
         ]);
 
         $user = User::create([
@@ -78,6 +80,8 @@ class UserController extends Controller
             'no_hp'         => $validated['no_hp'] ?? null,
             'alamat'        => $validated['alamat'] ?? null,
             'mesin_pos'     => $validated['mesin_pos'] ?? null,
+            'shift_masuk'   => $validated['shift_masuk'] ?? '07:00:00',
+            'shift_keluar'  => $validated['shift_keluar'] ?? '15:00:00',
         ]);
 
         $user->assignRole($validated['role']);
@@ -114,6 +118,8 @@ class UserController extends Controller
             'no_hp'         => 'nullable|string|max:255',
             'alamat'        => 'nullable|string',
             'mesin_pos'     => 'nullable|string|max:255',
+            'shift_masuk'   => 'nullable|date_format:H:i',
+            'shift_keluar'  => 'nullable|date_format:H:i',
         ]);
 
         $user->update([
@@ -131,6 +137,8 @@ class UserController extends Controller
             'no_hp'         => $validated['no_hp'] ?? null,
             'alamat'        => $validated['alamat'] ?? null,
             'mesin_pos'     => $validated['mesin_pos'] ?? null,
+            'shift_masuk'   => $validated['shift_masuk'] ?? '07:00:00',
+            'shift_keluar'  => $validated['shift_keluar'] ?? '15:00:00',
         ]);
 
         $user->syncRoles([$validated['role']]);

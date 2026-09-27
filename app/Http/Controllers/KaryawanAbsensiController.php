@@ -42,7 +42,9 @@ class KaryawanAbsensiController extends Controller
             'absensiHariIni' => $absensiHariIni,
             'riwayatMingguIni' => $riwayatMingguIni,
             'lokasiKantor' => $lokasiKantor,
-            'waktuSekarang' => Carbon::now()->format('H:i'),
+            'waktuSekarang' => Carbon::now()->format('H:i:s'),
+            'shiftMasuk' => $user->shift_masuk ?? '07:00:00',
+            'shiftKeluar' => $user->shift_keluar ?? '15:00:00',
         ]);
     }
 
@@ -118,6 +120,11 @@ class KaryawanAbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan absen keluar hari ini.');
         }
 
+        $shiftKeluarTime = Carbon::createFromFormat('H:i:s', $user->shift_keluar ?? '15:00:00');
+        if (Carbon::now()->lessThan($shiftKeluarTime)) {
+            return back()->with('error', 'Belum waktunya absen pulang. Jadwal pulang Anda pukul ' . $shiftKeluarTime->format('H:i') . '.');
+        }
+
         $fotoPath = $this->saveBase64Image($request->foto, 'keluar');
 
         $jamKeluar = Carbon::now();
@@ -126,8 +133,10 @@ class KaryawanAbsensiController extends Controller
         $absensi->longitude_keluar = $request->longitude;
         $absensi->foto_keluar      = $fotoPath;
 
-        // Kalkulasi lembur: jika keluar > 1 jam setelah shift berakhir (15:00)
-        $shiftEnd = Carbon::createFromFormat('H:i', '15:00');
+        // Kalkulasi lembur: jika keluar > 1 jam setelah shift berakhir
+        $shiftKeluar = $user->shift_keluar ?? '15:00:00';
+        $shiftEnd = Carbon::createFromFormat('H:i:s', $shiftKeluar);
+        
         if ($jamKeluar->greaterThan($shiftEnd->copy()->addHour())) {
             $diffMinutes       = $jamKeluar->diffInMinutes($shiftEnd);
             $absensi->jam_lembur = floor($diffMinutes / 60);

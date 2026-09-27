@@ -24,7 +24,7 @@ const STATUS_HADIR_MAP = {
     alpha:  { label: 'Alpha',  color: 'bg-red-100 text-red-800' },
 };
 
-export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKantor }) {
+export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKantor, waktuSekarang, shiftMasuk, shiftKeluar }) {
     const { auth, flash } = usePage().props;
     const [locationStatus, setLocationStatus] = useState('mencari');
     const [distanceInfo, setDistanceInfo] = useState('');
@@ -180,7 +180,7 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
         <MobileStaffLayout 
             title={`Absensi — ${auth.user.name}`}
             headerSubtitle={dayjs().format('dddd, DD MMMM YYYY')}
-            headerLabel="Shift pagi · 07.00–15.00"
+            headerLabel={`Jadwal Shift · ${shiftMasuk.substring(0,5)}–${shiftKeluar.substring(0,5)}`}
             activeTab="absensi" 
             setActiveTab={() => {}} 
             tabs={tabs}
@@ -255,11 +255,15 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                             ) : (
                                 <button 
                                     onClick={() => takePhotoAndSubmit('keluar')}
-                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive}
+                                    disabled={locationStatus !== 'dalam_radius' || processing || !cameraActive || waktuSekarang < shiftKeluar}
                                     className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl flex items-center justify-center space-x-2 transition shadow-md"
                                 >
                                     <CameraIcon className="w-5 h-5" />
-                                    <span>{processing ? 'Memproses...' : 'AMBIL SELFIE & ABSEN KELUAR'}</span>
+                                    <span>
+                                        {waktuSekarang < shiftKeluar 
+                                            ? `BELUM WAKTUNYA PULANG (${shiftKeluar.substring(0,5)})`
+                                            : processing ? 'Memproses...' : 'AMBIL SELFIE & ABSEN KELUAR'}
+                                    </span>
                                 </button>
                             )}
                         </div>
