@@ -142,7 +142,11 @@ export default function AbsensiRiwayat({ riwayat, divisiList, filters }) {
                         <button onClick={() => setSelectedPhoto(null)} className="text-gray-500 hover:text-gray-700">&times;</button>
                     </div>
                     {selectedPhoto && (
-                        <img src={selectedPhoto} alt="Bukti Kehadiran" className="w-full rounded-lg shadow-sm" />
+                        <img 
+                            src={selectedPhoto.startsWith('http') ? selectedPhoto : (selectedPhoto.startsWith('/') ? selectedPhoto : '/' + selectedPhoto)} 
+                            alt="Bukti Kehadiran" 
+                            className="w-full rounded-lg shadow-sm" 
+                        />
                     )}
                 </div>
             </Modal>
