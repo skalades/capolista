@@ -29,6 +29,19 @@ class KaryawanAbsensiController extends Controller
             ]
         ];
 
+        // Tambahkan lokasi cabang jika sudah di-set
+        $lat2Str = DB::table('system_settings')->where('key', 'hr.absensi.lat_2')->value('value');
+        $lng2Str = DB::table('system_settings')->where('key', 'hr.absensi.lng_2')->value('value');
+        $radius2 = DB::table('system_settings')->where('key', 'hr.absensi.radius_2')->value('value') ?? 100;
+
+        if ($lat2Str && $lng2Str) {
+            $lokasiKantor['Lokasi Cabang'] = [
+                'lat' => (float) $lat2Str,
+                'lng' => (float) $lng2Str,
+                'radius' => (int) $radius2,
+            ];
+        }
+
         $absensiHariIni = Absensi::where('karyawan_id', $user->id)
             ->where('tanggal', $today)
             ->first();
