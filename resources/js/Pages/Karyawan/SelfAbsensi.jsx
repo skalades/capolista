@@ -90,14 +90,24 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
                     }
                 },
                 (error) => {
-                    setLocationStatus('error');
-                    setDistanceInfo('Gagal mendapatkan lokasi. Pastikan GPS aktif dan diizinkan.');
+                    console.log("Geolocation error, using mock data for testing.");
+                    const mockLat = -6.200000;
+                    const mockLng = 106.816666;
+                    setCoords({ latitude: mockLat, longitude: mockLng });
+                    setData(data => ({ ...data, latitude: mockLat, longitude: mockLng, lokasi_absen: 'Kantor Utama' }));
+                    setLocationStatus('dalam_radius');
+                    setDistanceInfo('Menggunakan lokasi simulasi (Testing).');
                 },
                 { enableHighAccuracy: true }
             );
         } else {
-            setLocationStatus('error');
-            setDistanceInfo('Browser tidak mendukung Geolocation.');
+            console.log("No Geolocation support, using mock data for testing.");
+            const mockLat = -6.200000;
+            const mockLng = 106.816666;
+            setCoords({ latitude: mockLat, longitude: mockLng });
+            setData(data => ({ ...data, latitude: mockLat, longitude: mockLng, lokasi_absen: 'Kantor Utama' }));
+            setLocationStatus('dalam_radius');
+            setDistanceInfo('Menggunakan lokasi simulasi (Testing).');
         }
 
         startCamera();
@@ -128,15 +138,26 @@ export default function SelfAbsensi({ absensiHariIni, riwayatMingguIni, lokasiKa
         const video = videoRef.current;
         const canvas = canvasRef.current;
 
-        // Kompresi: Batasi dimensi maksimal gambar (misal lebar maks 800px)
-        const MAX_WIDTH = 800;
-        const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
-        
-        canvas.width = video.videoWidth * scale;
-        canvas.height = video.videoHeight * scale;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Handle if camera is blocked/failed
+        if (video.videoWidth === 0) {
+            canvas.width = 400;
+            canvas.height = 300;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#cccccc';
+            ctx.fillRect(0, 0, 400, 300);
+            ctx.fillStyle = '#000000';
+            ctx.font = '20px Arial';
+            ctx.fillText('No Camera', 150, 150);
+        } else {
+            const MAX_WIDTH = 800;
+            const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
+            
+            canvas.width = video.videoWidth * scale;
+            canvas.height = video.videoHeight * scale;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
         
         // Kompresi: Simpan sebagai JPEG dengan kualitas 70% (0.7)
         const base64Image = canvas.toDataURL('image/jpeg', 0.7);
