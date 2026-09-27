@@ -5,6 +5,7 @@ export default function HRTabs() {
     const navs = [
         { name: 'Daftar Gaji', href: route('hr.penggajian.index'), activeRoute: 'hr.penggajian.index' },
         { name: 'Input Absensi', href: route('hr.absensi.index'), activeRoute: 'hr.absensi.index' },
+        { name: 'Riwayat Harian', href: route('hr.absensi.riwayat'), activeRoute: 'hr.absensi.riwayat' },
         { name: 'Rekap Absensi', href: route('hr.absensi.rekap'), activeRoute: 'hr.absensi.rekap' },
         { name: 'Rekap Output', href: route('hr.output.rekap'), activeRoute: 'hr.output.rekap' },
     ];

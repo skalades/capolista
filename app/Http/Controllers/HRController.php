@@ -130,6 +130,58 @@ class HRController extends Controller
         ]);
     }
 
+    /**
+     * Riwayat detail absensi harian (termasuk foto, jam, lokasi, dan indikator telat).
+     */
+    public function absensiRiwayat(Request $request)
+    {
+        $tanggal = $request->input('tanggal', today()->toDateString());
+        $divisi  = $request->input('divisi', '');
+
+        $query = Absensi::with('karyawan')
+            ->where('tanggal', $tanggal);
+
+        if ($divisi) {
+            $query->whereHas('karyawan', fn($q) => $q->where('divisi', $divisi));
+        }
+
+        $riwayat = $query->get()->map(function ($absen) {
+            $shiftMasuk = $absen->karyawan->shift_masuk ?: '07:00:00';
+            $telatMenit = 0;
+            
+            if ($absen->status_hadir === Absensi::STATUS_HADIR && $absen->jam_masuk) {
+                try {
+                    $jamMasuk = \Carbon\Carbon::createFromFormat('H:i:s', $absen->jam_masuk);
+                    $batasMasuk = \Carbon\Carbon::createFromFormat('H:i:s', $shiftMasuk);
+                    if ($jamMasuk->greaterThan($batasMasuk)) {
+                        $telatMenit = $jamMasuk->diffInMinutes($batasMasuk);
+                    }
+                } catch (\Exception $e) {}
+            }
+
+            return [
+                'id' => $absen->id,
+                'karyawan' => $absen->karyawan->name,
+                'divisi' => $absen->karyawan->divisi,
+                'status_hadir' => $absen->status_hadir,
+                'jam_masuk' => $absen->jam_masuk,
+                'jam_keluar' => $absen->jam_keluar,
+                'foto_masuk' => $absen->foto_masuk,
+                'foto_keluar' => $absen->foto_keluar,
+                'lokasi_absen' => $absen->lokasi_absen,
+                'keterangan' => $absen->keterangan,
+                'shift_masuk' => $shiftMasuk,
+                'telat_menit' => $telatMenit,
+            ];
+        });
+
+        return Inertia::render('HR/AbsensiRiwayat', [
+            'riwayat' => $riwayat,
+            'divisiList' => User::DIVISI_LIST,
+            'filters' => ['tanggal' => $tanggal, 'divisi' => $divisi],
+        ]);
+    }
+
     // ===========================
     // PENGGAJIAN
     // ===========================

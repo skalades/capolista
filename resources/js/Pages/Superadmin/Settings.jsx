@@ -101,6 +101,20 @@ export default function Settings({ auth, settings }) {
                                                     hover:file:bg-navy/20 cursor-pointer"
                                                 />
                                             </div>
+                                        ) : setting.type === 'boolean' ? (
+                                            <select
+                                                id={setting.key}
+                                                className="mt-1 block w-full border-gray-300 focus:border-brand-500 focus:ring-brand-500 rounded-md shadow-sm text-sm"
+                                                value={setting.value || '0'}
+                                                onChange={(e) => {
+                                                    const newSettings = [...data.settings];
+                                                    newSettings[setting.originalIndex].value = e.target.value;
+                                                    setData('settings', newSettings);
+                                                }}
+                                            >
+                                                <option value="0">Tidak Aktif</option>
+                                                <option value="1">Aktif</option>
+                                            </select>
                                         ) : null}
                                     </div>
                                 ))}

@@ -37,7 +37,7 @@ class PenggajianService
             $tipeGaji = $karyawan->tipe_gaji ?? 'bulanan';
 
             // Hitung rekap absensi
-            $absensiData = $this->hitungAbsensi($karyawan->id, $periodeMulai, $periodeSelesai);
+            $absensiData = $this->hitungAbsensi($karyawan, $periodeMulai, $periodeSelesai);
 
             // Hitung upah berdasarkan tipe
             $kalkulasi = match ($tipeGaji) {
@@ -46,6 +46,32 @@ class PenggajianService
                 'bulanan'  => $this->hitungBulanan($karyawan, $absensiData),
                 default    => $this->hitungBulanan($karyawan, $absensiData),
             };
+
+            // Hitung Denda Telat
+            $dendaTelatAktif = \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'hr.absensi.denda_telat_aktif')->value('value') == '1';
+            $dendaPerMenit = (float) \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'hr.absensi.denda_telat_per_menit')->value('value');
+            
+            if ($dendaTelatAktif && $absensiData['total_menit_telat'] > 0 && $dendaPerMenit > 0) {
+                $totalDendaTelat = $absensiData['total_menit_telat'] * $dendaPerMenit;
+                $kalkulasi['potongan'] = ($kalkulasi['potongan'] ?? 0) + $totalDendaTelat;
+                
+                if (isset($kalkulasi['catatan_potongan']) && $kalkulasi['catatan_potongan']) {
+                    $kalkulasi['catatan_potongan'] .= " | Denda Telat {$absensiData['total_menit_telat']} menit × Rp " . number_format($dendaPerMenit, 0, ',', '.');
+                } else {
+                    $kalkulasi['catatan_potongan'] = "Denda Telat {$absensiData['total_menit_telat']} menit × Rp " . number_format($dendaPerMenit, 0, ',', '.');
+                }
+
+                $kalkulasi['items'][] = [
+                    'tipe_item'    => PenggajianItem::TIPE_POTONGAN,
+                    'tanggal'      => null,
+                    'order_id'     => null,
+                    'jenis_produk' => null,
+                    'pcs'          => null,
+                    'tarif'        => $dendaPerMenit,
+                    'subtotal'     => $totalDendaTelat,
+                    'keterangan'   => "Denda Telat {$absensiData['total_menit_telat']} menit",
+                ];
+            }
 
             $totalUpahKotor = $kalkulasi['upah_pokok'] + $kalkulasi['upah_lembur'] + ($kalkulasi['tunjangan'] ?? 0);
             $potongan        = $kalkulasi['potongan'] ?? 0;
@@ -85,11 +111,26 @@ class PenggajianService
     /**
      * Hitung rekap absensi karyawan dalam periode.
      */
-    private function hitungAbsensi(int $karyawanId, string $mulai, string $selesai): array
+    private function hitungAbsensi(User $karyawan, string $mulai, string $selesai): array
     {
-        $rows = Absensi::where('karyawan_id', $karyawanId)
+        $rows = Absensi::where('karyawan_id', $karyawan->id)
             ->whereBetween('tanggal', [$mulai, $selesai])
             ->get();
+
+        $shiftMasukStr = $karyawan->shift_masuk ?: '07:00:00';
+        $shiftMasukTime = \Carbon\Carbon::createFromFormat('H:i:s', $shiftMasukStr);
+        $totalMenitTelat = 0;
+
+        foreach ($rows as $row) {
+            if ($row->status_hadir === Absensi::STATUS_HADIR && $row->jam_masuk) {
+                try {
+                    $jamMasukReal = \Carbon\Carbon::createFromFormat('H:i:s', $row->jam_masuk);
+                    if ($jamMasukReal->greaterThan($shiftMasukTime)) {
+                        $totalMenitTelat += $jamMasukReal->diffInMinutes($shiftMasukTime);
+                    }
+                } catch (\Exception $e) {}
+            }
+        }
 
         return [
             'hadir'           => $rows->where('status_hadir', Absensi::STATUS_HADIR)->count(),
@@ -97,6 +138,7 @@ class PenggajianService
             'sakit'           => $rows->where('status_hadir', Absensi::STATUS_SAKIT)->count(),
             'alpha'           => $rows->where('status_hadir', Absensi::STATUS_ALPHA)->count(),
             'total_jam_lembur' => (float) $rows->sum('jam_lembur'),
+            'total_menit_telat'=> $totalMenitTelat,
             'rows'            => $rows,
         ];
     }

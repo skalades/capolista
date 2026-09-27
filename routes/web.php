@@ -194,6 +194,8 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::post('/absensi', [HRController::class, 'absensiStore'])->name('absensi.store');
         Route::get('/absensi/rekap', [HRController::class, 'absensiRekap'])->name('absensi.rekap');
 
+        Route::get('/absensi/riwayat', [HRController::class, 'absensiRiwayat'])->name('absensi.riwayat');
+
         // Penggajian
         Route::get('/penggajian', [HRController::class, 'penggajianIndex'])->name('penggajian.index');
         Route::get('/penggajian/create', [HRController::class, 'penggajianCreate'])->name('penggajian.create');
