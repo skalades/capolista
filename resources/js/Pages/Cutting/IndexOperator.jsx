@@ -141,6 +141,17 @@ export default function IndexOperator({ myAssigns, todayOutputs, recentOutputs, 
                                                 </div>
                                             </div>
                                             
+                                            {(ord.catatan || ord.catatan_produksi || ord.catatan_desain) && (
+                                                <div className="mt-2.5 mb-2 p-2.5 bg-amber-50 rounded border border-amber-200 text-xs text-amber-900">
+                                                    <div className="font-bold flex items-center gap-1 text-[11px] uppercase tracking-wider text-amber-800 mb-1">
+                                                        <span>Catatan Order:</span>
+                                                    </div>
+                                                    {ord.catatan && <p className="whitespace-pre-line mb-1"><span className="font-semibold">Umum:</span> {ord.catatan}</p>}
+                                                    {ord.catatan_produksi && <p className="whitespace-pre-line mb-1"><span className="font-semibold">Produksi:</span> {ord.catatan_produksi}</p>}
+                                                    {ord.catatan_desain && <p className="whitespace-pre-line"><span className="font-semibold">Desain:</span> {ord.catatan_desain}</p>}
+                                                </div>
+                                            )}
+
                                             {ord.items && ord.items.length > 0 && (
                                                 <div className="mt-3 border-t pt-3">
                                                     <div className="text-xs font-semibold text-gray-800 mb-2">Input Ukuran yang Dicutting:</div>

@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
 import StatusTimeline from '@/Components/StatusTimeline';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function Show({ order }) {
   const pemasangan = order.pemasangan || {};
@@ -54,12 +55,18 @@ export default function Show({ order }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <Card title="Info Order">
-            <div className="grid grid-cols-2 gap-4">
-              <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium">{order.customer?.nama}</p></div>
-              <div><p className="text-sm text-gray-500">Jenis Produk</p><p className="font-medium">{order.jenis_produk}</p></div>
-              <div><p className="text-sm text-gray-500">Jumlah</p><p className="font-medium">{order.jumlah}</p></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium text-ink">{order.customer?.nama || '-'}</p></div>
+              <div><p className="text-sm text-gray-500">Jenis Produk</p><p className="font-medium text-ink">{order.jenis_produk}</p></div>
+              <div><p className="text-sm text-gray-500">Jumlah</p><p className="font-medium text-ink">{order.jumlah} pcs</p></div>
+              <div>
+                <p className="text-sm text-gray-500">Deadline</p>
+                <p className="font-medium text-danger">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID') : '-'}</p>
+              </div>
             </div>
           </Card>
+
+          <OrderNotesSection order={order} title="Catatan Order untuk Divisi Pemasangan" />
 
           <Card title="Parameter Pemasangan">
             <form onSubmit={handleUpdate} className="space-y-4">

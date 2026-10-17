@@ -21,6 +21,7 @@ export default function OrderCreate({ customers = [] }) {
         total_harga: '',
         dp: '',
         catatan_desain: '',
+        catatan_produksi: '',
         catatan: '',
     });
 
@@ -410,10 +411,22 @@ export default function OrderCreate({ customers = [] }) {
                     {/* CATATAN */}
                     <div className="bg-panel rounded-md border border-line p-6 shadow-sm">
                         <h2 className="font-oswald text-[18px] font-bold text-ink mb-4 pb-2 border-b border-line uppercase tracking-wide">
-                            Catatan
+                            Catatan Order & Instruksi Divisi
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
+                                    Catatan Order (Umum / Kustomer)
+                                </label>
+                                <textarea
+                                    rows={3}
+                                    value={data.catatan}
+                                    onChange={e => setData('catatan', e.target.value)}
+                                    placeholder="Catatan umum order dari pelanggan / CS..."
+                                    className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2 resize-none"
+                                />
+                            </div>
                             <div>
                                 <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
                                     Catatan Desain
@@ -428,13 +441,13 @@ export default function OrderCreate({ customers = [] }) {
                             </div>
                             <div>
                                 <label className="block text-[11px] font-medium text-ink-soft uppercase tracking-wider mb-1.5">
-                                    Catatan Tambahan (Internal/Produksi)
+                                    Catatan Produksi
                                 </label>
                                 <textarea
                                     rows={3}
-                                    value={data.catatan}
-                                    onChange={e => setData('catatan', e.target.value)}
-                                    placeholder="Catatan untuk bagian produksi atau admin..."
+                                    value={data.catatan_produksi}
+                                    onChange={e => setData('catatan_produksi', e.target.value)}
+                                    placeholder="Instruksi khusus produksi (bahan, cutting, jahit, finishing)..."
                                     className="block w-full border-line bg-white rounded-md text-[13px] text-ink focus:ring-navy focus:border-navy py-2 resize-none"
                                 />
                             </div>

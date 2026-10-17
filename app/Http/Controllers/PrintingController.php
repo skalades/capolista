@@ -46,16 +46,17 @@ class PrintingController extends Controller
     public function update(Request $request, Printing $printing)
     {
         $request->validate([
-            'metode_cetak'    => 'required|in:sablon,dtf,dtg',
-            'jumlah_warna'    => 'nullable|integer|min:1',
-            'estimasi_selesai'=> 'nullable|date',
-            'tanggal_mulai'   => 'nullable|date',
+            'metode_cetak'     => 'required|in:sablon,dtf,dtg',
+            'jumlah_warna'     => 'nullable|integer|min:1',
+            'estimasi_cetak'   => 'nullable|date',
+            'estimasi_selesai' => 'nullable|date',
+            'tanggal_mulai'    => 'nullable|date',
         ]);
 
         $printing->update([
-            ...$request->only(['metode_cetak', 'jumlah_warna', 'estimasi_selesai', 'tanggal_mulai']),
-            'status'           => 'proses',
-            'dikerjakan_oleh'  => auth()->id(),
+            ...$request->only(['metode_cetak', 'jumlah_warna', 'estimasi_cetak', 'estimasi_selesai', 'tanggal_mulai']),
+            'status'                   => 'proses',
+            'printing_dikerjakan_oleh' => auth()->id(),
         ]);
 
         return back()->with('success', 'Detail printing diperbarui.');

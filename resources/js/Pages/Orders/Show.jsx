@@ -15,6 +15,7 @@ import {
     CheckCircleIcon,
     ClockIcon
 } from '@heroicons/react/24/outline';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 const STATUS_SEMANTICS = {
     draft: 'neutral', desain: 'neutral', procurement: 'gold',
@@ -221,6 +222,9 @@ export default function OrderShow({ order = {} }) {
                                 </div>
                             </div>
                         </div>
+
+                        {/* CATATAN ORDER */}
+                        <OrderNotesSection order={o} />
 
                         {/* FINANSIAL */}
                         <div className="bg-panel rounded-md border border-line shadow-sm overflow-hidden">

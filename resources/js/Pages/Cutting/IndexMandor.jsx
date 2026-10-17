@@ -13,6 +13,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 import EmptyState from '@/Components/EmptyState';
 import { UserGroupIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function IndexMandor({ ordersCutting, operatorList, stats, progresPemotong, catatanReject, menungguApproval }) {
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -300,9 +301,11 @@ export default function IndexMandor({ ordersCutting, operatorList, stats, progre
                             <Card className="sticky top-8">
                                 <div className="text-[11px] font-mono text-ink-soft mb-1">{selectedOrder.no_order}</div>
                                 <h3 className="font-bold font-oswald text-[20px] text-ink mb-1">{selectedOrder.customer?.nama}</h3>
-                                <div className="text-[12px] text-ink-soft mb-6">
+                                <div className="text-[12px] text-ink-soft mb-4">
                                     {selectedOrder.jenis_produk} • {selectedOrder.jumlah} pcs • deadline {new Date(selectedOrder.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                                 </div>
+
+                                <OrderNotesSection order={selectedOrder} className="mb-6 !p-3.5" />
 
                                 {(!selectedOrder.cutting_assigns || !selectedOrder.cutting_assigns.some(a => a.is_active)) ? (
                                     <div className="bg-bg p-5 rounded border border-line">

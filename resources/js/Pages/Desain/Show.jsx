@@ -5,6 +5,7 @@ import Badge from '@/Components/Badge';
 import Card from '@/Components/Card';
 import StatusTimeline from '@/Components/StatusTimeline';
 import ConfirmModal from '@/Components/ConfirmModal';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 const DESAIN_STATUS_COLORS = { menunggu: 'gray', dikerjakan: 'blue', revisi: 'yellow', disetujui: 'green' };
 const DESAIN_STATUS_LABELS = { menunggu: 'Menunggu', dikerjakan: 'Dikerjakan', revisi: 'Revisi', disetujui: 'Disetujui' };
@@ -66,11 +67,9 @@ export default function Show({ order }) {
                 <p className="font-medium">{new Date(order.deadline).toLocaleDateString('id-ID')}</p>
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">Catatan Desain</p>
-              <p className="whitespace-pre-line text-sm mt-1">{order.catatan_desain || '-'}</p>
-            </div>
           </Card>
+
+          <OrderNotesSection order={order} title="Catatan Order untuk Divisi Desain" />
 
           <Card title="Mockup Desain">
             {order.desain ? (

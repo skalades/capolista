@@ -44,6 +44,7 @@ export default function OrderEdit({ order, customers = [] }) {
         total_harga: order?.total_harga ? parseInt(order.total_harga, 10) : '',
         dp: order?.dp !== undefined && order?.dp !== null ? parseInt(order.dp, 10) : '',
         catatan_desain: order?.catatan_desain || '',
+        catatan_produksi: order?.catatan_produksi || '',
         catatan: order?.catatan || '',
     });
 
@@ -333,21 +334,34 @@ export default function OrderEdit({ order, customers = [] }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Desain</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Order (Umum / Kustomer)</label>
                                 <textarea
                                     rows={3}
-                                    value={data.catatan_desain}
-                                    onChange={e => setData('catatan_desain', e.target.value)}
+                                    value={data.catatan}
+                                    onChange={e => setData('catatan', e.target.value)}
+                                    placeholder="Catatan umum order dari pelanggan / CS..."
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Umum</label>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Desain</label>
                                 <textarea
                                     rows={3}
-                                    value={data.catatan}
-                                    onChange={e => setData('catatan', e.target.value)}
+                                    value={data.catatan_desain}
+                                    onChange={e => setData('catatan_desain', e.target.value)}
+                                    placeholder="Instruksi khusus desain (warna, sablon, letak logo, dll)..."
+                                    className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium leading-6 text-gray-900">Catatan Produksi</label>
+                                <textarea
+                                    rows={3}
+                                    value={data.catatan_produksi}
+                                    onChange={e => setData('catatan_produksi', e.target.value)}
+                                    placeholder="Instruksi khusus produksi (bahan, cutting, jahit, finishing)..."
                                     className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6"
                                 />
                             </div>

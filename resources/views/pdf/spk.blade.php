@@ -124,13 +124,16 @@
             </tbody>
         </table>
         
-        @if($order->catatan || $order->catatan_desain)
+        @if($order->catatan || $order->catatan_desain || $order->catatan_produksi)
         <div style="margin-bottom: 25px;">
             @if($order->catatan)
-            <div style="margin-bottom: 10px; font-size: 12px;"><strong>Catatan Umum/Produksi:</strong> {{ $order->catatan }}</div>
+            <div style="margin-bottom: 8px; font-size: 12px;"><strong>Catatan Order:</strong> {{ $order->catatan }}</div>
             @endif
             @if($order->catatan_desain)
-            <div style="font-size: 12px;"><strong>Catatan Desain:</strong> {{ $order->catatan_desain }}</div>
+            <div style="margin-bottom: 8px; font-size: 12px;"><strong>Catatan Desain:</strong> {{ $order->catatan_desain }}</div>
+            @endif
+            @if($order->catatan_produksi)
+            <div style="margin-bottom: 8px; font-size: 12px;"><strong>Catatan Produksi:</strong> {{ $order->catatan_produksi }}</div>
             @endif
         </div>
         @endif

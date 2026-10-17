@@ -5,6 +5,7 @@ import Card from '@/Components/Card';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function Show({ order, operatorList }) {
     const { data: assignData, setData: setAssignData, post: postAssign, processing: assignProcessing, reset: resetAssign } = useForm({
@@ -71,6 +72,8 @@ export default function Show({ order, operatorList }) {
                         </form>
                     </Card>
                 </div>
+
+                <OrderNotesSection order={order} title="Catatan Order untuk Divisi Jahit" />
 
                 <Card title="Operator Ditugaskan (Assign)">
                     {order.jahit_assigns && order.jahit_assigns.length > 0 ? (

@@ -16,6 +16,7 @@ class Printing extends Model
         'order_id',
         'metode_cetak',
         'jumlah_warna',
+        'estimasi_cetak',
         'estimasi_selesai',
         'tanggal_mulai',
         'tanggal_selesai',
@@ -27,6 +28,7 @@ class Printing extends Model
     ];
 
     protected $casts = [
+        'estimasi_cetak' => 'date',
         'estimasi_selesai' => 'date',
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',

@@ -35,6 +35,7 @@ class UpdateOrderRequest extends FormRequest
             'total_harga'    => 'required|numeric|min:0',
             'dp'             => 'nullable|numeric|min:0',
             'catatan_desain' => 'nullable|string',
+            'catatan_produksi' => 'nullable|string',
             'catatan'        => 'nullable|string',
         ];
     }

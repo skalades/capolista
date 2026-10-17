@@ -5,6 +5,7 @@ import Card from '@/Components/Card';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import Badge from '@/Components/Badge';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function Show({ order }) {
     const defaultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
@@ -94,16 +95,10 @@ export default function Show({ order }) {
                                         {order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                                     </dd>
                                 </div>
-                                {order.catatan_produksi && (
-                                    <div>
-                                        <dt className="text-[11px] font-bold text-ink-soft uppercase tracking-wider mb-1">Catatan Produksi</dt>
-                                        <dd className="bg-gold/10 p-3 border border-gold/30 rounded text-[12px] text-gold mt-1 leading-relaxed">
-                                            {order.catatan_produksi}
-                                        </dd>
-                                    </div>
-                                )}
                             </dl>
                         </Card>
+
+                        <OrderNotesSection order={order} title="Catatan Order untuk Cutting" />
 
                         <Card title="Target Ukuran (SPK)">
                             <ul className="divide-y divide-line text-[13px]">

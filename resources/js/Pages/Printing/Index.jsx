@@ -40,31 +40,55 @@ export default function Index({ orders, filters }) {
                       <Table.HeadCell>Jenis Produk</Table.HeadCell>
                       <Table.HeadCell>Jumlah</Table.HeadCell>
                       <Table.HeadCell>Metode Cetak</Table.HeadCell>
+                      <Table.HeadCell>Est. Cetak</Table.HeadCell>
                       <Table.HeadCell>Est. Selesai</Table.HeadCell>
+                      <Table.HeadCell>Catatan Order</Table.HeadCell>
                       <Table.HeadCell>Status Printing</Table.HeadCell>
                       <Table.HeadCell className="text-right">Aksi</Table.HeadCell>
                   </Table.Head>
                   <Table.Body>
-                    {orders.data.map((order) => (
-                      <Table.Row key={order.id}>
-                        <Table.Cell className="font-medium font-mono text-[12px]">{order.no_order}</Table.Cell>
-                        <Table.Cell className="font-bold text-ink">{order.customer?.nama}</Table.Cell>
-                        <Table.Cell>{order.jenis_produk}</Table.Cell>
-                        <Table.Cell className="font-bold text-ink">{order.jumlah} pcs</Table.Cell>
-                        <Table.Cell>{order.printing?.metode_cetak || '-'}</Table.Cell>
-                        <Table.Cell>{order.printing?.estimasi_selesai ? new Date(order.printing.estimasi_selesai).toLocaleDateString('id-ID') : '-'}</Table.Cell>
-                        <Table.Cell>
-                          <Badge status={PRINTING_STATUS_COLORS[order.printing?.status || 'menunggu']}>
-                            {PRINTING_STATUS_LABELS[order.printing?.status || 'menunggu']}
-                          </Badge>
-                        </Table.Cell>
-                        <Table.Cell className="text-right">
-                          <Link href={route('printing.show', order.id)} className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-line/20 hover:border-navy transition-colors">
-                            Detail
-                          </Link>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
+                    {orders.data.map((order) => {
+                      const catatanCombined = [
+                        order.catatan ? `Order: ${order.catatan}` : null,
+                        order.catatan_desain ? `Desain: ${order.catatan_desain}` : null,
+                        order.catatan_produksi ? `Produksi: ${order.catatan_produksi}` : null,
+                      ].filter(Boolean).join(' | ');
+
+                      return (
+                        <Table.Row key={order.id}>
+                          <Table.Cell className="font-medium font-mono text-[12px]">{order.no_order}</Table.Cell>
+                          <Table.Cell className="font-bold text-ink">{order.customer?.nama || '-'}</Table.Cell>
+                          <Table.Cell>{order.jenis_produk}</Table.Cell>
+                          <Table.Cell className="font-bold text-ink">{order.jumlah} pcs</Table.Cell>
+                          <Table.Cell>{order.printing?.metode_cetak || '-'}</Table.Cell>
+                          <Table.Cell className="text-ink font-medium">
+                            {order.printing?.estimasi_cetak ? new Date(order.printing.estimasi_cetak).toLocaleDateString('id-ID') : '-'}
+                          </Table.Cell>
+                          <Table.Cell className="text-ink font-medium">
+                            {order.printing?.estimasi_selesai ? new Date(order.printing.estimasi_selesai).toLocaleDateString('id-ID') : '-'}
+                          </Table.Cell>
+                          <Table.Cell className="max-w-xs">
+                            {catatanCombined ? (
+                              <span className="text-[11px] text-amber-900 bg-amber-50 px-2 py-1 rounded border border-amber-200 line-clamp-2 block" title={catatanCombined}>
+                                {catatanCombined}
+                              </span>
+                            ) : (
+                              <span className="text-ink-lighter text-[11px]">-</span>
+                            )}
+                          </Table.Cell>
+                          <Table.Cell>
+                            <Badge status={PRINTING_STATUS_COLORS[order.printing?.status || 'menunggu']}>
+                              {PRINTING_STATUS_LABELS[order.printing?.status || 'menunggu']}
+                            </Badge>
+                          </Table.Cell>
+                          <Table.Cell className="text-right">
+                            <Link href={route('printing.show', order.id)} className="inline-flex items-center justify-center rounded bg-panel border border-line px-3 py-1.5 text-[12px] font-medium text-ink hover:bg-line/20 hover:border-navy transition-colors">
+                              Detail
+                            </Link>
+                          </Table.Cell>
+                        </Table.Row>
+                      );
+                    })}
                   </Table.Body>
                 </Table>
                 <div className="p-4 border-t border-line bg-panel">

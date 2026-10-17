@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
 import StatusTimeline from '@/Components/StatusTimeline';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function Show({ order }) {
   const printing = order.printing || {};
@@ -12,6 +13,7 @@ export default function Show({ order }) {
   const { data: updateData, setData: setUpdateData, patch: patchUpdate, processing: updateProcessing, errors: updateErrors } = useForm({
     metode_cetak: printing.metode_cetak || '',
     jumlah_warna: printing.jumlah_warna || '',
+    estimasi_cetak: formatDateForInput(printing.estimasi_cetak),
     estimasi_selesai: formatDateForInput(printing.estimasi_selesai),
     tanggal_mulai: formatDateForInput(printing.tanggal_mulai),
   });
@@ -43,16 +45,23 @@ export default function Show({ order }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <Card title="Info Order">
-            <div className="grid grid-cols-2 gap-4">
-              <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium">{order.customer?.nama}</p></div>
-              <div><p className="text-sm text-gray-500">Jenis Produk</p><p className="font-medium">{order.jenis_produk}</p></div>
-              <div><p className="text-sm text-gray-500">Jumlah</p><p className="font-medium">{order.jumlah}</p></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div><p className="text-sm text-gray-500">Customer</p><p className="font-medium text-ink">{order.customer?.nama || '-'}</p></div>
+              <div><p className="text-sm text-gray-500">Jenis Produk</p><p className="font-medium text-ink">{order.jenis_produk}</p></div>
+              <div><p className="text-sm text-gray-500">Jumlah</p><p className="font-medium text-ink">{order.jumlah} pcs</p></div>
+              <div>
+                <p className="text-sm text-gray-500">Deadline Order</p>
+                <p className="font-medium text-danger">{order.deadline ? new Date(order.deadline).toLocaleDateString('id-ID') : '-'}</p>
+              </div>
             </div>
           </Card>
 
-          <Card title="Detail Printing">
+          {/* CATATAN ORDER UNTUK DIVISI PRINTING */}
+          <OrderNotesSection order={order} title="Catatan Order untuk Divisi Printing" />
+
+          <Card title="Detail Printing & Estimasi">
             <form onSubmit={handleUpdate} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Metode Cetak</label>
                   <select value={updateData.metode_cetak} onChange={e => setUpdateData('metode_cetak', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
@@ -69,14 +78,19 @@ export default function Show({ order }) {
                   {updateErrors.jumlah_warna && <p className="text-red-500 text-xs mt-1">{updateErrors.jumlah_warna}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                  <input type="date" value={updateData.tanggal_mulai} onChange={e => setUpdateData('tanggal_mulai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
-                  {updateErrors.tanggal_mulai && <p className="text-red-500 text-xs mt-1">{updateErrors.tanggal_mulai}</p>}
+                  <label className="block text-sm font-medium text-gray-700">Estimasi Cetak (Mulai)</label>
+                  <input type="date" value={updateData.estimasi_cetak} onChange={e => setUpdateData('estimasi_cetak', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
+                  {updateErrors.estimasi_cetak && <p className="text-red-500 text-xs mt-1">{updateErrors.estimasi_cetak}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Estimasi Selesai</label>
                   <input type="date" value={updateData.estimasi_selesai} onChange={e => setUpdateData('estimasi_selesai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
                   {updateErrors.estimasi_selesai && <p className="text-red-500 text-xs mt-1">{updateErrors.estimasi_selesai}</p>}
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">Realisasi Tanggal Mulai (Opsional)</label>
+                  <input type="date" value={updateData.tanggal_mulai} onChange={e => setUpdateData('tanggal_mulai', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm" />
+                  {updateErrors.tanggal_mulai && <p className="text-red-500 text-xs mt-1">{updateErrors.tanggal_mulai}</p>}
                 </div>
               </div>
               {printing.status !== 'selesai' && (

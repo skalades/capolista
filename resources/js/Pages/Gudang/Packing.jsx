@@ -3,6 +3,7 @@ import { Link, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import Card from '@/Components/Card';
 import StatusTimeline from '@/Components/StatusTimeline';
+import OrderNotesSection from '@/Components/OrderNotesSection';
 
 export default function Packing({ order }) {
   const packing = order.packing || {};
@@ -76,6 +77,8 @@ export default function Packing({ order }) {
               </a>
             </div>
           </Card>
+
+          <OrderNotesSection order={order} title="Catatan Order untuk Divisi Packing / Pengiriman" />
 
           <Card title="Checklist Packing">
             <div className="space-y-3">

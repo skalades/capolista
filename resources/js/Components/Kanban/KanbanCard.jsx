@@ -17,9 +17,15 @@ export default function KanbanCard({ order, imagePlaceholder, badgeText, badgeSt
             
             <div className="font-mono text-[11.5px] text-ink-soft mb-1">{order.no_order}</div>
             <h4 className="font-semibold font-sans text-ink text-[13px] mb-1 line-clamp-1">{order.customer?.nama || 'Tanpa Customer'}</h4>
-            <div className="text-[12px] text-ink-soft mb-3 line-clamp-1 font-sans">
+            <div className="text-[12px] text-ink-soft mb-2 line-clamp-1 font-sans">
                 {order.jenis_produk} &bull; {order.jumlah} pcs
             </div>
+
+            {(order.catatan || order.catatan_produksi || order.catatan_desain) && (
+                <div className="mb-2 text-[11px] text-amber-800 bg-amber-50/80 px-2 py-0.5 rounded border border-amber-200 line-clamp-1" title={order.catatan || order.catatan_produksi || order.catatan_desain}>
+                    📝 {order.catatan || order.catatan_produksi || order.catatan_desain}
+                </div>
+            )}
             
             <div className="flex justify-between items-center mt-2 border-t border-line/50 pt-2">
                 {badgeText ? (
